@@ -6,3 +6,13 @@ experiments/
 *.ckpt
 .env
 
+# Ignore Python Environment Folders
+venv/
+env/
+.idea/
+.vscode/
+.ipynb_checkpoints/
+.DS_Store
+logs/
+edge_glass_env/
+
