@@ -1,0 +1,13 @@
+device: "cuda"        # or "cpu" for quick local tests
+dtype: "fp16"         # fp32 | fp16 | bf16
+seeds:
+  python: 1337
+  torch: 1337
+paths:
+  data: "./data"
+  out: "./experiments"
+  embeds: "./experiments/embeddings"
+encoders:
+  vision: "openai/clip-vit-base-patch32"
+  text: "sentence-transformers/all-MiniLM-L6-v2"
+  audio: "openai/whisper-small"
