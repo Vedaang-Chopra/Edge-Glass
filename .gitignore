@@ -16,3 +16,6 @@ env/
 logs/
 edge_glass_env/
 
+
+
+code_base/notebooks/freeze_align_poc/data/
