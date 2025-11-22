@@ -1,0 +1,2702 @@
+[
+  {
+    "orig_idx": 32,
+    "file": "perceiver_alignment_experiment/features/val_feat_32.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 33,
+    "file": "perceiver_alignment_experiment/features/val_feat_33.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 34,
+    "file": "perceiver_alignment_experiment/features/val_feat_34.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 35,
+    "file": "perceiver_alignment_experiment/features/val_feat_35.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 36,
+    "file": "perceiver_alignment_experiment/features/val_feat_36.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 37,
+    "file": "perceiver_alignment_experiment/features/val_feat_37.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 38,
+    "file": "perceiver_alignment_experiment/features/val_feat_38.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 39,
+    "file": "perceiver_alignment_experiment/features/val_feat_39.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 40,
+    "file": "perceiver_alignment_experiment/features/val_feat_40.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 41,
+    "file": "perceiver_alignment_experiment/features/val_feat_41.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 42,
+    "file": "perceiver_alignment_experiment/features/val_feat_42.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 43,
+    "file": "perceiver_alignment_experiment/features/val_feat_43.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 45,
+    "file": "perceiver_alignment_experiment/features/val_feat_45.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 46,
+    "file": "perceiver_alignment_experiment/features/val_feat_46.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 47,
+    "file": "perceiver_alignment_experiment/features/val_feat_47.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 48,
+    "file": "perceiver_alignment_experiment/features/val_feat_48.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 49,
+    "file": "perceiver_alignment_experiment/features/val_feat_49.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 50,
+    "file": "perceiver_alignment_experiment/features/val_feat_50.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 51,
+    "file": "perceiver_alignment_experiment/features/val_feat_51.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 53,
+    "file": "perceiver_alignment_experiment/features/val_feat_53.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 54,
+    "file": "perceiver_alignment_experiment/features/val_feat_54.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 55,
+    "file": "perceiver_alignment_experiment/features/val_feat_55.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 57,
+    "file": "perceiver_alignment_experiment/features/val_feat_57.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 58,
+    "file": "perceiver_alignment_experiment/features/val_feat_58.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 59,
+    "file": "perceiver_alignment_experiment/features/val_feat_59.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 60,
+    "file": "perceiver_alignment_experiment/features/val_feat_60.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 61,
+    "file": "perceiver_alignment_experiment/features/val_feat_61.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 62,
+    "file": "perceiver_alignment_experiment/features/val_feat_62.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 63,
+    "file": "perceiver_alignment_experiment/features/val_feat_63.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 64,
+    "file": "perceiver_alignment_experiment/features/val_feat_64.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 65,
+    "file": "perceiver_alignment_experiment/features/val_feat_65.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 66,
+    "file": "perceiver_alignment_experiment/features/val_feat_66.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 67,
+    "file": "perceiver_alignment_experiment/features/val_feat_67.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 69,
+    "file": "perceiver_alignment_experiment/features/val_feat_69.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 70,
+    "file": "perceiver_alignment_experiment/features/val_feat_70.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 71,
+    "file": "perceiver_alignment_experiment/features/val_feat_71.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 72,
+    "file": "perceiver_alignment_experiment/features/val_feat_72.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 73,
+    "file": "perceiver_alignment_experiment/features/val_feat_73.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 75,
+    "file": "perceiver_alignment_experiment/features/val_feat_75.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 76,
+    "file": "perceiver_alignment_experiment/features/val_feat_76.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 77,
+    "file": "perceiver_alignment_experiment/features/val_feat_77.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 78,
+    "file": "perceiver_alignment_experiment/features/val_feat_78.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 79,
+    "file": "perceiver_alignment_experiment/features/val_feat_79.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 80,
+    "file": "perceiver_alignment_experiment/features/val_feat_80.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 82,
+    "file": "perceiver_alignment_experiment/features/val_feat_82.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 83,
+    "file": "perceiver_alignment_experiment/features/val_feat_83.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 84,
+    "file": "perceiver_alignment_experiment/features/val_feat_84.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 85,
+    "file": "perceiver_alignment_experiment/features/val_feat_85.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 87,
+    "file": "perceiver_alignment_experiment/features/val_feat_87.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 88,
+    "file": "perceiver_alignment_experiment/features/val_feat_88.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 89,
+    "file": "perceiver_alignment_experiment/features/val_feat_89.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 90,
+    "file": "perceiver_alignment_experiment/features/val_feat_90.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 91,
+    "file": "perceiver_alignment_experiment/features/val_feat_91.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 93,
+    "file": "perceiver_alignment_experiment/features/val_feat_93.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 94,
+    "file": "perceiver_alignment_experiment/features/val_feat_94.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 95,
+    "file": "perceiver_alignment_experiment/features/val_feat_95.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 0,
+    "file": "perceiver_alignment_experiment/features/val_feat_0.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 1,
+    "file": "perceiver_alignment_experiment/features/val_feat_1.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 2,
+    "file": "perceiver_alignment_experiment/features/val_feat_2.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 3,
+    "file": "perceiver_alignment_experiment/features/val_feat_3.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 4,
+    "file": "perceiver_alignment_experiment/features/val_feat_4.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 5,
+    "file": "perceiver_alignment_experiment/features/val_feat_5.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 9,
+    "file": "perceiver_alignment_experiment/features/val_feat_9.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 10,
+    "file": "perceiver_alignment_experiment/features/val_feat_10.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 11,
+    "file": "perceiver_alignment_experiment/features/val_feat_11.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 12,
+    "file": "perceiver_alignment_experiment/features/val_feat_12.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 13,
+    "file": "perceiver_alignment_experiment/features/val_feat_13.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 14,
+    "file": "perceiver_alignment_experiment/features/val_feat_14.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 15,
+    "file": "perceiver_alignment_experiment/features/val_feat_15.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 16,
+    "file": "perceiver_alignment_experiment/features/val_feat_16.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 17,
+    "file": "perceiver_alignment_experiment/features/val_feat_17.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 18,
+    "file": "perceiver_alignment_experiment/features/val_feat_18.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 19,
+    "file": "perceiver_alignment_experiment/features/val_feat_19.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 20,
+    "file": "perceiver_alignment_experiment/features/val_feat_20.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 22,
+    "file": "perceiver_alignment_experiment/features/val_feat_22.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 23,
+    "file": "perceiver_alignment_experiment/features/val_feat_23.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 24,
+    "file": "perceiver_alignment_experiment/features/val_feat_24.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 25,
+    "file": "perceiver_alignment_experiment/features/val_feat_25.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 26,
+    "file": "perceiver_alignment_experiment/features/val_feat_26.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 28,
+    "file": "perceiver_alignment_experiment/features/val_feat_28.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 29,
+    "file": "perceiver_alignment_experiment/features/val_feat_29.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 30,
+    "file": "perceiver_alignment_experiment/features/val_feat_30.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 31,
+    "file": "perceiver_alignment_experiment/features/val_feat_31.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 161,
+    "file": "perceiver_alignment_experiment/features/val_feat_161.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 162,
+    "file": "perceiver_alignment_experiment/features/val_feat_162.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 163,
+    "file": "perceiver_alignment_experiment/features/val_feat_163.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 164,
+    "file": "perceiver_alignment_experiment/features/val_feat_164.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 165,
+    "file": "perceiver_alignment_experiment/features/val_feat_165.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 166,
+    "file": "perceiver_alignment_experiment/features/val_feat_166.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 167,
+    "file": "perceiver_alignment_experiment/features/val_feat_167.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 168,
+    "file": "perceiver_alignment_experiment/features/val_feat_168.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 169,
+    "file": "perceiver_alignment_experiment/features/val_feat_169.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 170,
+    "file": "perceiver_alignment_experiment/features/val_feat_170.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 171,
+    "file": "perceiver_alignment_experiment/features/val_feat_171.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 172,
+    "file": "perceiver_alignment_experiment/features/val_feat_172.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 173,
+    "file": "perceiver_alignment_experiment/features/val_feat_173.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 174,
+    "file": "perceiver_alignment_experiment/features/val_feat_174.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 175,
+    "file": "perceiver_alignment_experiment/features/val_feat_175.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 176,
+    "file": "perceiver_alignment_experiment/features/val_feat_176.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 177,
+    "file": "perceiver_alignment_experiment/features/val_feat_177.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 179,
+    "file": "perceiver_alignment_experiment/features/val_feat_179.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 180,
+    "file": "perceiver_alignment_experiment/features/val_feat_180.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 181,
+    "file": "perceiver_alignment_experiment/features/val_feat_181.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 182,
+    "file": "perceiver_alignment_experiment/features/val_feat_182.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 183,
+    "file": "perceiver_alignment_experiment/features/val_feat_183.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 185,
+    "file": "perceiver_alignment_experiment/features/val_feat_185.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 186,
+    "file": "perceiver_alignment_experiment/features/val_feat_186.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 187,
+    "file": "perceiver_alignment_experiment/features/val_feat_187.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 188,
+    "file": "perceiver_alignment_experiment/features/val_feat_188.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 189,
+    "file": "perceiver_alignment_experiment/features/val_feat_189.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 191,
+    "file": "perceiver_alignment_experiment/features/val_feat_191.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 224,
+    "file": "perceiver_alignment_experiment/features/val_feat_224.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 225,
+    "file": "perceiver_alignment_experiment/features/val_feat_225.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 226,
+    "file": "perceiver_alignment_experiment/features/val_feat_226.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 227,
+    "file": "perceiver_alignment_experiment/features/val_feat_227.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 229,
+    "file": "perceiver_alignment_experiment/features/val_feat_229.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 230,
+    "file": "perceiver_alignment_experiment/features/val_feat_230.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 231,
+    "file": "perceiver_alignment_experiment/features/val_feat_231.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 232,
+    "file": "perceiver_alignment_experiment/features/val_feat_232.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 233,
+    "file": "perceiver_alignment_experiment/features/val_feat_233.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 234,
+    "file": "perceiver_alignment_experiment/features/val_feat_234.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 235,
+    "file": "perceiver_alignment_experiment/features/val_feat_235.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 236,
+    "file": "perceiver_alignment_experiment/features/val_feat_236.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 237,
+    "file": "perceiver_alignment_experiment/features/val_feat_237.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 238,
+    "file": "perceiver_alignment_experiment/features/val_feat_238.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 239,
+    "file": "perceiver_alignment_experiment/features/val_feat_239.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 240,
+    "file": "perceiver_alignment_experiment/features/val_feat_240.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 241,
+    "file": "perceiver_alignment_experiment/features/val_feat_241.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 242,
+    "file": "perceiver_alignment_experiment/features/val_feat_242.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 243,
+    "file": "perceiver_alignment_experiment/features/val_feat_243.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 245,
+    "file": "perceiver_alignment_experiment/features/val_feat_245.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 246,
+    "file": "perceiver_alignment_experiment/features/val_feat_246.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 247,
+    "file": "perceiver_alignment_experiment/features/val_feat_247.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 248,
+    "file": "perceiver_alignment_experiment/features/val_feat_248.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 249,
+    "file": "perceiver_alignment_experiment/features/val_feat_249.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 250,
+    "file": "perceiver_alignment_experiment/features/val_feat_250.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 251,
+    "file": "perceiver_alignment_experiment/features/val_feat_251.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 252,
+    "file": "perceiver_alignment_experiment/features/val_feat_252.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 253,
+    "file": "perceiver_alignment_experiment/features/val_feat_253.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 254,
+    "file": "perceiver_alignment_experiment/features/val_feat_254.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 255,
+    "file": "perceiver_alignment_experiment/features/val_feat_255.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 194,
+    "file": "perceiver_alignment_experiment/features/val_feat_194.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 195,
+    "file": "perceiver_alignment_experiment/features/val_feat_195.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 196,
+    "file": "perceiver_alignment_experiment/features/val_feat_196.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 197,
+    "file": "perceiver_alignment_experiment/features/val_feat_197.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 198,
+    "file": "perceiver_alignment_experiment/features/val_feat_198.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 199,
+    "file": "perceiver_alignment_experiment/features/val_feat_199.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 200,
+    "file": "perceiver_alignment_experiment/features/val_feat_200.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 201,
+    "file": "perceiver_alignment_experiment/features/val_feat_201.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 202,
+    "file": "perceiver_alignment_experiment/features/val_feat_202.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 203,
+    "file": "perceiver_alignment_experiment/features/val_feat_203.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 204,
+    "file": "perceiver_alignment_experiment/features/val_feat_204.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 205,
+    "file": "perceiver_alignment_experiment/features/val_feat_205.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 206,
+    "file": "perceiver_alignment_experiment/features/val_feat_206.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 207,
+    "file": "perceiver_alignment_experiment/features/val_feat_207.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 208,
+    "file": "perceiver_alignment_experiment/features/val_feat_208.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 209,
+    "file": "perceiver_alignment_experiment/features/val_feat_209.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 210,
+    "file": "perceiver_alignment_experiment/features/val_feat_210.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 211,
+    "file": "perceiver_alignment_experiment/features/val_feat_211.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 212,
+    "file": "perceiver_alignment_experiment/features/val_feat_212.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 213,
+    "file": "perceiver_alignment_experiment/features/val_feat_213.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 215,
+    "file": "perceiver_alignment_experiment/features/val_feat_215.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 216,
+    "file": "perceiver_alignment_experiment/features/val_feat_216.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 217,
+    "file": "perceiver_alignment_experiment/features/val_feat_217.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 218,
+    "file": "perceiver_alignment_experiment/features/val_feat_218.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 219,
+    "file": "perceiver_alignment_experiment/features/val_feat_219.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 220,
+    "file": "perceiver_alignment_experiment/features/val_feat_220.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 221,
+    "file": "perceiver_alignment_experiment/features/val_feat_221.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 222,
+    "file": "perceiver_alignment_experiment/features/val_feat_222.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 223,
+    "file": "perceiver_alignment_experiment/features/val_feat_223.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 96,
+    "file": "perceiver_alignment_experiment/features/val_feat_96.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 97,
+    "file": "perceiver_alignment_experiment/features/val_feat_97.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 98,
+    "file": "perceiver_alignment_experiment/features/val_feat_98.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 99,
+    "file": "perceiver_alignment_experiment/features/val_feat_99.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 100,
+    "file": "perceiver_alignment_experiment/features/val_feat_100.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 101,
+    "file": "perceiver_alignment_experiment/features/val_feat_101.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 103,
+    "file": "perceiver_alignment_experiment/features/val_feat_103.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 105,
+    "file": "perceiver_alignment_experiment/features/val_feat_105.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 107,
+    "file": "perceiver_alignment_experiment/features/val_feat_107.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 108,
+    "file": "perceiver_alignment_experiment/features/val_feat_108.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 109,
+    "file": "perceiver_alignment_experiment/features/val_feat_109.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 110,
+    "file": "perceiver_alignment_experiment/features/val_feat_110.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 111,
+    "file": "perceiver_alignment_experiment/features/val_feat_111.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 112,
+    "file": "perceiver_alignment_experiment/features/val_feat_112.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 113,
+    "file": "perceiver_alignment_experiment/features/val_feat_113.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 114,
+    "file": "perceiver_alignment_experiment/features/val_feat_114.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 115,
+    "file": "perceiver_alignment_experiment/features/val_feat_115.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 116,
+    "file": "perceiver_alignment_experiment/features/val_feat_116.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 117,
+    "file": "perceiver_alignment_experiment/features/val_feat_117.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 118,
+    "file": "perceiver_alignment_experiment/features/val_feat_118.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 119,
+    "file": "perceiver_alignment_experiment/features/val_feat_119.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 120,
+    "file": "perceiver_alignment_experiment/features/val_feat_120.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 121,
+    "file": "perceiver_alignment_experiment/features/val_feat_121.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 122,
+    "file": "perceiver_alignment_experiment/features/val_feat_122.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 123,
+    "file": "perceiver_alignment_experiment/features/val_feat_123.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 125,
+    "file": "perceiver_alignment_experiment/features/val_feat_125.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 126,
+    "file": "perceiver_alignment_experiment/features/val_feat_126.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 127,
+    "file": "perceiver_alignment_experiment/features/val_feat_127.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 129,
+    "file": "perceiver_alignment_experiment/features/val_feat_129.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 130,
+    "file": "perceiver_alignment_experiment/features/val_feat_130.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 131,
+    "file": "perceiver_alignment_experiment/features/val_feat_131.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 132,
+    "file": "perceiver_alignment_experiment/features/val_feat_132.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 133,
+    "file": "perceiver_alignment_experiment/features/val_feat_133.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 135,
+    "file": "perceiver_alignment_experiment/features/val_feat_135.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 136,
+    "file": "perceiver_alignment_experiment/features/val_feat_136.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 137,
+    "file": "perceiver_alignment_experiment/features/val_feat_137.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 138,
+    "file": "perceiver_alignment_experiment/features/val_feat_138.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 139,
+    "file": "perceiver_alignment_experiment/features/val_feat_139.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 140,
+    "file": "perceiver_alignment_experiment/features/val_feat_140.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 141,
+    "file": "perceiver_alignment_experiment/features/val_feat_141.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 142,
+    "file": "perceiver_alignment_experiment/features/val_feat_142.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 143,
+    "file": "perceiver_alignment_experiment/features/val_feat_143.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 144,
+    "file": "perceiver_alignment_experiment/features/val_feat_144.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 145,
+    "file": "perceiver_alignment_experiment/features/val_feat_145.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 146,
+    "file": "perceiver_alignment_experiment/features/val_feat_146.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 147,
+    "file": "perceiver_alignment_experiment/features/val_feat_147.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 149,
+    "file": "perceiver_alignment_experiment/features/val_feat_149.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 150,
+    "file": "perceiver_alignment_experiment/features/val_feat_150.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 151,
+    "file": "perceiver_alignment_experiment/features/val_feat_151.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 152,
+    "file": "perceiver_alignment_experiment/features/val_feat_152.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 153,
+    "file": "perceiver_alignment_experiment/features/val_feat_153.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 154,
+    "file": "perceiver_alignment_experiment/features/val_feat_154.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 155,
+    "file": "perceiver_alignment_experiment/features/val_feat_155.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 156,
+    "file": "perceiver_alignment_experiment/features/val_feat_156.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 157,
+    "file": "perceiver_alignment_experiment/features/val_feat_157.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 158,
+    "file": "perceiver_alignment_experiment/features/val_feat_158.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 159,
+    "file": "perceiver_alignment_experiment/features/val_feat_159.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 288,
+    "file": "perceiver_alignment_experiment/features/val_feat_288.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 289,
+    "file": "perceiver_alignment_experiment/features/val_feat_289.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 290,
+    "file": "perceiver_alignment_experiment/features/val_feat_290.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 291,
+    "file": "perceiver_alignment_experiment/features/val_feat_291.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 293,
+    "file": "perceiver_alignment_experiment/features/val_feat_293.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 294,
+    "file": "perceiver_alignment_experiment/features/val_feat_294.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 295,
+    "file": "perceiver_alignment_experiment/features/val_feat_295.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 296,
+    "file": "perceiver_alignment_experiment/features/val_feat_296.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 297,
+    "file": "perceiver_alignment_experiment/features/val_feat_297.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 299,
+    "file": "perceiver_alignment_experiment/features/val_feat_299.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 300,
+    "file": "perceiver_alignment_experiment/features/val_feat_300.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 301,
+    "file": "perceiver_alignment_experiment/features/val_feat_301.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 302,
+    "file": "perceiver_alignment_experiment/features/val_feat_302.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 303,
+    "file": "perceiver_alignment_experiment/features/val_feat_303.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 304,
+    "file": "perceiver_alignment_experiment/features/val_feat_304.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 305,
+    "file": "perceiver_alignment_experiment/features/val_feat_305.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 306,
+    "file": "perceiver_alignment_experiment/features/val_feat_306.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 307,
+    "file": "perceiver_alignment_experiment/features/val_feat_307.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 308,
+    "file": "perceiver_alignment_experiment/features/val_feat_308.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 309,
+    "file": "perceiver_alignment_experiment/features/val_feat_309.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 310,
+    "file": "perceiver_alignment_experiment/features/val_feat_310.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 311,
+    "file": "perceiver_alignment_experiment/features/val_feat_311.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 312,
+    "file": "perceiver_alignment_experiment/features/val_feat_312.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 313,
+    "file": "perceiver_alignment_experiment/features/val_feat_313.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 314,
+    "file": "perceiver_alignment_experiment/features/val_feat_314.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 315,
+    "file": "perceiver_alignment_experiment/features/val_feat_315.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 316,
+    "file": "perceiver_alignment_experiment/features/val_feat_316.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 317,
+    "file": "perceiver_alignment_experiment/features/val_feat_317.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 318,
+    "file": "perceiver_alignment_experiment/features/val_feat_318.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 319,
+    "file": "perceiver_alignment_experiment/features/val_feat_319.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 320,
+    "file": "perceiver_alignment_experiment/features/val_feat_320.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 323,
+    "file": "perceiver_alignment_experiment/features/val_feat_323.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 324,
+    "file": "perceiver_alignment_experiment/features/val_feat_324.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 325,
+    "file": "perceiver_alignment_experiment/features/val_feat_325.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 326,
+    "file": "perceiver_alignment_experiment/features/val_feat_326.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 327,
+    "file": "perceiver_alignment_experiment/features/val_feat_327.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 328,
+    "file": "perceiver_alignment_experiment/features/val_feat_328.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 329,
+    "file": "perceiver_alignment_experiment/features/val_feat_329.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 330,
+    "file": "perceiver_alignment_experiment/features/val_feat_330.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 331,
+    "file": "perceiver_alignment_experiment/features/val_feat_331.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 332,
+    "file": "perceiver_alignment_experiment/features/val_feat_332.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 333,
+    "file": "perceiver_alignment_experiment/features/val_feat_333.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 334,
+    "file": "perceiver_alignment_experiment/features/val_feat_334.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 335,
+    "file": "perceiver_alignment_experiment/features/val_feat_335.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 336,
+    "file": "perceiver_alignment_experiment/features/val_feat_336.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 337,
+    "file": "perceiver_alignment_experiment/features/val_feat_337.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 338,
+    "file": "perceiver_alignment_experiment/features/val_feat_338.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 339,
+    "file": "perceiver_alignment_experiment/features/val_feat_339.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 340,
+    "file": "perceiver_alignment_experiment/features/val_feat_340.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 341,
+    "file": "perceiver_alignment_experiment/features/val_feat_341.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 342,
+    "file": "perceiver_alignment_experiment/features/val_feat_342.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 343,
+    "file": "perceiver_alignment_experiment/features/val_feat_343.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 344,
+    "file": "perceiver_alignment_experiment/features/val_feat_344.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 345,
+    "file": "perceiver_alignment_experiment/features/val_feat_345.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 346,
+    "file": "perceiver_alignment_experiment/features/val_feat_346.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 347,
+    "file": "perceiver_alignment_experiment/features/val_feat_347.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 348,
+    "file": "perceiver_alignment_experiment/features/val_feat_348.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 349,
+    "file": "perceiver_alignment_experiment/features/val_feat_349.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 350,
+    "file": "perceiver_alignment_experiment/features/val_feat_350.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 351,
+    "file": "perceiver_alignment_experiment/features/val_feat_351.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 384,
+    "file": "perceiver_alignment_experiment/features/val_feat_384.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 385,
+    "file": "perceiver_alignment_experiment/features/val_feat_385.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 386,
+    "file": "perceiver_alignment_experiment/features/val_feat_386.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 387,
+    "file": "perceiver_alignment_experiment/features/val_feat_387.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 388,
+    "file": "perceiver_alignment_experiment/features/val_feat_388.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 389,
+    "file": "perceiver_alignment_experiment/features/val_feat_389.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 390,
+    "file": "perceiver_alignment_experiment/features/val_feat_390.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 391,
+    "file": "perceiver_alignment_experiment/features/val_feat_391.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 392,
+    "file": "perceiver_alignment_experiment/features/val_feat_392.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 393,
+    "file": "perceiver_alignment_experiment/features/val_feat_393.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 394,
+    "file": "perceiver_alignment_experiment/features/val_feat_394.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 395,
+    "file": "perceiver_alignment_experiment/features/val_feat_395.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 396,
+    "file": "perceiver_alignment_experiment/features/val_feat_396.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 397,
+    "file": "perceiver_alignment_experiment/features/val_feat_397.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 398,
+    "file": "perceiver_alignment_experiment/features/val_feat_398.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 399,
+    "file": "perceiver_alignment_experiment/features/val_feat_399.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 401,
+    "file": "perceiver_alignment_experiment/features/val_feat_401.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 402,
+    "file": "perceiver_alignment_experiment/features/val_feat_402.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 403,
+    "file": "perceiver_alignment_experiment/features/val_feat_403.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 404,
+    "file": "perceiver_alignment_experiment/features/val_feat_404.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 405,
+    "file": "perceiver_alignment_experiment/features/val_feat_405.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 406,
+    "file": "perceiver_alignment_experiment/features/val_feat_406.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 407,
+    "file": "perceiver_alignment_experiment/features/val_feat_407.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 409,
+    "file": "perceiver_alignment_experiment/features/val_feat_409.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 410,
+    "file": "perceiver_alignment_experiment/features/val_feat_410.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 411,
+    "file": "perceiver_alignment_experiment/features/val_feat_411.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 412,
+    "file": "perceiver_alignment_experiment/features/val_feat_412.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 413,
+    "file": "perceiver_alignment_experiment/features/val_feat_413.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 414,
+    "file": "perceiver_alignment_experiment/features/val_feat_414.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 415,
+    "file": "perceiver_alignment_experiment/features/val_feat_415.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 256,
+    "file": "perceiver_alignment_experiment/features/val_feat_256.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 257,
+    "file": "perceiver_alignment_experiment/features/val_feat_257.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 258,
+    "file": "perceiver_alignment_experiment/features/val_feat_258.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 259,
+    "file": "perceiver_alignment_experiment/features/val_feat_259.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 260,
+    "file": "perceiver_alignment_experiment/features/val_feat_260.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 261,
+    "file": "perceiver_alignment_experiment/features/val_feat_261.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 262,
+    "file": "perceiver_alignment_experiment/features/val_feat_262.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 263,
+    "file": "perceiver_alignment_experiment/features/val_feat_263.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 264,
+    "file": "perceiver_alignment_experiment/features/val_feat_264.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 265,
+    "file": "perceiver_alignment_experiment/features/val_feat_265.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 266,
+    "file": "perceiver_alignment_experiment/features/val_feat_266.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 267,
+    "file": "perceiver_alignment_experiment/features/val_feat_267.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 268,
+    "file": "perceiver_alignment_experiment/features/val_feat_268.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 269,
+    "file": "perceiver_alignment_experiment/features/val_feat_269.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 270,
+    "file": "perceiver_alignment_experiment/features/val_feat_270.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 271,
+    "file": "perceiver_alignment_experiment/features/val_feat_271.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 272,
+    "file": "perceiver_alignment_experiment/features/val_feat_272.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 273,
+    "file": "perceiver_alignment_experiment/features/val_feat_273.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 274,
+    "file": "perceiver_alignment_experiment/features/val_feat_274.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 275,
+    "file": "perceiver_alignment_experiment/features/val_feat_275.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 276,
+    "file": "perceiver_alignment_experiment/features/val_feat_276.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 277,
+    "file": "perceiver_alignment_experiment/features/val_feat_277.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 278,
+    "file": "perceiver_alignment_experiment/features/val_feat_278.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 280,
+    "file": "perceiver_alignment_experiment/features/val_feat_280.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 281,
+    "file": "perceiver_alignment_experiment/features/val_feat_281.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 282,
+    "file": "perceiver_alignment_experiment/features/val_feat_282.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 283,
+    "file": "perceiver_alignment_experiment/features/val_feat_283.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 284,
+    "file": "perceiver_alignment_experiment/features/val_feat_284.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 285,
+    "file": "perceiver_alignment_experiment/features/val_feat_285.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 286,
+    "file": "perceiver_alignment_experiment/features/val_feat_286.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 287,
+    "file": "perceiver_alignment_experiment/features/val_feat_287.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 352,
+    "file": "perceiver_alignment_experiment/features/val_feat_352.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 353,
+    "file": "perceiver_alignment_experiment/features/val_feat_353.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 354,
+    "file": "perceiver_alignment_experiment/features/val_feat_354.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 357,
+    "file": "perceiver_alignment_experiment/features/val_feat_357.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 358,
+    "file": "perceiver_alignment_experiment/features/val_feat_358.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 359,
+    "file": "perceiver_alignment_experiment/features/val_feat_359.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 360,
+    "file": "perceiver_alignment_experiment/features/val_feat_360.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 361,
+    "file": "perceiver_alignment_experiment/features/val_feat_361.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 362,
+    "file": "perceiver_alignment_experiment/features/val_feat_362.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 363,
+    "file": "perceiver_alignment_experiment/features/val_feat_363.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 364,
+    "file": "perceiver_alignment_experiment/features/val_feat_364.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 365,
+    "file": "perceiver_alignment_experiment/features/val_feat_365.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 366,
+    "file": "perceiver_alignment_experiment/features/val_feat_366.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 367,
+    "file": "perceiver_alignment_experiment/features/val_feat_367.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 368,
+    "file": "perceiver_alignment_experiment/features/val_feat_368.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 369,
+    "file": "perceiver_alignment_experiment/features/val_feat_369.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 370,
+    "file": "perceiver_alignment_experiment/features/val_feat_370.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 371,
+    "file": "perceiver_alignment_experiment/features/val_feat_371.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 372,
+    "file": "perceiver_alignment_experiment/features/val_feat_372.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 373,
+    "file": "perceiver_alignment_experiment/features/val_feat_373.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 374,
+    "file": "perceiver_alignment_experiment/features/val_feat_374.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 375,
+    "file": "perceiver_alignment_experiment/features/val_feat_375.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 376,
+    "file": "perceiver_alignment_experiment/features/val_feat_376.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 377,
+    "file": "perceiver_alignment_experiment/features/val_feat_377.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 378,
+    "file": "perceiver_alignment_experiment/features/val_feat_378.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 379,
+    "file": "perceiver_alignment_experiment/features/val_feat_379.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 380,
+    "file": "perceiver_alignment_experiment/features/val_feat_380.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 381,
+    "file": "perceiver_alignment_experiment/features/val_feat_381.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 382,
+    "file": "perceiver_alignment_experiment/features/val_feat_382.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 417,
+    "file": "perceiver_alignment_experiment/features/val_feat_417.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 418,
+    "file": "perceiver_alignment_experiment/features/val_feat_418.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 419,
+    "file": "perceiver_alignment_experiment/features/val_feat_419.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 420,
+    "file": "perceiver_alignment_experiment/features/val_feat_420.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 421,
+    "file": "perceiver_alignment_experiment/features/val_feat_421.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 422,
+    "file": "perceiver_alignment_experiment/features/val_feat_422.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 423,
+    "file": "perceiver_alignment_experiment/features/val_feat_423.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 424,
+    "file": "perceiver_alignment_experiment/features/val_feat_424.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 425,
+    "file": "perceiver_alignment_experiment/features/val_feat_425.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 426,
+    "file": "perceiver_alignment_experiment/features/val_feat_426.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 427,
+    "file": "perceiver_alignment_experiment/features/val_feat_427.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 428,
+    "file": "perceiver_alignment_experiment/features/val_feat_428.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 429,
+    "file": "perceiver_alignment_experiment/features/val_feat_429.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 431,
+    "file": "perceiver_alignment_experiment/features/val_feat_431.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 432,
+    "file": "perceiver_alignment_experiment/features/val_feat_432.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 435,
+    "file": "perceiver_alignment_experiment/features/val_feat_435.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 436,
+    "file": "perceiver_alignment_experiment/features/val_feat_436.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 438,
+    "file": "perceiver_alignment_experiment/features/val_feat_438.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 439,
+    "file": "perceiver_alignment_experiment/features/val_feat_439.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 442,
+    "file": "perceiver_alignment_experiment/features/val_feat_442.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 443,
+    "file": "perceiver_alignment_experiment/features/val_feat_443.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 444,
+    "file": "perceiver_alignment_experiment/features/val_feat_444.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 445,
+    "file": "perceiver_alignment_experiment/features/val_feat_445.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 446,
+    "file": "perceiver_alignment_experiment/features/val_feat_446.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 447,
+    "file": "perceiver_alignment_experiment/features/val_feat_447.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 448,
+    "file": "perceiver_alignment_experiment/features/val_feat_448.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 449,
+    "file": "perceiver_alignment_experiment/features/val_feat_449.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 450,
+    "file": "perceiver_alignment_experiment/features/val_feat_450.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 451,
+    "file": "perceiver_alignment_experiment/features/val_feat_451.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 452,
+    "file": "perceiver_alignment_experiment/features/val_feat_452.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 453,
+    "file": "perceiver_alignment_experiment/features/val_feat_453.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 454,
+    "file": "perceiver_alignment_experiment/features/val_feat_454.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 455,
+    "file": "perceiver_alignment_experiment/features/val_feat_455.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 456,
+    "file": "perceiver_alignment_experiment/features/val_feat_456.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 458,
+    "file": "perceiver_alignment_experiment/features/val_feat_458.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 459,
+    "file": "perceiver_alignment_experiment/features/val_feat_459.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 460,
+    "file": "perceiver_alignment_experiment/features/val_feat_460.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 461,
+    "file": "perceiver_alignment_experiment/features/val_feat_461.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 462,
+    "file": "perceiver_alignment_experiment/features/val_feat_462.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 463,
+    "file": "perceiver_alignment_experiment/features/val_feat_463.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 464,
+    "file": "perceiver_alignment_experiment/features/val_feat_464.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 465,
+    "file": "perceiver_alignment_experiment/features/val_feat_465.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 466,
+    "file": "perceiver_alignment_experiment/features/val_feat_466.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 467,
+    "file": "perceiver_alignment_experiment/features/val_feat_467.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 468,
+    "file": "perceiver_alignment_experiment/features/val_feat_468.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 469,
+    "file": "perceiver_alignment_experiment/features/val_feat_469.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 470,
+    "file": "perceiver_alignment_experiment/features/val_feat_470.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 471,
+    "file": "perceiver_alignment_experiment/features/val_feat_471.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 472,
+    "file": "perceiver_alignment_experiment/features/val_feat_472.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 473,
+    "file": "perceiver_alignment_experiment/features/val_feat_473.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 474,
+    "file": "perceiver_alignment_experiment/features/val_feat_474.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 475,
+    "file": "perceiver_alignment_experiment/features/val_feat_475.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 477,
+    "file": "perceiver_alignment_experiment/features/val_feat_477.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 478,
+    "file": "perceiver_alignment_experiment/features/val_feat_478.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 479,
+    "file": "perceiver_alignment_experiment/features/val_feat_479.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 480,
+    "file": "perceiver_alignment_experiment/features/val_feat_480.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 481,
+    "file": "perceiver_alignment_experiment/features/val_feat_481.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 482,
+    "file": "perceiver_alignment_experiment/features/val_feat_482.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 483,
+    "file": "perceiver_alignment_experiment/features/val_feat_483.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 485,
+    "file": "perceiver_alignment_experiment/features/val_feat_485.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 486,
+    "file": "perceiver_alignment_experiment/features/val_feat_486.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 487,
+    "file": "perceiver_alignment_experiment/features/val_feat_487.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 488,
+    "file": "perceiver_alignment_experiment/features/val_feat_488.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 489,
+    "file": "perceiver_alignment_experiment/features/val_feat_489.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 490,
+    "file": "perceiver_alignment_experiment/features/val_feat_490.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 491,
+    "file": "perceiver_alignment_experiment/features/val_feat_491.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 492,
+    "file": "perceiver_alignment_experiment/features/val_feat_492.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 493,
+    "file": "perceiver_alignment_experiment/features/val_feat_493.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 494,
+    "file": "perceiver_alignment_experiment/features/val_feat_494.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 496,
+    "file": "perceiver_alignment_experiment/features/val_feat_496.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 497,
+    "file": "perceiver_alignment_experiment/features/val_feat_497.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 498,
+    "file": "perceiver_alignment_experiment/features/val_feat_498.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  },
+  {
+    "orig_idx": 499,
+    "file": "perceiver_alignment_experiment/features/val_feat_499.pt",
+    "num_patches": 256,
+    "feat_dim": 1536
+  }
+]
