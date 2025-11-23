@@ -26,6 +26,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import List, Optional, Tuple, Union
+import numpy as np
 
 import torch
 import torch.nn as nn
@@ -283,45 +284,64 @@ class AudioEncoder(nn.Module):
         Args:
             waveforms:
                 - Tensor of shape (B, T) or (B, 1, T)
-                - List of 1D Tensors
+                - List of 1D or multi-D Tensors / numpy arrays (we flatten to 1D)
             sample_rates:
                 - Single int if all waveforms share the same sampling rate
-                - List[int] of length B otherwise.
+                - List[int] of length B otherwise. (Currently ignored, we resample to cfg.target_sampling_rate.)
 
         Returns:
             dict with:
                 feats: (B, T_audio, D_audio)
-                mask:  (B, T_audio) bool
+                mask:  (B, T_audio) boolean
         """
-        # Normalize inputs to list-of-1D tensors for processor
+        # ---- Normalize inputs to list-of-1D float32 numpy arrays ----
         if isinstance(waveforms, torch.Tensor):
-            if waveforms.ndim == 2:     # (B, T)
-                wav_list = [w.cpu().float() for w in waveforms]
-            elif waveforms.ndim == 3:   # (B, 1, T)
-                wav_list = [w.squeeze(0).cpu().float() for w in waveforms]
+            # Ensure batch dim exists
+            if waveforms.ndim == 1:
+                waveforms = waveforms.unsqueeze(0)  # (1, T)
+
+            if waveforms.ndim == 2:      # (B, T)
+                wav_list = [
+                    w.detach().cpu().numpy().astype("float32").reshape(-1)
+                    for w in waveforms
+                ]
+            elif waveforms.ndim == 3:    # (B, C, T) -> flatten all dims to 1D
+                wav_list = [
+                    w.detach().cpu().numpy().astype("float32").reshape(-1)
+                    for w in waveforms
+                ]
             else:
                 raise ValueError(f"Unexpected waveform tensor shape: {waveforms.shape}")
         else:
-            wav_list = [w.cpu().float() for w in waveforms]
+            # list[Tensor] or list[np.ndarray]
+            wav_list = []
+            for w in waveforms:
+                if isinstance(w, torch.Tensor):
+                    arr = w.detach().cpu().numpy().astype("float32")
+                else:
+                    arr = np.asarray(w, dtype="float32")
+                wav_list.append(arr.reshape(-1))  # ensure 1D
 
+        # (Optional) we could respect per-sample sample_rates, but for now
+        # WhisperProcessor will resample to self.cfg.target_sampling_rate.
         if isinstance(sample_rates, int):
-            sr_list = [sample_rates] * len(wav_list)
+            sr = sample_rates
         else:
-            sr_list = sample_rates
+            # if a list is given, we just pick the first; Whisper will resample anyway
+            sr = sample_rates[0]
 
-        # WhisperProcessor handles resampling to target_sampling_rate internally
+        # ---- WhisperProcessor: raw audio -> log-Mel features ----
         inputs = self.processor(
             wav_list,
-            sampling_rate=self.cfg.target_sampling_rate,
+            sampling_rate=sr,
             return_tensors="pt",
         )
         input_features = inputs["input_features"]  # (B, n_frames, feat_dim)
 
         input_features = move_to_device(input_features, self.device, self.cfg.dtype)
 
-        # Forward through Whisper encoder
-        # WhisperModel's forward with only input_features runs the encoder.
-        outputs = self.model(
+        # ---- Forward through Whisper encoder (encoder-only path) ----
+        outputs = self.model.encoder(
             input_features=input_features,
         )
         feats = outputs.last_hidden_state  # (B, T_audio, D_audio)
