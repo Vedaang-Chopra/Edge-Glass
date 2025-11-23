@@ -1,0 +1,104 @@
+_wandb:
+    value:
+        cli_version: 0.23.0
+        e:
+            6ctxc9qjo6c90cxlmus2ym501uqg2c82:
+                codePath: /home/hice1/vchopra37/scratch/projects/edge_glass/code_base/final_code_base.ipynb
+                cpu_count: 64
+                cpu_count_logical: 64
+                cudaVersion: "12.9"
+                disk:
+                    /:
+                        total: "53619982336"
+                        used: "27192852480"
+                email: vedaangchopra@hotmail.com
+                executable: /home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/bin/python
+                git:
+                    commit: 845c6080e6f01653925e9733fb1e08c8a9dd33f6
+                    remote: git@github.com:Vedaang-Chopra/Edge-Glass.git
+                gpu: NVIDIA H200
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Hopper
+                      cudaCores: 16896
+                      memoryTotal: "150754820096"
+                      name: NVIDIA H200
+                      uuid: GPU-a0a58896-f6b6-2e9a-4325-1a472f856dd5
+                    - architecture: Hopper
+                      cudaCores: 16896
+                      memoryTotal: "150754820096"
+                      name: NVIDIA H200
+                      uuid: GPU-53fca250-cee1-fddc-59c6-c7970b70048a
+                host: atl1-1-03-018-2-0.pace.gatech.edu
+                memory:
+                    total: "2163478589440"
+                os: Linux-5.14.0-570.37.1.el9_6.x86_64-x86_64-with-glibc2.34
+                program: /home/hice1/vchopra37/scratch/projects/edge_glass/code_base/final_code_base.ipynb
+                python: CPython 3.12.5
+                root: /storage/ice1/1/0/vchopra37/projects/edge_glass/code_base
+                slurm:
+                    job_id: "3622315"
+                    mpi_type: pmix_v4
+                    root: /opt/slurm/current
+                startedAt: "2025-11-23T00:48:25.394478Z"
+                writerId: 6ctxc9qjo6c90cxlmus2ym501uqg2c82
+        m: []
+        python_version: 3.12.5
+        t:
+            "1":
+                - 1
+            "2":
+                - 1
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.12.5
+            "5": 0.23.0
+            "8":
+                - 1
+            "12": 0.23.0
+            "13": linux-x86_64
+architecture:
+    value:
+        mlp_ratio: 4
+        num_attn_heads: 8
+        num_latents: 64
+        num_perceiver_layers: 4
+        perceiver_dim: null
+misc:
+    value:
+        device: auto
+        dtype: float16
+        seed: 42
+        use_wandb: true
+        wandb_project: edge_glass
+        wandb_run_name: phase0_global_setup
+models:
+    value:
+        audio_model_name: openai/whisper-base
+        llm_model_name: qwen/Qwen2.5-3B-Instruct
+        vision_model_name: openai/clip-vit-base-patch32
+mrl:
+    value:
+        mrl_dims:
+            - 1024
+            - 512
+            - 256
+        mrl_temp: 0.07
+        mrl_weight: 1
+paths:
+    value:
+        features_dir: /storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/edge_glass/features
+        root_dir: /storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/edge_glass
+training:
+    value:
+        batch_size: 16
+        learning_rate: "3e-4"
+        log_every_steps: 50
+        max_grad_norm: 1
+        num_epochs: 5
+        train_subset_size: 2000
+        val_subset_size: 500
+        warmup_steps: 500
+        weight_decay: 0.01

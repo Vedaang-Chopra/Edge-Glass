@@ -1,0 +1,70 @@
+# ========================
+# Paths
+# ========================
+paths:
+  # Root directory for this project (absolute or relative)
+  root_dir: "./edge_glass"
+  # If null, features_dir will be set to root_dir/features in Python
+  features_dir: null
+
+# ========================
+# Models
+# ========================
+models:
+  vision_model_name: "openai/clip-vit-base-patch32"
+  llm_model_name: "qwen/Qwen2.5-3B-Instruct"
+  audio_model_name: "openai/whisper-base"   # set null if not using audio yet
+
+
+# ========================
+# Architecture (Perceiver, etc.)
+# ========================
+architecture:
+  perceiver_dim: null         # will be set from vision encoder hidden dim in code
+  num_latents: 64
+  num_perceiver_layers: 4
+  num_attn_heads: 8
+  mlp_ratio: 4.0
+
+# ========================
+# Training
+# ========================
+training:
+  batch_size: 16
+  num_epochs: 5
+  learning_rate: 3e-4
+  weight_decay: 0.01
+
+  warmup_steps: 500
+  max_grad_norm: 1.0
+
+  log_every_steps: 50
+
+  # For quick POC: limit number of examples
+  train_subset_size: 2000
+  val_subset_size: 500
+
+# ========================
+# Matryoshka / MRL
+# ========================
+mrl:
+  # List of dims to train for, e.g. [1024, 512, 256] or null if not using yet
+  mrl_dims: [1024, 512, 256]
+  mrl_weight: 1.0
+  mrl_temp: 0.07
+
+# ========================
+# Misc / Global
+# ========================
+misc:
+  dtype: "float16"        # "float16" or "bfloat16"
+  seed: 42
+
+  # device preference: "auto" | "cuda" | "cpu"
+  # auto = choose cuda if available, else cpu
+  device: "auto"
+
+  # W&B
+  use_wandb: true
+  wandb_project: "edge_glass"
+  wandb_run_name: "phase0_global_setup"
