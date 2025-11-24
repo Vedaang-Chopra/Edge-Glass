@@ -194,3 +194,86 @@ class MultiModalAlignmentModel(nn.Module):
             "vision": v,   # v["pooled"] → (B, d_align)
             "audio": a,    # a["pooled"] → (B, d_align)
         }
+
+
+
+class FullAlignmentGraphWrapper(nn.Module):
+    """
+    Wrapper around MultiModalAlignmentModel that:
+
+      - Uses the *existing* VisionEncoder.encode_images()
+        and AudioEncoder.encode_waveforms()
+      - Then runs:
+          adapter -> shared Perceiver (optional) -> ProjectorMLP -> pooled
+
+    Designed so:
+      - Shapes exactly match your real training path
+      - torchview can see a clean tensor-only forward().
+    """
+    def __init__(self, core_model: MultiModalAlignmentModel):
+        super().__init__()
+        self.core = core_model
+        self.device = core_model.device
+        self.dtype = core_model.dtype
+
+    def forward(self, pixel_values: torch.Tensor, waveforms: torch.Tensor):
+        """
+        pixel_values: Tensor (B, 3, H, W)
+            Preprocessed or dummy image tensor. Since VisionEncoder.encode_images()
+            checks `isinstance(images, list)`, passing a Tensor skips PIL/processor
+            and goes straight to the HF model.
+
+        waveforms: Tensor (B, T)
+            Raw audio waveforms at some sampling rate (we pass target_sr to encoder).
+        """
+        device = self.device
+
+        # -----------------------------
+        # 1) Vision path via wrapper
+        # -----------------------------
+        # Treat pixel_values as already preprocessed tensor
+        enc_v = self.core.vision_encoder.encode_images(pixel_values)  # uses your wrapper
+        v_feats = enc_v["feats"].to(device)       # (B, T_v, D_v_concat)
+        v_mask  = enc_v["mask"]                   # (B, T_v) bool
+
+        # Ensure / create adapter with correct in_features
+        self.core._ensure_vision_adapter(v_feats.size(-1))
+        v_sh = self.core.vision_adapter(v_feats)  # (B, T_v, d_shared)
+
+        # -----------------------------
+        # 2) Audio path via wrapper
+        # -----------------------------
+        target_sr = self.core.audio_encoder.cfg.target_sampling_rate
+        enc_a = self.core.audio_encoder.encode_waveforms(
+            waveforms,
+            sample_rates=target_sr,
+        )
+        a_feats = enc_a["feats"].to(device)       # (B, T_a, D_a)
+        a_mask  = enc_a["mask"]                   # (B, T_a) bool
+
+        self.core._ensure_audio_adapter(a_feats.size(-1))
+        a_sh = self.core.audio_adapter(a_feats)   # (B, T_a, d_shared)
+
+        # -----------------------------
+        # 3) Shared Perceiver + Projector
+        # -----------------------------
+        if self.core.use_perceiver:
+            # Perceiver over each modality separately
+            lat_v = self.core.perceiver(v_sh, encoder_mask=v_mask)  # (B, L, d_latent)
+            lat_a = self.core.perceiver(a_sh, encoder_mask=a_mask)  # (B, L, d_latent)
+
+            z_v = self.core.projector(lat_v)    # (B, L, d_align)
+            z_a = self.core.projector(lat_a)    # (B, L, d_align)
+
+            pooled_v = z_v.mean(dim=1)          # (B, d_align)
+            pooled_a = z_a.mean(dim=1)          # (B, d_align)
+        else:
+            # No Perceiver: pool in shared space then project
+            pooled_v_in = self.core._pool_masked_mean(v_sh, v_mask)  # (B, d_shared)
+            pooled_a_in = self.core._pool_masked_mean(a_sh, a_mask)  # (B, d_shared)
+
+            pooled_v = self.core.projector(pooled_v_in)              # (B, d_align)
+            pooled_a = self.core.projector(pooled_a_in)              # (B, d_align)
+
+        # Single tensor so torchview sees one output
+        return pooled_v + pooled_a
