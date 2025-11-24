@@ -18,6 +18,39 @@ import yaml  # pip install pyyaml if needed
 # Dataclasses
 # ==========================
 
+
+@dataclass
+class DatasetsConfig:
+    # Paths to your pre-built feature index files
+    pixmo_train_index: str
+    pixmo_val_index: str
+    librispeech_train_index: Optional[str] = None
+
+    # Flags in case you want to disable a modality
+    use_pixmo: bool = True
+    use_librispeech: bool = True
+
+    def resolve(self) -> None:
+        """Normalize paths to absolute paths."""
+        self.pixmo_train_index = str(Path(self.pixmo_train_index).expanduser().resolve())
+        self.pixmo_val_index = str(Path(self.pixmo_val_index).expanduser().resolve())
+        if self.librispeech_train_index is not None:
+            self.librispeech_train_index = str(
+                Path(self.librispeech_train_index).expanduser().resolve()
+            )
+
+    @property
+    def pixmo_train_path(self) -> Path:
+        return Path(self.pixmo_train_index)
+
+    @property
+    def pixmo_val_path(self) -> Path:
+        return Path(self.pixmo_val_index)
+
+    @property
+    def librispeech_train_path(self) -> Optional[Path]:
+        return Path(self.librispeech_train_index) if self.librispeech_train_index else None
+
 @dataclass
 class PathsConfig:
     root_dir: str
@@ -102,6 +135,8 @@ class Config:
     training: TrainingConfig
     mrl: MRLConfig
     misc: MiscConfig
+    datasets: DatasetsConfig  # ⬅️ add this line
+
 
     # Derived fields (not from YAML)
     torch_device: torch.device = torch.device("cpu")
@@ -152,13 +187,16 @@ def load_config(yaml_path: str = "config.yaml") -> Config:
     # Extract subsections with sane defaults
     paths_raw = _get_section(raw, "paths", {"root_dir": "./runs", "features_dir": None})
     models_raw = _get_section(raw, "models", {})
+    datasets_raw = _get_section(raw, "datasets", {})  # ⬅️ new
     arch_raw = _get_section(raw, "architecture", {})
     training_raw = _get_section(raw, "training", {})
     mrl_raw = _get_section(raw, "mrl", {})
     misc_raw = _get_section(raw, "misc", {})
 
+
     paths = PathsConfig(**paths_raw)
     models = ModelsConfig(**models_raw)
+    datasets = DatasetsConfig(**datasets_raw)   # ⬅️ new
     arch = ArchitectureConfig(**arch_raw)
     training = TrainingConfig(**training_raw)
     mrl = MRLConfig(**mrl_raw)
@@ -174,6 +212,7 @@ def load_config(yaml_path: str = "config.yaml") -> Config:
         training=training,
         mrl=mrl,
         misc=misc,
+        datasets=datasets
     )
     cfg.resolve_device_and_dtype()
 
@@ -229,6 +268,7 @@ def init_wandb(cfg: Config, extra_config: Optional[Dict[str, Any]] = None):
     base_cfg = {
         "paths": asdict(cfg.paths),
         "models": asdict(cfg.models),
+        "datasets": asdict(cfg.datasets),
         "architecture": asdict(cfg.architecture),
         "training": asdict(cfg.training),
         "mrl": asdict(cfg.mrl),

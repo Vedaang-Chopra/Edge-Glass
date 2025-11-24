@@ -68,3 +68,13 @@ misc:
   use_wandb: true
   wandb_project: "edge_glass"
   wandb_run_name: "phase0_global_setup"
+
+# ========================
+# Datasets
+# ========================
+datasets:
+  pixmo_train_index: "./data/data/pixmo/train_index.json"
+  pixmo_val_index: "./data/data/pixmo/val_index.json"
+  librispeech_train_index: "./data/data/librispeech/train_index.json"
+  use_pixmo: true
+  use_librispeech: true
