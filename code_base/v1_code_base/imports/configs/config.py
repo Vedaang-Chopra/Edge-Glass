@@ -160,6 +160,8 @@ class Config:
             self.torch_dtype = torch.float16
         elif self.misc.dtype.lower() == "bfloat16":
             self.torch_dtype = torch.bfloat16
+        elif self.misc.dtype.lower() == "float32":
+            self.torch_dtype = torch.float32
         else:
             raise ValueError(f"Unsupported dtype in config.misc.dtype: {self.misc.dtype}")
 

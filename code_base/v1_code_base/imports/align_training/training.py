@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 from torch.optim import AdamW
 
 from imports.align_training.steps import AlignmentModules, AlignmentConfig, forward_alignment_step
-
+from imports.align_training.eval import eval_alignment
 
 def build_alignment_optimizer(
     modules: AlignmentModules,
@@ -95,6 +95,7 @@ def train_one_epoch(
 
 def train_alignment(
     train_loaders: Dict[str, DataLoader],
+    val_loaders: Dict[str, DataLoader],
     modules: AlignmentModules,
     cfg: AlignmentConfig,
     text_embed_fn: Callable[[list[str], int], torch.Tensor],
@@ -129,6 +130,31 @@ def train_alignment(
                 log_every=log_every,
                 log_fn=log_fn,
             )
+        
+        # --- Validation ---
+        val_loader = val_loaders.get(modality)
+        if val_loader is not None:
+            results = eval_alignment(
+                dataloader=val_loader,
+                modality=modality,
+                modules=modules,
+                cfg=cfg,
+                text_embed_fn=text_embed_fn,
+                device=device,
+            )
+            if log_fn is not None:
+                log_fn(
+                    {
+                        f"{modality}/val_loss": results["val_loss"],
+                        f"{modality}/val_r1": results["val_r1"],
+                    }
+                )
+            print(
+                f"[Eval {epoch}] {modality}: "
+                f"val_loss={results['val_loss']:.4f} "
+                f"val_r1={100 * results['val_r1']:.2f}%"
+            )
+
 
             if log_fn is None:
                 print(

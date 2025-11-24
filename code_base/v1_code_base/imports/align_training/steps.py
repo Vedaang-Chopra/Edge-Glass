@@ -112,9 +112,41 @@ def forward_alignment_step(
 
     # 4) Pool modality embedding
     h_mod = pooled_modality_embedding(latent_tokens_llm)  # (B, D_llm)
+    
 
-    # 5) Text embeddings from HFTextEncoder (or any other)
-    h_txt = text_embed_fn(texts, cfg.max_text_length)  # (B, D_llm)
+    # 5) Text embeddings
+    h_txt = text_embed_fn(texts, cfg.max_text_length)     # (B, D_text)
+
+    # --- cast to float32 for MRL for stability ---
+    h_mod = h_mod.to(torch.float32)
+    h_txt = h_txt.to(torch.float32)
+
+    
+     # --- DEBUG STATS (temporary) ---
+    if not torch.isfinite(h_mod).all():
+        print("[DEBUG] Non-finite values in h_mod:",
+              torch.isnan(h_mod).sum().item(),
+              "NaNs;",
+              torch.isinf(h_mod).sum().item(),
+              "Infs")
+    if not torch.isfinite(h_txt).all():
+        print("[DEBUG] Non-finite values in h_txt:",
+              torch.isnan(h_txt).sum().item(),
+              "NaNs;",
+              torch.isinf(h_txt).sum().item(),
+              "Infs")
+
+    # print norms every few batches
+    print(
+        "[DEBUG] h_mod norm mean/std:",
+        h_mod.norm(dim=-1).mean().item(),
+        h_mod.norm(dim=-1).std().item(),
+        "| h_txt norm mean/std:",
+        h_txt.norm(dim=-1).mean().item(),
+        h_txt.norm(dim=-1).std().item(),
+    )  
+
+
 
     # 6) Matryoshka contrastive loss
     loss = matryoshka_contrastive_loss(
@@ -129,4 +161,6 @@ def forward_alignment_step(
         f"{modality}/mrl_loss": float(loss.detach().cpu().item()),
     }
 
+        
+    
     return loss, metrics

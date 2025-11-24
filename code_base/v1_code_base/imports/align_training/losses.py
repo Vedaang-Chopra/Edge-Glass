@@ -91,44 +91,27 @@ def clip_contrastive_loss(
 # Matryoshka Contrastive Loss (MRL)
 # ============================================================
 
-def matryoshka_contrastive_loss(
-    z_a: torch.Tensor,
-    z_b: torch.Tensor,
-    radii: Sequence[int],
-    temperature: float = 0.07,
-    symmetric: bool = True,
-) -> torch.Tensor:
-    """
-    Matryoshka (nested) contrastive loss.
-    Enforces good alignment at multiple embedding truncation radii.
+def matryoshka_contrastive_loss(z_a, z_b, radii, temperature=0.07, symmetric=True):
+    import torch.nn.functional as F
 
-    Args:
-        z_a: (B, D) modality A embeddings
-        z_b: (B, D) modality B embeddings
-        radii: list of radii, e.g. [256, 512, 1024]
-        temperature: contrastive temp
-        symmetric: CLIP symmetric loss
-
-    Returns:
-        scalar loss
-    """
     assert z_a.shape == z_b.shape
     B, D = z_a.shape
-    max_r = max(radii)
-    assert max_r <= D, f"Max radius {max_r} > embedding dim {D}"
+
+    if not torch.isfinite(z_a).all() or not torch.isfinite(z_b).all():
+        raise ValueError("Non-finite values in embeddings passed to MRL loss")
+
+    valid_radii = [int(r) for r in radii if isinstance(r, (int, float)) and 0 < int(r) <= D]
+    if not valid_radii:
+        raise ValueError(f"No valid radii in {radii} for embedding dim {D}")
 
     losses = []
-
-    for r in radii:
-        # truncate
+    for r in valid_radii:
         za = z_a[:, :r]
         zb = z_b[:, :r]
 
-        # normalize after truncation
         za = l2_normalize(za)
         zb = l2_normalize(zb)
 
-        # compute logits
         logits = (za @ zb.T) / temperature
         targets = torch.arange(B, device=z_a.device)
 
@@ -141,5 +124,4 @@ def matryoshka_contrastive_loss(
 
         losses.append(loss_r)
 
-    # Average over radii
     return sum(losses) / len(losses)

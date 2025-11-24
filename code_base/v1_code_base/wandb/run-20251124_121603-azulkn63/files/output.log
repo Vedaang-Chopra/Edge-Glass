@@ -1,0 +1,4 @@
+[Config] Device: cuda, dtype: torch.float16
+[Config] root_dir: /storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/edge_glass
+[Config] features_dir: /storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/edge_glass/features
+Device: cuda dtype: torch.float16

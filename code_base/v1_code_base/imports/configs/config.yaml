@@ -57,7 +57,7 @@ mrl:
 # Misc / Global
 # ========================
 misc:
-  dtype: "float16"        # "float16" or "bfloat16"
+  dtype: "float32"        # "float16" or "bfloat16"
   seed: 42
 
   # device preference: "auto" | "cuda" | "cpu"
