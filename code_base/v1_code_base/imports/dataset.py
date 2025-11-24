@@ -10,59 +10,132 @@ import numpy as np
 
 class PixmoFeatureDataset(Dataset):
     """
-    Loads the pre-extracted image features.
-    It also fixes old paths like 'data/pixmo/...' -> 'data/data/pixmo/...'
+    Dataset for pre-extracted PixMo image features.
+
+    Expects an index JSON where each record has at least:
+      - "file": path to a .pt blob with keys:
+          * "features": (L, D) tensor
+          * "caption": str
+      - optionally: "num_patches", "orig_idx"
+
+    This class:
+      - fixes old paths like 'data/pixmo/...' -> 'data/data/pixmo/...'
+      - filters out any entries whose feature file cannot be found
+      - returns samples compatible with `collate_alignment`:
+          {
+            "features": (L, D) tensor,
+            "text": str,
+            "modality": "vision",
+            ...extras...
+          }
     """
     def __init__(self, index_file: str | Path):
-        index_file = Path(index_file)
-        with open(index_file, "r") as f:
-            self.index = json.load(f)
+        self.index_file = Path(index_file)
+        self.base_dir = self.index_file.parent
 
-        # Base dir where your index lives (e.g. ./data/data/pixmo)
-        self.base_dir = index_file.parent
+        with open(self.index_file, "r") as f:
+            raw_index = json.load(f)
+
+        clean_index: list[dict] = []
+        for rec in raw_index:
+            raw_path = rec["file"]
+            try:
+                resolved = self._fix_path(raw_path)
+            except FileNotFoundError:
+                print(
+                    f"[PixmoFeatureDataset] WARNING: skipping missing feature file: {raw_path}"
+                )
+                continue
+
+            # store a resolved, absolute-ish path so __getitem__ is cheap
+            rec = dict(rec)
+            rec["resolved_path"] = str(resolved)
+            clean_index.append(rec)
+
+        self.index = clean_index
+        print(
+            f"[PixmoFeatureDataset] Loaded {len(self.index)} valid entries "
+            f"from {len(raw_index)} total."
+        )
 
     def _fix_path(self, raw_path: str) -> Path:
+        """
+        Try multiple strategies to fix incorrect dataset paths.
+
+        Order:
+          1. Use raw path if absolute + exists
+          2. Fix common 'data/pixmo' → 'data/data/pixmo'
+          3. Treat raw_path as relative to index dir
+          4. Use just the filename under index dir
+          5. Brute-force search for filename under base_dir
+
+        Raises:
+          FileNotFoundError if nothing works.
+        """
         p = Path(raw_path)
 
-        # If it's already absolute and exists, just return
+        # Case 1: Raw path is already correct
         if p.is_absolute() and p.exists():
             return p
 
-        # Common case: path stored as "data/pixmo/features/xxx.pt"
-        # but actual is "data/data/pixmo/features/xxx.pt"
-        s = str(p)
-
-        if "data/pixmo" in s and not p.exists():
-            s = s.replace("data/pixmo", "data/data/pixmo")
-            p2 = Path(s)
+        # Case 2: Fix common double-"data" mistake
+        s = str(raw_path)
+        if "data/pixmo" in s:
+            fixed = s.replace("data/pixmo", "data/data/pixmo")
+            p2 = Path(fixed)
             if p2.exists():
                 return p2
 
-        # Otherwise, try resolving relative to the index directory
-        p3 = (self.base_dir / p.name)  # fallback: same dir, same filename
-        if p3.exists():
-            return p3
+        # Case 3: Resolve relative to the index JSON's base_dir
+        candidate = (self.base_dir / raw_path).resolve()
+        if candidate.exists():
+            return candidate
 
-        # Last resort: just return the original; will raise if missing
-        return p
+        # Case 4: Only filename under base_dir
+        candidate2 = (self.base_dir / Path(raw_path).name).resolve()
+        if candidate2.exists():
+            return candidate2
 
-    def __len__(self):
+        # Case 5: brute-force search for matching filename somewhere under base_dir
+        matches = list(self.base_dir.rglob(Path(raw_path).name))
+        if matches:
+            return matches[0]
+
+        raise FileNotFoundError(
+            f"Cannot resolve feature file: '{raw_path}'. "
+            f"Tried absolute, fixed, base_dir-relative, and recursive search."
+        )
+
+    def __len__(self) -> int:
         return len(self.index)
 
-    def __getitem__(self, idx):
-        meta = self.index[idx]
-        raw_path = meta["file"]
-        file_path = self._fix_path(raw_path)
+    def __getitem__(self, idx: int) -> dict:
+        rec = self.index[idx]
+        file_path = Path(rec["resolved_path"])
 
-        blob = torch.load(file_path)
+        blob = torch.load(file_path, map_location="cpu")
 
-        return {
-            "features": blob["features"],          # (num_patches, feat_dim)
-            "text": blob["caption"],               # unify name: "text"
-            "num_patches": meta["num_patches"],
-            "orig_idx": meta["orig_idx"],
+        feats = blob["features"]              # (L, D)
+        text = blob.get("caption", None)
+
+        # fallback: allow text stored in index as "caption" or "text"
+        if text is None:
+            text = rec.get("caption", rec.get("text", ""))
+
+        item: dict[str, Any] = {
+            "features": feats,
+            "text": text,
             "modality": "vision",
+            "file": str(file_path),
         }
+
+        # preserve extra metadata if present
+        if "num_patches" in rec:
+            item["num_patches"] = rec["num_patches"]
+        if "orig_idx" in rec:
+            item["orig_idx"] = rec["orig_idx"]
+
+        return item
 
 
 
