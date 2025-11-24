@@ -119,6 +119,15 @@ class VisionEncoder(nn.Module):
 
         self.device = device
 
+        # Adjust dtype for device capabilities: MPS currently does not
+        # support float16 for many ops. If user requested float16 but the
+        # device is MPS, fall back to float32 to avoid silent partial moves
+        # that later cause Input/weight type mismatches.
+        if getattr(self.device, "type", None) == "mps" and self.cfg.dtype == torch.float16:
+            # keep cfg in sync
+            self.cfg.dtype = torch.float32
+            dtype = torch.float32
+
         # Load processor + model
         self.processor = AutoImageProcessor.from_pretrained(self.cfg.model_name, use_fast=True)
         self.model = AutoModel.from_pretrained(
@@ -126,8 +135,20 @@ class VisionEncoder(nn.Module):
             output_hidden_states=True,
         )
 
-        # Move & freeze
-        self.model.to(self.device, dtype=self.cfg.dtype)
+        # Move & freeze. Move to device first, then cast dtype.
+        # Some backends (eg. MPS) do not support float16; by ensuring
+        # device placement is done first and dtype is compatible we avoid
+        # the common mismatch where inputs are on MPS but weights remain on CPU.
+        self.model.to(self.device)
+        # Only cast dtype if requested and supported; `.to(dtype=...)`
+        # will operate on parameters/buffers already on the target device.
+        if self.cfg.dtype is not None:
+            try:
+                self.model.to(dtype=self.cfg.dtype)
+            except Exception:
+                # If casting fails for any reason, fallback to float32
+                self.model.to(dtype=torch.float32)
+                self.cfg.dtype = torch.float32
         self.model.eval()
         for p in self.model.parameters():
             p.requires_grad = False
@@ -176,6 +197,26 @@ class VisionEncoder(nn.Module):
             pixel_values = images
 
         pixel_values = move_to_device(pixel_values, self.device, self.cfg.dtype)
+
+        # Ensure the HF model is on the same device as the inputs. It's
+        # possible an external wrapper moved the input tensors but the
+        # underlying HF model remained on CPU; move it now if needed.
+        try:
+            param = next(self.model.parameters())
+            model_dev = param.device
+        except StopIteration:
+            model_dev = self.device
+
+        if model_dev != pixel_values.device:
+            # Move model to input device first, then cast dtype if requested.
+            self.model.to(pixel_values.device)
+            # Try casting dtype on-device; if unsupported, fall back to float32.
+            if self.cfg.dtype is not None:
+                try:
+                    self.model.to(dtype=self.cfg.dtype)
+                except Exception:
+                    self.model.to(dtype=torch.float32)
+                    self.cfg.dtype = torch.float32
 
         # Forward through the model
         outputs = self.model(pixel_values=pixel_values)
@@ -257,7 +298,14 @@ class AudioEncoder(nn.Module):
         self.model = WhisperModel.from_pretrained(self.cfg.model_name)
 
         # Move & freeze
-        self.model.to(self.device, dtype=self.cfg.dtype)
+        # Move to device first, then cast dtype (see VisionEncoder note).
+        self.model.to(self.device)
+        if self.cfg.dtype is not None:
+            try:
+                self.model.to(dtype=self.cfg.dtype)
+            except Exception:
+                self.model.to(dtype=torch.float32)
+                self.cfg.dtype = torch.float32
         self.model.eval()
         for p in self.model.parameters():
             p.requires_grad = False
@@ -339,6 +387,22 @@ class AudioEncoder(nn.Module):
         input_features = inputs["input_features"]  # (B, n_frames, feat_dim)
 
         input_features = move_to_device(input_features, self.device, self.cfg.dtype)
+
+        # Ensure the Whisper model is on the same device as the input_features
+        try:
+            param = next(self.model.parameters())
+            model_dev = param.device
+        except StopIteration:
+            model_dev = self.device
+
+        if model_dev != input_features.device:
+            self.model.to(input_features.device)
+            if self.cfg.dtype is not None:
+                try:
+                    self.model.to(dtype=self.cfg.dtype)
+                except Exception:
+                    self.model.to(dtype=torch.float32)
+                    self.cfg.dtype = torch.float32
 
         # ---- Forward through Whisper encoder (encoder-only path) ----
         outputs = self.model.encoder(

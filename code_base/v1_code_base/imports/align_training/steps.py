@@ -1,5 +1,3 @@
-# alignment/alignment_steps.py
-
 from dataclasses import dataclass
 from typing import Callable, Dict, Any
 
@@ -11,9 +9,14 @@ from imports.align_training.losses import matryoshka_contrastive_loss
 
 @dataclass
 class AlignmentConfig:
-    """
-    Thin config wrapper so we don't depend on your big notebook dataclass directly.
+    """Thin config wrapper for alignment training.
+
     You can construct this from your existing `cfg` in the notebook.
+
+    Args:
+        mrl_dims: tuple of Matryoshka radii (e.g., (256, 512, 1024))
+        mrl_temperature: contrastive temperature
+        max_text_length: (optional) max text length hint passed to text_embed_fn
     """
     mrl_dims: tuple[int, ...]
     mrl_temperature: float = 0.07
@@ -22,19 +25,23 @@ class AlignmentConfig:
 
 @dataclass
 class AlignmentModules:
+    """Bundle all modules needed for the alignment step.
+
+    Each attribute can be an nn.Module or None (e.g., audio_adapter if you
+    are only training vision).
     """
-    Bundle all modules needed for the alignment step.
-    """
-    vision_adapter: nn.Module
-    audio_adapter: nn.Module
-    perceiver: nn.Module
-    projector: nn.Module  # Perceiver dim -> LLM/Qwen dim
+    vision_adapter: nn.Module | None
+    audio_adapter: nn.Module | None
+    perceiver: nn.Module | None
+    projector: nn.Module  # Perceiver dim -> LLM/text dim
 
 
 def pooled_modality_embedding(latent_tokens_llm: torch.Tensor) -> torch.Tensor:
-    """
-    Simple mean-pooling over the latent sequence.
-    latent_tokens_llm: (B, L, D_llm)
+    """Simple mean-pooling over the latent sequence.
+
+    Args:
+        latent_tokens_llm: (B, L, D_llm)
+
     Returns:
         (B, D_llm)
     """
@@ -49,14 +56,21 @@ def forward_alignment_step(
     text_embed_fn: Callable[[list[str], int], torch.Tensor],
     device: torch.device,
 ) -> tuple[torch.Tensor, Dict[str, float]]:
-    """
-    One alignment step for a batch.
+    """One alignment step for a batch.
+
+    Expects the output format of `collate_alignment` from dataset.py:
+
+        batch = {
+            "features":       (B, T, D_feat)  # CPU
+            "feature_mask":   (B, T)          # CPU bool
+            "input_ids":      (B, T_txt)      # CPU (unused here)
+            "attention_mask": (B, T_txt)      # CPU (unused here)
+            "modality_ids":   (B,)            # CPU (unused here)
+            "raw_text":       list[str],
+        }
 
     Args:
-        batch: dict with keys:
-            - "encoder_feats": (B, T, D_enc)
-            - "encoder_mask": (B, T) bool or 0/1
-            - "texts": list[str]
+        batch: dict as above
         modality: "vision" or "audio"
         modules: AlignmentModules bundle
         cfg: AlignmentConfig
@@ -67,13 +81,18 @@ def forward_alignment_step(
         loss: scalar tensor
         metrics: dict[str, float]
     """
-    encoder_feats = batch["encoder_feats"].to(device)
-    encoder_mask = batch["encoder_mask"].to(device)
-    texts = batch["texts"]
+    # --- unpack & move features to device ---
+    encoder_feats = batch["features"].to(device)         # (B, T, D_feat)
+    encoder_mask = batch["feature_mask"].to(device)      # (B, T)
+    texts = batch["raw_text"]                            # list[str]
 
     if modality == "vision":
+        if modules.vision_adapter is None:
+            raise ValueError("vision_adapter is None but modality='vision'")
         adapter = modules.vision_adapter
     elif modality == "audio":
+        if modules.audio_adapter is None:
+            raise ValueError("audio_adapter is None but modality='audio'")
         adapter = modules.audio_adapter
     else:
         raise ValueError(f"Unknown modality: {modality}")
@@ -82,23 +101,28 @@ def forward_alignment_step(
     tokens = adapter(encoder_feats)  # (B, T, D_perceiver)
 
     # 2) Perceiver: (B, T, D_perceiver) -> (B, L, D_perceiver)
-    latents = modules.perceiver(tokens, encoder_mask=encoder_mask)  # (B, L, D_perceiver)
+    if modules.perceiver is not None:
+        latents = modules.perceiver(tokens, encoder_mask=encoder_mask)  # (B, L, D_perceiver)
+    else:
+        # If no Perceiver, treat tokens as latents
+        latents = tokens
 
-    # 3) Projector: Perceiver -> LLM dim
+    # 3) Projector: Perceiver -> LLM/text dim
     latent_tokens_llm = modules.projector(latents)  # (B, L, D_llm)
 
     # 4) Pool modality embedding
     h_mod = pooled_modality_embedding(latent_tokens_llm)  # (B, D_llm)
 
-    # 5) Text embeddings from Qwen (or any LLM text encoder)
+    # 5) Text embeddings from HFTextEncoder (or any other)
     h_txt = text_embed_fn(texts, cfg.max_text_length)  # (B, D_llm)
 
     # 6) Matryoshka contrastive loss
     loss = matryoshka_contrastive_loss(
         h_mod,
         h_txt,
-        trunc_dims=cfg.mrl_dims,
+        radii=cfg.mrl_dims,
         temperature=cfg.mrl_temperature,
+        symmetric=True,
     )
 
     metrics = {

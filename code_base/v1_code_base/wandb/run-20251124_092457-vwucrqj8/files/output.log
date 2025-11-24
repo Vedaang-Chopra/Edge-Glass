@@ -1,0 +1,5 @@
+[Config] Device: mps, dtype: torch.float16
+[Config] root_dir: /Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/edge_glass
+[Config] features_dir: /Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/edge_glass/features
+Using device: mps
+Using dtype: torch.float16

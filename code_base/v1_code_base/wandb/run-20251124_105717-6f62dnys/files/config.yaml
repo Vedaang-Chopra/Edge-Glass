@@ -1,0 +1,111 @@
+_wandb:
+    value:
+        cli_version: 0.23.0
+        e:
+            ekppw1hyspagn1gmkwo417g1ib0b7gb4:
+                apple:
+                    ecpuCores: 4
+                    gpuCores: 40
+                    memoryGb: 64
+                    name: Apple M4 Max
+                    pcpuCores: 12
+                    ramTotalBytes: "68719476736"
+                    swapTotalBytes: "2147483648"
+                codePath: /Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/01_align_encoders copy.ipynb
+                codePathLocal: 01_align_encoders copy.ipynb
+                cpu_count: 16
+                cpu_count_logical: 16
+                disk:
+                    /:
+                        total: "994662584320"
+                        used: "343384866816"
+                email: vedaangchopra@hotmail.com
+                executable: /opt/homebrew/Caskroom/miniconda/base/envs/edge_glass_env/bin/python
+                git:
+                    commit: 25b2fc39659441bb65570b6d071a6ed5de400f94
+                    remote: https://github.com/Vedaang-Chopra/Edge-Glass.git
+                host: ipsec-10-2-128-82.vpn.gatech.edu
+                memory:
+                    total: "68719476736"
+                os: macOS-15.6-arm64-arm-64bit
+                program: /Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/01_align_encoders copy.ipynb
+                python: CPython 3.12.12
+                root: /Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base
+                startedAt: "2025-11-24T15:57:17.368989Z"
+                writerId: ekppw1hyspagn1gmkwo417g1ib0b7gb4
+        m: []
+        python_version: 3.12.12
+        t:
+            "1":
+                - 1
+                - 5
+                - 11
+                - 49
+                - 53
+            "2":
+                - 1
+                - 5
+                - 11
+                - 49
+                - 53
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.12.12
+            "5": 0.23.0
+            "6": 4.57.1
+            "8":
+                - 1
+            "12": 0.23.0
+            "13": darwin-arm64
+architecture:
+    value:
+        mlp_ratio: 4
+        num_attn_heads: 8
+        num_latents: 64
+        num_perceiver_layers: 4
+        perceiver_dim: null
+datasets:
+    value:
+        librispeech_train_index: ./data/data/librispeech/train_index.json
+        pixmo_train_index: ./data/data/pixmo/train_index.json
+        pixmo_val_index: ./data/data/pixmo/val_index.json
+        use_librispeech: true
+        use_pixmo: true
+misc:
+    value:
+        device: auto
+        dtype: float16
+        seed: 42
+        use_wandb: true
+        wandb_project: edge_glass
+        wandb_run_name: phase0_global_setup
+models:
+    value:
+        audio_model_name: openai/whisper-base
+        llm_model_name: qwen/Qwen2.5-3B-Instruct
+        vision_model_name: openai/clip-vit-base-patch32
+mrl:
+    value:
+        mrl_dims:
+            - 1024
+            - 512
+            - 256
+        mrl_temp: 0.07
+        mrl_weight: 1
+paths:
+    value:
+        features_dir: /Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/edge_glass/features
+        root_dir: /Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/edge_glass
+training:
+    value:
+        batch_size: 16
+        learning_rate: "3e-4"
+        log_every_steps: 50
+        max_grad_norm: 1
+        num_epochs: 5
+        train_subset_size: 2000
+        val_subset_size: 500
+        warmup_steps: 500
+        weight_decay: 0.01

@@ -1,0 +1,37 @@
+{
+  "os": "macOS-15.6-arm64-arm-64bit",
+  "python": "CPython 3.12.12",
+  "startedAt": "2025-11-24T15:00:33.354863Z",
+  "program": "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/01_align_encoders.ipynb",
+  "codePath": "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/01_align_encoders.ipynb",
+  "codePathLocal": "01_align_encoders.ipynb",
+  "git": {
+    "remote": "https://github.com/Vedaang-Chopra/Edge-Glass.git",
+    "commit": "25b2fc39659441bb65570b6d071a6ed5de400f94"
+  },
+  "email": "vedaangchopra@hotmail.com",
+  "root": "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base",
+  "host": "ipsec-10-2-128-82.vpn.gatech.edu",
+  "executable": "/opt/homebrew/Caskroom/miniconda/base/envs/edge_glass_env/bin/python",
+  "cpu_count": 16,
+  "cpu_count_logical": 16,
+  "disk": {
+    "/": {
+      "total": "994662584320",
+      "used": "343993131008"
+    }
+  },
+  "memory": {
+    "total": "68719476736"
+  },
+  "apple": {
+    "name": "Apple M4 Max",
+    "ecpuCores": 4,
+    "pcpuCores": 12,
+    "gpuCores": 40,
+    "memoryGb": 64,
+    "swapTotalBytes": "2147483648",
+    "ramTotalBytes": "68719476736"
+  },
+  "writerId": "b8hst0u2xj1a6fm2k17l4ksjro1sg5as"
+}

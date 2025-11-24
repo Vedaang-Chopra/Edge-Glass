@@ -58,10 +58,12 @@ class PixmoFeatureDataset(Dataset):
 
         return {
             "features": blob["features"],          # (num_patches, feat_dim)
-            "caption": blob["caption"],            # raw caption text
+            "text": blob["caption"],               # unify name: "text"
             "num_patches": meta["num_patches"],
             "orig_idx": meta["orig_idx"],
+            "modality": "vision",
         }
+
 
 
 
@@ -130,18 +132,23 @@ class LibriSpeechFeatureDataset(Dataset):
             "duration": blob["duration"],
             "sampling_rate": blob["sampling_rate"],
             "orig_idx": blob["orig_idx"],
+            "modality": "audio",
         }
 
 
-def collate_alignment(batch, tokenizer, device="cpu"):
+
+
+def collate_alignment(batch, tokenizer, device=None):
     """
-    batch: list of dicts with keys:
-      - features: (L_i, D)
-      - text: str
-      - modality: "vision" or "audio"
+    batch: list of items from PixmoFeatureDataset / LibriSpeechFeatureDataset
+    Each item must have:
+      - "features": (L_i, D)
+      - "text": str
+      - "modality": "vision" or "audio"
+    Returns **CPU tensors** only (safe for Mac + CUDA with num_workers>0).
     """
     # 1) Feature padding
-    seqs = [b["features"] for b in batch]             # list of (L_i, D)
+    seqs = [b["features"] for b in batch]  # list of (L_i, D)
     lengths = [s.size(0) for s in seqs]
     max_len = max(lengths)
     feat_dim = seqs[0].size(1)
@@ -152,34 +159,33 @@ def collate_alignment(batch, tokenizer, device="cpu"):
 
     for i, (s, L) in enumerate(zip(seqs, lengths)):
         feats[i, :L] = s
-        feat_mask[i, :L] = True   # True where there is real data
+        feat_mask[i, :L] = True
 
-    # 2) Text tokenization (for LLM)
+    # 2) Tokenize text with LLM tokenizer
     texts = [b["text"] for b in batch]
     tok = tokenizer(
         texts,
         padding=True,
         truncation=True,
-        max_length=tokenizer.model_max_length,
         return_tensors="pt",
     )
 
-    # 3) Modality as tensor of ints (0 = vision, 1 = audio), if you want
+    # 3) Modality ids: 0 = vision, 1 = audio
     modality_strs = [b.get("modality", "vision") for b in batch]
     modality_ids = torch.tensor(
         [0 if m == "vision" else 1 for m in modality_strs],
         dtype=torch.long,
     )
 
-    batch_out = {
-        "encoder_feats": feats.to(device),            # (B, max_L, D)
-        "encoder_mask": feat_mask.to(device),         # (B, max_L)
-        "input_ids": tok["input_ids"].to(device),     # (B, T_text)
-        "attention_mask": tok["attention_mask"].to(device),
-        "modality_ids": modality_ids.to(device),      # (B,)
-        "texts": texts,
+    return {
+        "features": feats,                    # (B, L, D) on CPU
+        "feature_mask": feat_mask,            # (B, L) on CPU
+        "input_ids": tok["input_ids"],        # (B, T) on CPU
+        "attention_mask": tok["attention_mask"],  # (B, T) on CPU
+        "modality_ids": modality_ids,         # (B,) on CPU
+        "raw_text": texts,
     }
-    return batch_out
+
 
 
 # ---------------------------------------------------------------------------

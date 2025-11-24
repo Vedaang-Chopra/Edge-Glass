@@ -314,3 +314,16 @@ def setup_from_yaml(yaml_path: str = "config.yaml") -> Config:
     return cfg
 
 
+# def get_default_device():
+#     # Prefer CUDA (NVIDIA)
+#     if torch.cuda.is_available():
+#         return torch.device("cuda")
+#     # Then Apple Silicon / MPS
+#     if getattr(torch.backends, "mps", None) is not None and torch.backends.mps.is_available():
+#         return torch.device("mps")
+#     # Fallback to CPU
+#     return torch.device("cpu")
+
+
+# device = get_default_device()
+# print("Using device:", device)

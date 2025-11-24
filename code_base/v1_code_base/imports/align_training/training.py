@@ -1,5 +1,3 @@
-# alignment/alignment_trainer.py
-
 from typing import Callable, Dict, Any, Optional
 
 import torch
@@ -10,14 +8,24 @@ from imports.align_training.steps import AlignmentModules, AlignmentConfig, forw
 
 
 def build_alignment_optimizer(
-    trainable_modules: torch.nn.Module,
+    modules: AlignmentModules,
     learning_rate: float,
     weight_decay: float,
 ) -> AdamW:
+    """Build AdamW optimizer over all parameters that require grad.
+
+    We collect params from vision_adapter, audio_adapter, perceiver, and projector.
+    Any of them can be None (e.g., if you are only training vision).
     """
-    Build AdamW optimizer over all parameters that require grad.
-    """
-    params = [p for p in trainable_modules.parameters() if p.requires_grad]
+    params = []
+    for m in (modules.vision_adapter, modules.audio_adapter, modules.perceiver, modules.projector):
+        if m is None:
+            continue
+        params.extend([p for p in m.parameters() if p.requires_grad])
+
+    if not params:
+        raise ValueError("No trainable parameters found for optimizer")
+
     return AdamW(params, lr=learning_rate, weight_decay=weight_decay)
 
 
@@ -33,25 +41,15 @@ def train_one_epoch(
     log_every: int = 50,
     log_fn: Optional[Callable[[Dict[str, float]], None]] = None,
 ) -> float:
-    """
-    Train for one epoch on a single modality (vision or audio).
+    """Train for one epoch on a single modality (vision or audio)."""
 
-    Args:
-        dataloader: yields batches in the required format
-        modality: "vision" or "audio"
-        modules, cfg, text_embed_fn: see forward_alignment_step
-        optimizer: AdamW optimizer
-        device: torch.device
-        epoch: epoch index (for logging only)
-        log_every: print/log every N steps
-        log_fn: optional callback(metrics_dict) – e.g. wandb.log
-
-    Returns:
-        mean_loss over the epoch
-    """
-    modules.vision_adapter.train()
-    modules.audio_adapter.train()
-    modules.perceiver.train()
+    # Put relevant modules in train mode
+    if modality == "vision" and modules.vision_adapter is not None:
+        modules.vision_adapter.train()
+    if modality == "audio" and modules.audio_adapter is not None:
+        modules.audio_adapter.train()
+    if modules.perceiver is not None:
+        modules.perceiver.train()
     modules.projector.train()
 
     running_loss = 0.0
@@ -70,6 +68,7 @@ def train_one_epoch(
         )
 
         loss.backward()
+        # Gradient clipping (projector is usually the largest)
         torch.nn.utils.clip_grad_norm_(modules.projector.parameters(), max_norm=1.0)
         optimizer.step()
 
@@ -77,19 +76,17 @@ def train_one_epoch(
         n_steps += 1
 
         if step % log_every == 0:
-            log_data = {
-                "epoch": epoch,
-                "step": step,
-                "modality": modality,
-                "loss": loss.item(),
+            log_data: Dict[str, float] = {
+                "epoch": float(epoch),
+                "step": float(step),
+                "loss": float(loss.item()),
             }
             log_data.update(metrics)
             if log_fn is not None:
                 log_fn(log_data)
             else:
                 print(
-                    f"[Epoch {epoch} | {modality}] "
-                    f"step {step:04d} | loss {loss.item():.4f}"
+                    f"[Epoch {epoch} | {modality}] step {step:04d} | loss {loss.item():.4f}"
                 )
 
     mean_loss = running_loss / max(n_steps, 1)
@@ -108,8 +105,7 @@ def train_alignment(
     log_fn: Optional[Callable[[Dict[str, float]], None]] = None,
     modalities: tuple[str, ...] = ("vision", "audio"),
 ):
-    """
-    Simple multi-epoch training loop over both modalities.
+    """Simple multi-epoch training loop over both modalities.
 
     Args:
         train_loaders: {"vision": vision_loader, "audio": audio_loader}
@@ -136,6 +132,5 @@ def train_alignment(
 
             if log_fn is None:
                 print(
-                    f"[Epoch {epoch}] modality={modality} | "
-                    f"mean_loss={mean_loss:.4f}"
+                    f"[Epoch {epoch}] modality={modality} | mean_loss={mean_loss:.4f}"
                 )
