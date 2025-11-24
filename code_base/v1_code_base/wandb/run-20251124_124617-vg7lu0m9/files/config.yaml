@@ -1,0 +1,119 @@
+_wandb:
+    value:
+        cli_version: 0.23.0
+        e:
+            n7nazkylrpag1hcvd9fpmhs9fshua744:
+                codePath: /home/hice1/vchopra37/scratch/projects/edge_glass/code_base/v1_code_base/training.ipynb
+                cpu_count: 64
+                cpu_count_logical: 64
+                cudaVersion: "12.9"
+                disk:
+                    /:
+                        total: "53619982336"
+                        used: "23655505920"
+                email: vedaangchopra@hotmail.com
+                executable: /home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/bin/python
+                git:
+                    commit: fa7f13b3e264682836cd579fb32c8bf0d1843f4d
+                    remote: git@github.com:Vedaang-Chopra/Edge-Glass.git
+                gpu: NVIDIA L40S
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      cudaCores: 18176
+                      memoryTotal: "48305799168"
+                      name: NVIDIA L40S
+                      uuid: GPU-d8dfd165-727c-fb36-2708-e499a0b3b144
+                host: atl1-1-03-004-21-0.pace.gatech.edu
+                memory:
+                    total: "810722701312"
+                os: Linux-5.14.0-570.37.1.el9_6.x86_64-x86_64-with-glibc2.34
+                program: /home/hice1/vchopra37/scratch/projects/edge_glass/code_base/v1_code_base/training.ipynb
+                python: CPython 3.12.5
+                root: /storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base
+                slurm:
+                    job_id: "3642276"
+                    mpi_type: pmix_v4
+                    root: /opt/slurm/current
+                startedAt: "2025-11-24T17:46:17.128004Z"
+                writerId: n7nazkylrpag1hcvd9fpmhs9fshua744
+        m: []
+        python_version: 3.12.5
+        t:
+            "1":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 53
+                - 71
+            "2":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 53
+                - 71
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.12.5
+            "5": 0.23.0
+            "6": 4.57.1
+            "8":
+                - 1
+            "12": 0.23.0
+            "13": linux-x86_64
+architecture:
+    value:
+        mlp_ratio: 4
+        num_attn_heads: 8
+        num_latents: 64
+        num_perceiver_layers: 4
+        perceiver_dim: null
+datasets:
+    value:
+        librispeech_train_index: ./data/data/librispeech/train_index.json
+        pixmo_train_index: ./data/data/pixmo/train_index.json
+        pixmo_val_index: ./data/data/pixmo/val_index.json
+        use_librispeech: true
+        use_pixmo: true
+misc:
+    value:
+        device: auto
+        dtype: float32
+        seed: 42
+        use_wandb: true
+        wandb_project: edge_glass
+        wandb_run_name: phase0_global_setup
+models:
+    value:
+        audio_model_name: openai/whisper-base
+        llm_model_name: qwen/Qwen2.5-3B-Instruct
+        vision_model_name: openai/clip-vit-base-patch32
+mrl:
+    value:
+        mrl_dims:
+            - 1024
+            - 512
+            - 256
+        mrl_temp: 0.07
+        mrl_weight: 1
+paths:
+    value:
+        features_dir: /storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/edge_glass/features
+        root_dir: /storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/edge_glass
+training:
+    value:
+        batch_size: 16
+        learning_rate: "3e-4"
+        log_every_steps: 50
+        max_grad_norm: 1
+        num_epochs: 5
+        train_subset_size: 2000
+        val_subset_size: 500
+        warmup_steps: 500
+        weight_decay: 0.01
