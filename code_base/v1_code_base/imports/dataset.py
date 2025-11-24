@@ -2,6 +2,11 @@ import json
 import torch
 from torch.utils.data import Dataset, DataLoader
 from pathlib import Path
+import random
+import requests
+from io import BytesIO
+from PIL import Image
+import numpy as np
 
 class PixmoFeatureDataset(Dataset):
     """
@@ -167,11 +172,168 @@ def collate_alignment(batch, tokenizer, device="cpu"):
     )
 
     batch_out = {
-        "features": feats.to(device),                 # (B, max_L, D)
-        "feature_mask": feat_mask.to(device),         # (B, max_L)
+        "encoder_feats": feats.to(device),            # (B, max_L, D)
+        "encoder_mask": feat_mask.to(device),         # (B, max_L)
         "input_ids": tok["input_ids"].to(device),     # (B, T_text)
         "attention_mask": tok["attention_mask"].to(device),
         "modality_ids": modality_ids.to(device),      # (B,)
-        "raw_text": texts,
+        "texts": texts,
     }
     return batch_out
+
+
+# ---------------------------------------------------------------------------
+# On-the-fly Datasets (from notebook)
+# ---------------------------------------------------------------------------
+
+class PixmoVisionDataset(Dataset):
+    """
+    On-the-fly image loading + CLIP feature extraction.
+
+    If 'image' column exists: uses HF-managed images (no manual HTTP).
+    Else: falls back to 'image_url' with robust skipping of bad URLs.
+
+    Returns:
+        {
+          "features": Tensor(T, d_vision),
+          "text": str
+        }
+    """
+    def __init__(self, hf_dataset, vision_model, vision_processor, device, max_retries: int = 5):
+        self.ds = hf_dataset
+        self.vision_model = vision_model
+        self.vision_processor = vision_processor
+        self.device = device
+        self.max_retries = max_retries
+
+        # Determine columns
+        cols = hf_dataset.column_names
+        self.has_image_col = "image" in cols
+        self.img_col = "image" if self.has_image_col else "image_url"
+        self.txt_col = "caption"
+
+    def __len__(self):
+        return len(self.ds)
+
+    def _load_image_from_url(self, url: str) -> Image.Image:
+        resp = requests.get(url, timeout=10)
+        # do NOT let this propagate; we'll catch in __getitem__
+        resp.raise_for_status()
+        img = Image.open(BytesIO(resp.content)).convert("RGB")
+        return img
+
+    def _encode_image(self, img: Image.Image):
+        proc = self.vision_processor(images=img, return_tensors="pt")
+        pixel_values = proc["pixel_values"].to(self.device)
+
+        with torch.no_grad():
+            out = self.vision_model(pixel_values=pixel_values)
+            # (1, T, d_vision)
+            feats = out.last_hidden_state.squeeze(0).to("cpu")  # (T, d_vision)
+        return feats
+
+    def _get_example(self, idx: int):
+        ex = self.ds[idx]
+        caption = ex[self.txt_col]
+
+        if self.has_image_col:
+            # HF has already downloaded/cached images; this is usually a PIL.Image
+            img = ex[self.img_col]
+            if not isinstance(img, Image.Image):
+                img = img.convert("RGB")
+        else:
+            url = ex[self.img_col]
+            img = self._load_image_from_url(url)
+
+        feats = self._encode_image(img)
+        return {
+            "features": feats,
+            "text": caption,
+        }
+
+    def __getitem__(self, idx: int):
+        """
+        Try up to max_retries times with different indices if something fails
+        (HTTP error, decoding error, etc).
+        """
+        n = len(self.ds)
+        attempt = 0
+        cur_idx = idx
+
+        while attempt < self.max_retries:
+            try:
+                return self._get_example(cur_idx)
+            except Exception as e:
+                # print(f"[PixmoVisionDataset] Failed idx={cur_idx}, attempt={attempt+1}, err={e}")
+                attempt += 1
+                cur_idx = (cur_idx + 1) % n
+
+        # Final fallback: try random indices
+        for _ in range(self.max_retries):
+            j = random.randint(0, n - 1)
+            try:
+                return self._get_example(j)
+            except Exception:
+                continue
+
+        raise RuntimeError("PixmoVisionDataset: could not load any valid images after multiple retries.")
+
+
+class LibriSpeechAudioDataset(Dataset):
+    """
+    Dataset over the in-memory filtered LibriSpeech examples.
+    Returns:
+        {
+          "features": Tensor(T_enc, d_audio),
+          "text": str,
+          "duration": float
+        }
+    """
+    def __init__(self, examples, audio_processor, audio_model, device, max_len: int | None = None):
+        self.examples = examples
+        self.audio_processor = audio_processor
+        self.audio_model = audio_model
+        self.device = device
+        if max_len is not None and max_len < len(examples):
+            # Optionally cut down further for faster experiments
+            self.examples = examples[:max_len]
+
+    def __len__(self):
+        return len(self.examples)
+
+    def _whisper_encode_sequence(self, wav: np.ndarray, sr: int):
+        """
+        wav: 1D numpy array (time,)
+        sr:  sampling rate (expected 16k)
+        Returns:
+            feats: Tensor(T_enc, d_audio) on CPU (float16)
+        """
+        # WhisperProcessor: raw waveform -> log-Mel spectrogram features
+        inputs = self.audio_processor(
+            wav,
+            sampling_rate=sr,
+            return_tensors="pt",
+        )
+        input_features = inputs["input_features"].to(self.device)  # (1, T_mel, 80)
+
+        with torch.no_grad():
+            enc_out = self.audio_model.encoder(input_features)
+            hidden = enc_out.last_hidden_state  # (1, T_enc, d_audio)
+
+        feats = hidden.squeeze(0).to(torch.float16).cpu()  # (T_enc, d_audio)
+        return feats
+
+    def __getitem__(self, idx: int):
+        ex = self.examples[idx]
+        wav = ex["waveform"]
+        sr = ex["sampling_rate"]
+        text = ex["text"]
+        dur = ex["duration"]
+
+        feats = self._whisper_encode_sequence(wav, sr)  # (T_enc, d_audio)
+
+        return {
+            "features": feats,
+            "text": text,
+            "duration": dur,
+        }
