@@ -3,11 +3,18 @@
 # Part 0 – Imports, config, and utilities
 # ============================================
 
+import sys
+
+import matplotlib
+matplotlib.use("Agg")  # headless backend (important on PACE)
+import matplotlib.pyplot as plt
+
+
 import os
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Optional, Tuple, List, Dict, Any
-
+import wandb
 import torch
 import torch.nn as nn
 import numpy as np
@@ -21,6 +28,8 @@ from transformers import (
     WhisperModel,
 )
 
+import warnings
+warnings.filterwarnings("ignore")
 
 # ---- Device & dtype ----
 if torch.cuda.is_available():
@@ -60,64 +69,75 @@ from accelerate.utils import set_seed
 
 
 
+from typing import Tuple
+
+
 @dataclass
 class Config:
     # --- Model names ---
     vision_model_name: str = "openai/clip-vit-base-patch32"
     audio_model_name: str = "openai/whisper-base"
     audio_sample_rate: int = 16000
-    llm_model_name: str = "Qwen/Qwen2.5-7B-Instruct"
+    llm_model_name: str   = "Qwen/Qwen2.5-7B-Instruct"
 
     # --- Dimensions ---
     encoder_dim_vision: int = 768     # CLIP-base dim
     encoder_dim_audio: int = 512      # Whisper-base dim
-    llm_hidden_size: int = 3584       # Qwen 7B dim
-    
-    # === IMPROVEMENT 1: Model Capacity ===
-    perceiver_dim: int = 768          # Increased from 512 to match Vision
-    num_latents: int = 64
-    num_perceiver_layers: int = 6     # Increased from 2 to 6 (Deeper logic)
-    num_attn_heads: int = 8
-    mlp_ratio: float = 4.0
+    llm_hidden_size: int   = 3584     # Qwen 7B hidden size
+
+    # === Perceiver bottleneck ===
+    perceiver_dim: int       = 768    # match vision dim
+    num_latents: int         = 64
+    num_perceiver_layers: int = 6     # deeper for more capacity
+    num_attn_heads: int      = 8
+    mlp_ratio: float         = 4.0
 
     # --- Matryoshka loss (MRL) ---
-    use_mrl: bool = True
-    # Adjusted MRL dims to match new perceiver_dim
-    mrl_dims: Tuple[int, ...] = (128, 256, 512, 768, 3584) 
-    mrl_temperature: float = 0.07
-    mrl_weight: float = 0.1
+    use_mrl: bool                = True
+    mrl_dims: Tuple[int, ...]    = (128, 256, 512, 768, 3584)
+    mrl_temperature: float       = 0.07
+    mrl_weight: float            = 0.1
 
-    # === IMPROVEMENT 2: Training Dynamics ===
-    # Contrastive loss needs large batches. 
-    # If you get OOM, lower to 32 but use Gradient Cache if possible.
-    batch_size_vision: int = 512       
-    batch_size_audio: int = 512       
-    
-    # Train longer (200 steps is too short)
-    max_train_steps_vision: int = 1000 
-    max_train_steps_audio: int = 2000 
-    
-    learning_rate: float = 5e-4       # Slightly higher LR for Perceiver
-    weight_decay: float = 0.01
+    # === Training (batch / steps / rounds) ===
+    # 2 GPUs, batch_vision=512, batch_audio=512 → global batch 1024 per step
+    batch_size_vision: int       = 1024   # per GPU
+    batch_size_audio: int        = 1024   # per GPU
 
-    # === IMPROVEMENT 3: Data Scale ===
-    # We need more than 3k samples for alignment
-    librispeech_max_samples: int = 20000 
-    vision_max_samples: int = 25000     
-    max_audio_duration_s: float =  50
-    
-    # --- Training Dynamics ---
-    max_grad_norm: float = 1.0        # Fix: Adds gradient clipping (prevents exploding gradients)
-    num_rounds: int = 1               # Fix: Moving this to config
-    grad_accum_steps: int = 1         # Fix: Explicitly define this (default was 4 in loop)
+    # ~3 hours budget:
+    # 1 round = 300 vision + 300 audio steps = 600 steps
+    # 3 rounds = 1800 total steps
+    max_train_steps_vision: int  = 300
+    max_train_steps_audio: int   = 300
+    num_rounds: int              = 30
+
+    # No gradient accumulation (each step uses full global batch)
+    grad_accum_steps: int        = 1
+
+    # Optimizer hyperparams
+    learning_rate: float         = 5e-4
+    weight_decay: float          = 0.01
+    max_grad_norm: float         = 1.0   # gradient clipping
+
+    # === Data scale ===
+    # You can bump these if IO allows
+    librispeech_max_samples: int = 20000
+    vision_max_samples: int      = 20000
+    max_audio_duration_s: float  = 50.0
 
     # --- Paths & Misc ---
-    vision_features_root: Path = Path("./features_vision")
-    audio_features_root: Path = Path("./features_audio_librispeech")
-    seed: int = 42
-    log_every_steps: int = 20
-    save_dir: Path = Path("./runs_perceiver_mrl_qwen")
-    run_name: str = "optimized_alignment_run"
+    vision_features_root: Path   = Path("./features_vision")
+    audio_features_root: Path    = Path("./features_audio_librispeech")
+
+    seed: int                    = 42
+    log_every_steps: int         = 1
+
+    save_dir: Path               = Path("./runs_perceiver_mrl_qwen")
+    run_name: str                = "alignment_h200_bs1024_r3x300"
+
+    # for WandB via accelerator.init_trackers
+    wandb_project: str           = "edgeglass-multimodal"
+
+
 
 cfg = Config()
 set_seed(cfg.seed)
@@ -126,16 +146,16 @@ print("Optimized Config Loaded.")
 # --------------------------------------------
 # W&B Init
 # --------------------------------------------
-import wandb
-from dataclasses import asdict
+# import wandb
+# from dataclasses import asdict
 
-run_name = cfg.run_name if hasattr(cfg, "run_name") else "tri_modal_alignment"
+# run_name = cfg.run_name if hasattr(cfg, "run_name") else "final_alignment_run"
 
-wandb.init(
-    project=getattr(cfg, "wandb_project", "edgeglass-multimodal"),
-    name=run_name,
-    config=asdict(cfg),
-)
+# wandb.init(
+#     project=getattr(cfg, "wandb_project", "edgeglass-multimodal"),
+#     name=run_name,
+#     config=asdict(cfg),
+# )
 
 
 ### Phase-1: - Loading the Encoders
@@ -365,8 +385,8 @@ for ex in audio_stream:
         break
 
 print("\nSubset collected:", len(subset))
-print("Keys:", subset[0].keys())
-print("Example 0:", subset[0])
+# print("Keys:", subset[0].keys())
+# print("Example 0:", subset[0])
 
 # Helper: convert LibriSpeech streaming example → waveform
 def load_waveform_from_streaming_example(example, target_sr=16000):
@@ -406,14 +426,14 @@ for ex in subset:
             "duration": dur,
             "text": ex["text"]
         })
-print("After duration filtering:", len(filtered), "examples")
-print("\nShowing a few filtered samples...")
+# print("After duration filtering:", len(filtered), "examples")
+# print("\nShowing a few filtered samples...")
 for i in range(min(5, len(filtered))):
     ex = filtered[i]
-    print(f"\nSample {i}:")
-    print("  Duration:", round(ex["duration"], 2), "s")
-    print("  Transcript:", ex["text"])
-    print("  Waveform shape:", ex["waveform"].shape)
+    # print(f"\nSample {i}:")
+    # print("  Duration:", round(ex["duration"], 2), "s")
+    # print("  Transcript:", ex["text"])
+    # print("  Waveform shape:", ex["waveform"].shape)
 len(filtered)
 
 # ============================================
@@ -661,9 +681,9 @@ class LibriSpeechAudioDataset(Dataset):
 audio_max = getattr(cfg, "librispeech_max_samples", len(filtered))
 audio_dataset = LibriSpeechAudioDataset(filtered, max_len=audio_max)
 
-print("Audio dataset fixed (Padding Slicing + Text Norm).")
-print("Example 0 features shape:", audio_dataset[0]["features"].shape) # Should NOT be (1500, 512) anymore unless audio is exactly 30s
-print("Example 0 text:", audio_dataset[0]["text"])
+# print("Audio dataset fixed (Padding Slicing + Text Norm).")
+# print("Example 0 features shape:", audio_dataset[0]["features"].shape) # Should NOT be (1500, 512) anymore unless audio is exactly 30s
+# print("Example 0 text:", audio_dataset[0]["text"])
 ### Part-5
 # ============================================
 # Part 5 – Unified Adapters, Perceiver Resampler & Projector
@@ -968,19 +988,34 @@ sample_v = vision_dataset[0]
 print("  features shape:", sample_v["features"].shape)
 print("  text snippet:", sample_v["text"][:120], "...")
 
-vision_loader = DataLoader(
-    vision_dataset,
-    batch_size=cfg.batch_size_vision,
-    shuffle=True,
-    collate_fn=collate_features_with_text,
-)
+# vision_loader = DataLoader(
+#     vision_dataset,
+#     batch_size=cfg.batch_size_vision,
+#     shuffle=True,
+#     collate_fn=collate_features_with_text,
+# )
 
 # Vision & audio loaders (you’ll use these in Part 7 for training)
+# vision_loader = DataLoader(
+#     vision_dataset,
+#     batch_size=cfg.batch_size_vision,
+#     shuffle=True,
+#     collate_fn=collate_features_with_text,
+# )
+
+# audio_loader = DataLoader(
+#     audio_dataset,
+#     batch_size=cfg.batch_size_audio,
+#     shuffle=True,
+#     collate_fn=collate_features_with_text,
+# )
+
 vision_loader = DataLoader(
     vision_dataset,
     batch_size=cfg.batch_size_vision,
     shuffle=True,
     collate_fn=collate_features_with_text,
+    drop_last=True,          # <--- ADD THIS
 )
 
 audio_loader = DataLoader(
@@ -988,7 +1023,9 @@ audio_loader = DataLoader(
     batch_size=cfg.batch_size_audio,
     shuffle=True,
     collate_fn=collate_features_with_text,
+    drop_last=True,          # <--- AND THIS
 )
+
 
 print("Vision loader & audio loader ready.")
 
@@ -1276,8 +1313,6 @@ def pooled_modality_embedding(latent_tokens_llm: torch.Tensor) -> torch.Tensor:
 
 #     return mrl_loss, metrics
 
-
-
 def forward_alignment_step(
     batch: dict,
     accelerator,
@@ -1291,40 +1326,37 @@ def forward_alignment_step(
         - encoder_mask:  (B, T) bool
         - texts: list[str]
     """
-    device = accelerator.device
+    dev = accelerator.device
 
-    encoder_feats = batch["encoder_feats"].to(device)   # (B, T, D_enc)
-    encoder_mask  = batch["encoder_mask"].to(device)    # (B, T)
-    texts         = batch["texts"]                      # list[str]
+    encoder_feats = batch["encoder_feats"].to(dev)   # (B, T, D_enc)
+    encoder_mask  = batch["encoder_mask"].to(dev)    # (B, T)
+    texts         = batch["texts"]                   # list[str]
 
     # 1) Modality adapter → Perceiver dim
     if modality == "vision":
-        tokens = vision_adapter(encoder_feats)          # (B, T, D_perc)
+        tokens = vision_adapter(encoder_feats)       # (B, T, D_perc)
     elif modality == "audio":
-        tokens = audio_adapter(encoder_feats)           # (B, T, D_perc)
+        tokens = audio_adapter(encoder_feats)        # (B, T, D_perc)
     else:
         raise ValueError(f"Unknown modality: {modality}")
 
     # 2) Perceiver resampler → latent tokens
-    latents = perceiver(tokens, encoder_mask)           # (B, L, D_perc)
+    latents = perceiver(tokens, encoder_mask)        # (B, L, D_perc)
 
     # 3) Project to Qwen hidden space
-    z_llm_local = projector(latents)                    # (B, L, D_llm)
-    assert z_llm_local.shape[-1] == cfg.llm_hidden_size, \
-        f"Projector output {z_llm_local.shape[-1]} != cfg.llm_hidden_size {cfg.llm_hidden_size}"
+    z_llm = projector(latents)                      # (B, L, D_llm)
+    assert z_llm.shape[-1] == cfg.llm_hidden_size, \
+        f"Projector output {z_llm.shape[-1]} != cfg.llm_hidden_size {cfg.llm_hidden_size}"
 
-    # 4) Local pooled embeddings
-    h_mod_local = pooled_modality_embedding(z_llm_local)       # (B, D_llm)
-    h_txt_local, _ = pooled_text_embedding(texts, max_length=64)  # (B, D_llm)
+    # 4) Local pooled embeddings (per-GPU)
+    h_mod = pooled_modality_embedding(z_llm)        # (B, D_llm)
+    h_txt, _ = pooled_text_embedding(texts, max_length=64)  # (B, D_llm)
+    h_txt = h_txt.to(h_mod.device)
 
-    # 5) Gather across all processes → global batch for contrastive loss
-    h_mod_global = accelerator.gather(h_mod_local)
-    h_txt_global = accelerator.gather(h_txt_local)
-
-    # 6) Matryoshka contrastive loss
+    # 5) Matryoshka contrastive loss (LOCAL ONLY; no cross-GPU gather)
     mrl_loss = matryoshka_contrastive_loss(
-        h_mod_global,
-        h_txt_global,
+        h_mod,
+        h_txt,
         trunc_dims=cfg.mrl_dims,
         temperature=cfg.mrl_temperature,
     )
@@ -1333,10 +1365,12 @@ def forward_alignment_step(
         "loss":        float(mrl_loss.detach().cpu()),
         "mrl_loss":    float(mrl_loss.detach().cpu()),
         "modality":    modality,
-        "batch_size":  int(h_mod_local.size(0)),
+        "batch_size":  int(h_mod.size(0)),
     }
 
     return mrl_loss, metrics
+
+
 
 print("\nPart 6 ready: collate, MRL, and forward_alignment_step defined.")
 
@@ -1381,105 +1415,126 @@ print("\nOptimizer ready with", sum(p.numel() for p in trainable_modules.paramet
 
 
 
-wandb.watch(trainable_modules, log="all", log_freq=50)
+# wandb.watch(trainable_modules, log="all", log_freq=50)
 # --------------------------------------------
 # 7.1 – Generic training epoch for one modality
 # --------------------------------------------
-# def train_one_epoch(
-#     dataloader,
-#     modality,
-#     max_steps,
-#     optimizer,      # Passed in
-#     scheduler,      # Passed in
-#     accelerator,
-#     log_prefix=""
-# ):
-#     trainable_modules.train()
-#     running_loss = 0.0
-#     num_batches = 0
-#     import time
-#     start_time = time.time()
-
-    
-#     # We assume dataloader is already prepared by accelerator
-#     # pbar = tqdm(dataloader, total=max_steps, desc=f"{log_prefix}train-{modality}", leave=False)
-#     pbar = tqdm(
-#     dataloader,
-#     total=max_steps,
-#     desc=f"{log_prefix}train-{modality}",
-#     leave=True,
-#     dynamic_ncols=True,
-#     )
-#     for step, batch in enumerate(pbar, start=1):
-#         if step > max_steps:
-#             break
-
-#         optimizer.zero_grad(set_to_none=True)
-
-#         # Forward step
-#         loss, metrics = forward_alignment_step(batch, accelerator, modality=modality)
-        
-#         # Backward step (Accelerate handles the scaling/unscaling)
-#         accelerator.backward(loss)
-
-#         if cfg.max_grad_norm is not None:
-#             if accelerator.sync_gradients:
-#                 accelerator.clip_grad_norm_(trainable_modules.parameters(), cfg.max_grad_norm)
-
-#         optimizer.step()
-#         if scheduler:
-#             scheduler.step()
-
-#         running_loss += metrics["loss"]
-#         num_batches += 1
-#         avg_loss = running_loss / num_batches
-
-#         # W&B logging (only on main process)
-#         if accelerator.is_main_process:
-#             wandb.log({
-#                 f"{modality}/train/loss": metrics["loss"],
-#                 f"{modality}/train/avg_loss": avg_loss,
-#                 f"{modality}/train/mrl_loss": metrics["mrl_loss"],
-#             })
-            
-#             if step % cfg.log_every_steps == 0:
-#                 pbar.set_postfix({"loss": f"{metrics['loss']:.4f}"})
-#         if accelerator.is_main_process and step % 50 == 0:
-#             elapsed = time.time() - start_time
-#             steps_done = step
-#             steps_left = max_steps - steps_done
-#             eta = steps_left * (elapsed / steps_done)
-#             print(f"[ETA] {modality}: {eta/60:.2f} min remaining")
-
-#     return running_loss / max(1, num_batches)
-
+import os
 import time
+from dataclasses import asdict
 
+import torch
+import torch.nn.functional as F
+from torch.optim import AdamW
+from torch.utils.data import DataLoader
+from tqdm.auto import tqdm
+from accelerate import Accelerator
+from transformers import get_cosine_schedule_with_warmup
+
+
+
+def plot_alignment_curves(
+    vision_history: dict,
+    audio_history: dict,
+    out_dir: Path,
+    prefix: str = "alignment",
+):
+    """
+    vision_history / audio_history are dicts like:
+      {
+        "epoch":      [1, 2, ...],
+        "train_loss": [..],
+        "eval_loss":  [..],
+        "eval_acc":   [..],   # recall@1
+      }
+    Saves:  {prefix}_loss.png and {prefix}_accuracy.png
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # ---------- LOSS ----------
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.plot(vision_history["epoch"], vision_history["train_loss"],
+            label="vision train", marker="o")
+    ax.plot(vision_history["epoch"], vision_history["eval_loss"],
+            label="vision eval", marker="o")
+    ax.plot(audio_history["epoch"], audio_history["train_loss"],
+            label="audio train", marker="x")
+    ax.plot(audio_history["epoch"], audio_history["eval_loss"],
+            label="audio eval", marker="x")
+
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel("Loss")
+    ax.set_title("Alignment loss per epoch")
+    ax.legend()
+    ax.grid(True, linestyle="--", alpha=0.4)
+
+    loss_path = out_dir / f"{prefix}_loss.png"
+    fig.tight_layout()
+    fig.savefig(loss_path, dpi=150)
+    plt.close(fig)
+
+    # ---------- ACCURACY ----------
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.plot(vision_history["epoch"], vision_history["eval_acc"],
+            label="vision recall@1", marker="o")
+    ax.plot(audio_history["epoch"], audio_history["eval_acc"],
+            label="audio recall@1", marker="x")
+
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel("Recall@1")
+    ax.set_title("Alignment retrieval accuracy per epoch")
+    ax.legend()
+    ax.grid(True, linestyle="--", alpha=0.4)
+
+    acc_path = out_dir / f"{prefix}_accuracy.png"
+    fig.tight_layout()
+    fig.savefig(acc_path, dpi=150)
+    plt.close(fig)
+
+    print(f"📈 Saved plots to:\n  - {loss_path}\n  - {acc_path}")
+
+
+# ============================================================
+# 1) One training epoch
+# ============================================================
 def train_one_epoch(
     dataloader,
-    modality,
-    max_steps,
-    optimizer,      # Passed in
-    scheduler,      # Passed in
-    accelerator,
-    log_prefix=""
+    modality: str,
+    max_steps: int,
+    optimizer,
+    scheduler,
+    accelerator: Accelerator,
+    global_step: int,
+    log_prefix: str = "",
 ):
+    """
+    One training epoch for a single modality ("vision" or "audio").
+
+    Logs per *step*:
+      - train/loss (global)
+      - {modality}/train/loss
+      - {modality}/train/avg_loss
+      - {modality}/train/mrl_loss
+      - timing & ETA stats
+
+    Logs per *epoch*:
+      - {modality}/train/epoch_loss
+    """
     trainable_modules.train()
 
-    # --- timing state ---
     start_time = time.time()
     running_loss = 0.0
     num_batches = 0
 
-    # tqdm with ETA-friendly settings
     pbar = tqdm(
-        dataloader,
-        total=max_steps,
-        desc=f"{log_prefix}train-{modality}",
-        leave=True,
-        dynamic_ncols=True,
-    )
-
+    dataloader,
+    total=max_steps,
+    desc=f"{log_prefix}train-{modality}",
+    file=sys.stdout,                 # ← stdout
+    dynamic_ncols=True,
+    leave=True,
+    disable=not accelerator.is_main_process
+)
     for step, batch in enumerate(pbar, start=1):
         if step > max_steps:
             break
@@ -1488,20 +1543,32 @@ def train_one_epoch(
 
         optimizer.zero_grad(set_to_none=True)
 
-        # Forward step
+        # ---- forward + loss ----
         loss, metrics = forward_alignment_step(batch, accelerator, modality=modality)
-        
-        # Backward step (Accelerate handles scaling/unscaling)
+
+        # DEBUG prints (main process only)
+        if accelerator.is_main_process and (
+            step in (1, 2, 5, 10) or step % 100 == 0
+        ):
+            accelerator.print(
+                f"[DEBUG {modality}] step={step} "
+                f"loss={metrics['loss']:.4f} "
+                f"batch={metrics['batch_size']}"
+            )
+
+        # ---- backward ----
         accelerator.backward(loss)
 
         if cfg.max_grad_norm is not None and accelerator.sync_gradients:
-            accelerator.clip_grad_norm_(trainable_modules.parameters(), cfg.max_grad_norm)
+            accelerator.clip_grad_norm_(
+                trainable_modules.parameters(), cfg.max_grad_norm
+            )
 
         optimizer.step()
-        if scheduler:
+        if scheduler is not None:
             scheduler.step()
 
-        # ---- update running stats ----
+        # ---- stats & ETA ----
         running_loss += metrics["loss"]
         num_batches += 1
         avg_loss = running_loss / num_batches
@@ -1511,58 +1578,77 @@ def train_one_epoch(
         steps_done = num_batches
         steps_left = max_steps - steps_done
         avg_step_time = elapsed / max(1, steps_done)
-        eta_sec = steps_left * avg_step_time
+        eta_sec = max(0.0, steps_left * avg_step_time)
 
+        # ---- logging per step ----
         if accelerator.is_main_process:
-            # Update tqdm bar
+            global_step += 1  # bump global counter
+
             if step % cfg.log_every_steps == 0:
-                pbar.set_postfix({
-                    "loss": f"{metrics['loss']:.4f}",
-                    "eta_min": f"{eta_sec/60:.1f}",
-                })
+                pbar.set_postfix(
+                    {
+                        "loss": f"{metrics['loss']:.4f}",
+                        "eta_min": f"{eta_sec / 60:.1f}",
+                    }
+                )
 
-            # W&B logging
-            wandb.log({
-                f"{modality}/train/loss": metrics["loss"],
-                f"{modality}/train/avg_loss": avg_loss,
-                f"{modality}/train/mrl_loss": metrics["mrl_loss"],
-                f"{modality}/train/step_time_sec": iter_time,
-                f"{modality}/train/avg_step_time_sec": avg_step_time,
-                f"{modality}/train/eta_sec": eta_sec,
-                f"{modality}/train/eta_min": eta_sec / 60.0,
-                f"{modality}/train/steps_done": steps_done,
-                f"{modality}/train/steps_left": steps_left,
-            })
+            accelerator.log(
+                {
+                    "train/loss": metrics["loss"],
+                    f"{modality}/train/loss": metrics["loss"],
+                    f"{modality}/train/avg_loss": avg_loss,
+                    f"{modality}/train/mrl_loss": metrics["mrl_loss"],
+                    f"{modality}/train/step_time_sec": iter_time,
+                    f"{modality}/train/avg_step_time_sec": avg_step_time,
+                    f"{modality}/train/eta_sec": eta_sec,
+                    f"{modality}/train/eta_min": eta_sec / 60.0,
+                    f"{modality}/train/steps_done": steps_done,
+                    f"{modality}/train/steps_left": steps_left,
+                },
+                step=global_step,
+            )
 
-    return running_loss / max(1, num_batches)
+    # ---- epoch-level logging ----
+    epoch_loss = running_loss / max(1, num_batches)
+
+    if accelerator.is_main_process:
+        accelerator.log(
+            {f"{modality}/train/epoch_loss": epoch_loss},
+            step=global_step,
+        )
+
+    return epoch_loss, global_step
 
 
-
-# --------------------------------------------
-# 7.2 – Simple retrieval eval (sanity check)
-# --------------------------------------------
-
+# ============================================================
+# 2) Retrieval eval (sanity check)
+# ============================================================
 @torch.no_grad()
 def eval_retrieval(
     dataset,
     modality: str,
+    accelerator: Accelerator,
     num_samples: int = 64,
 ):
     """
-    Very small retrieval sanity check:
-      - take num_samples examples
-      - compute modality & text embeddings
-      - compute similarity matrix
-      - report Recall@1 (how often correct text is most similar)
+    Small retrieval sanity check:
 
-    Works for both vision_dataset and audio_dataset.
+      - takes up to `num_samples` examples
+      - computes:
+          * modality & text embeddings
+          * Matryoshka contrastive loss (val loss)
+          * Recall@1 retrieval accuracy
+
+    Returns:
+        {
+            "val_loss": float,
+            "recall_at_1": float,
+        }
     """
     trainable_modules.eval()
+    device = accelerator.device
 
-    # Build a tiny batch with collate
-    from math import ceil
     B = min(num_samples, len(dataset))
-    # Manual batching using DataLoader with our collate
     tmp_loader = DataLoader(
         dataset,
         batch_size=B,
@@ -1571,11 +1657,11 @@ def eval_retrieval(
     )
     batch = next(iter(tmp_loader))
 
-    # Forward until we get h_mod and h_txt (without loss)
     encoder_feats = batch["encoder_feats"].to(device)
-    encoder_mask  = batch["encoder_mask"].to(device)
-    texts         = batch["texts"]
+    encoder_mask = batch["encoder_mask"].to(device)
+    texts = batch["texts"]
 
+    # modality adapter
     if modality == "vision":
         tokens = vision_adapter(encoder_feats)
     elif modality == "audio":
@@ -1583,189 +1669,253 @@ def eval_retrieval(
     else:
         raise ValueError(f"Unknown modality: {modality}")
 
+    # perceiver + projector
     latents = perceiver(tokens, encoder_mask)
-    z_llm   = projector(latents)
+    z_llm = projector(latents)
 
-    h_mod = pooled_modality_embedding(z_llm)      # (B, D_llm)
-    h_txt, _ = pooled_text_embedding(texts)      # (B, D_llm)
+    # pooled representations
+    h_mod = pooled_modality_embedding(z_llm)  # (B, D_llm)
+    h_txt, _ = pooled_text_embedding(texts)   # (B, D_llm)
 
-    # Normalize
-    h_mod = F.normalize(h_mod, dim=-1)
-    h_txt = F.normalize(h_txt, dim=-1)
+    # dtype / device fix
+    h_mod = h_mod.to(device)
+    h_txt = h_txt.to(device)
+    if h_mod.dtype != h_txt.dtype:
+        h_txt = h_txt.to(h_mod.dtype)
 
-    # Similarity matrix (B, B)
-    sims = h_mod @ h_txt.T
+    # validation MRL loss
+    val_loss = matryoshka_contrastive_loss(
+        h_mod,
+        h_txt,
+        trunc_dims=cfg.mrl_dims,
+        temperature=cfg.mrl_temperature,
+    ).item()
 
-    # For each modality embedding, check if its diagonal text is top-1
+    # retrieval Recall@1
+    h_mod_n = F.normalize(h_mod, dim=-1)
+    h_txt_n = F.normalize(h_txt, dim=-1)
+    sims = h_mod_n @ h_txt_n.T  # (B, B)
+
     ranks = sims.argsort(dim=-1, descending=True)
-    correct_top1 = (ranks[:, 0] == torch.arange(B, device=ranks.device)).float().mean().item()
+    recall_at_1 = (
+        ranks[:, 0] == torch.arange(B, device=ranks.device)
+    ).float().mean().item()
 
-    print(f"[Eval {modality}] Retrieval Recall@1 on {B} samples: {correct_top1:.3f}")
-    return correct_top1
+    accelerator.print(
+        f"[Eval {modality}] B={B} "
+        f"val_loss={val_loss:.4f} "
+        f"R@1={recall_at_1:.3f} "
+        f"h_mod.dtype={h_mod.dtype}, h_txt.dtype={h_txt.dtype}"
+    )
+
+    return {
+        "val_loss": val_loss,
+        "recall_at_1": recall_at_1,
+    }
 
 
-from transformers import get_cosine_schedule_with_warmup
+# ============================================================
+# 3) Main training function
+# ============================================================
 def training_function():
-    # 1. Initialize Accelerator FIRST
-    # We must create it here so each process gets its own instance.
+    # 1. Accelerator (multi-GPU + W&B)
     accelerator = Accelerator(mixed_precision="bf16", log_with="wandb")
     device = accelerator.device
 
-    # --- move all modules to device BEFORE training ---
+    # 2. W&B trackers (only once on main process)
+    if accelerator.is_main_process:
+        accelerator.init_trackers(
+            project_name=getattr(cfg, "wandb_project", "edgeglass-multimodal"),
+            config=asdict(cfg),
+            init_kwargs={
+                "wandb": {
+                    "name": cfg.run_name,
+                    "settings": {"start_method": "fork"},
+                }
+            },
+        )
+
+    # 3. Move *unwrapped* modules to device
     perceiver.to(device)
     projector.to(device)
-    # pooled_modality_embedding.to(device)
-    qwen_model.to(device)   # <-- IMPORTANT
+    qwen_model.to(device)
+    vision_adapter.to(device)
+    audio_adapter.to(device)
 
-    # Now we can safely use it
-    print(f"Process {accelerator.process_index} starting...")
+    accelerator.print(f"Process {accelerator.process_index} starting...")
 
-    # 2. Setup Optimizer (Must be created fresh inside the function)
+    # 4. Optimizer & scheduler
     optimizer = AdamW(
         [p for p in trainable_modules.parameters() if p.requires_grad],
         lr=cfg.learning_rate,
         weight_decay=cfg.weight_decay,
     )
 
-    # 3. Setup Scheduler
     total_steps = (cfg.max_train_steps_vision + cfg.max_train_steps_audio) * cfg.num_rounds
     scheduler = get_cosine_schedule_with_warmup(
-        optimizer, 
-        num_warmup_steps=int(0.1 * total_steps), 
-        num_training_steps=total_steps
+        optimizer,
+        num_warmup_steps=int(0.1 * total_steps),
+        num_training_steps=total_steps,
     )
 
-    # 4. Prepare everything ONCE
-    # We reference the global models/loaders, but Accelerate wraps them for this specific process.
-    # global vision_adapter, audio_adapter, perceiver, projector, trainable_modules
+    vision_hist = {"epoch": [], "train_loss": [], "eval_loss": [], "eval_acc": []}
+    audio_hist  = {"epoch": [], "train_loss": [], "eval_loss": [], "eval_acc": []}
+    
+    
+    # 5. Wrap with Accelerate
     (
-        vision_adapter_acc, 
-        audio_adapter_acc, 
-        perceiver_acc, 
-        projector_acc, 
-        optimizer_acc, 
-        vision_loader_acc, 
+        vision_adapter_acc,
+        audio_adapter_acc,
+        perceiver_acc,
+        projector_acc,
+        optimizer_acc,
+        vision_loader_acc,
         audio_loader_acc,
-        scheduler_acc
+        scheduler_acc,
     ) = accelerator.prepare(
-        vision_adapter, 
-        audio_adapter, 
-        perceiver, 
-        projector, 
-        optimizer, 
-        vision_loader, 
+        vision_adapter,
+        audio_adapter,
+        perceiver,
+        projector,
+        optimizer,
+        vision_loader,
         audio_loader,
-        scheduler
+        scheduler,
     )
 
-    # 5. The Training Loop
+    # IMPORTANT: rebind globals to wrapped modules so forward_alignment_step & eval use them
+    globals()["vision_adapter"] = vision_adapter_acc
+    globals()["audio_adapter"] = audio_adapter_acc
+    globals()["perceiver"] = perceiver_acc
+    globals()["projector"] = projector_acc
+
+    # Global logging step counter
+    global_step = 0
+
+    # 6. Training rounds
     for round_idx in range(cfg.num_rounds):
         if accelerator.is_main_process:
-            print(f"\n========== Round {round_idx+1}/{cfg.num_rounds} ==========")
+            accelerator.print(
+                f"\n========== Round {round_idx + 1}/{cfg.num_rounds} =========="
+            )
 
-        # --- Vision Training ---
-        train_one_epoch(
+        # ---- Vision training ----
+        vision_loss, global_step = train_one_epoch(
             dataloader=vision_loader_acc,
             modality="vision",
             max_steps=cfg.max_train_steps_vision,
             optimizer=optimizer_acc,
             scheduler=scheduler_acc,
             accelerator=accelerator,
-            log_prefix=f"round{round_idx+1}-"
+            global_step=global_step,
+            log_prefix=f"round{round_idx + 1}-",
         )
-        
-        # Wait for all GPUs to finish before evaluation
-        accelerator.wait_for_everyone()
-        
-        # Run eval only on the main process to avoid duplicate logs/prints
-        if accelerator.is_main_process:
-            eval_retrieval(vision_dataset, modality="vision", num_samples=32)
 
-        # --- Audio Training ---
-        train_one_epoch(
+        
+        accelerator.wait_for_everyone()
+
+        # Vision eval
+        if accelerator.is_main_process:
+            vision_metrics = eval_retrieval(
+                vision_dataset,
+                modality="vision",
+                accelerator=accelerator,
+                num_samples=32,
+            )
+            accelerator.log(
+                {
+                    "vision/eval/loss": vision_metrics["val_loss"],
+                    "vision/eval/recall_at_1": vision_metrics["recall_at_1"],
+                    "vision/eval/accuracy": vision_metrics["recall_at_1"],
+                    "vision/train/epoch_loss": vision_loss,
+                },
+                step=global_step,
+            )
+            # store for local plotting
+            vision_hist["epoch"].append(round_idx)
+            vision_hist["train_loss"].append(vision_loss)
+            vision_hist["eval_loss"].append(vision_metrics["val_loss"])
+            vision_hist["eval_acc"].append(vision_metrics["recall_at_1"])
+
+        # ---- Audio training ----
+        audio_loss, global_step = train_one_epoch(
             dataloader=audio_loader_acc,
             modality="audio",
             max_steps=cfg.max_train_steps_audio,
             optimizer=optimizer_acc,
             scheduler=scheduler_acc,
             accelerator=accelerator,
-            log_prefix=f"round{round_idx+1}-"
+            global_step=global_step,
+            log_prefix=f"round{round_idx + 1}-",
         )
+
         
         accelerator.wait_for_everyone()
+
         if accelerator.is_main_process:
-            eval_retrieval(audio_dataset, modality="audio", num_samples=32)
+            audio_metrics = eval_retrieval(
+                audio_dataset,
+                modality="audio",
+                accelerator=accelerator,
+                num_samples=32,
+            )
+            accelerator.log(
+                {
+                    "audio/eval/loss": audio_metrics["val_loss"],
+                    "audio/eval/recall_at_1": audio_metrics["recall_at_1"],
+                    "audio/eval/accuracy": audio_metrics["recall_at_1"],
+                    "audio/train/epoch_loss": audio_loss,
+                },
+                step=global_step,
+            )
+        
+            audio_hist["epoch"].append(round_idx)
+            audio_hist["train_loss"].append(audio_loss)
+            audio_hist["eval_loss"].append(audio_metrics["val_loss"])
+            audio_hist["eval_acc"].append(audio_metrics["recall_at_1"])
+        
+    # 7. Save checkpoint (only once)
+    accelerator.wait_for_everyone()
 
     if accelerator.is_main_process:
-        print("Training Finished!")
+        ckpt_dir = cfg.save_dir / "v1_code_base" / "model_saved"
+        os.makedirs(ckpt_dir, exist_ok=True)
+        ckpt_path = ckpt_dir / "alignment_checkpoint.pt"
+
+        # unwrap possible DDP wrappers
+        va = accelerator.unwrap_model(vision_adapter_acc)
+        aa = accelerator.unwrap_model(audio_adapter_acc)
+        perc = accelerator.unwrap_model(perceiver_acc)
+        proj = accelerator.unwrap_model(projector_acc)
+
+        state = {
+            "cfg": asdict(cfg),
+            "vision_adapter": va.state_dict(),
+            "audio_adapter": aa.state_dict(),
+            "perceiver": perc.state_dict(),
+            "projector": proj.state_dict(),
+        }
+        torch.save(state, ckpt_path)
+        accelerator.print(f"✅ Saved checkpoint to {ckpt_path}")
+        # ---- NEW: make plots ----
+        save_dir = cfg.save_dir / "v1_code_base" / "model_saved"
+        os.makedirs(save_dir, exist_ok=True)
+        ckpt_path = save_dir / "alignment_checkpoint.pt"
+        plot_alignment_curves(
+            vision_history=vision_hist,
+            audio_history=audio_hist,
+            out_dir=save_dir,
+            prefix="alignment",
+        )
+        
+    accelerator.end_training()
+    if accelerator.is_main_process:
+        accelerator.print("Training Finished!")
 
 
 if __name__ == "__main__":
     training_function()
     
-
-
-
-
-
-
-
-
-
-# training_function()
-# import torch.multiprocessing as mp
-# mp.set_start_method("spawn", force=True)
-# import os
-# os.environ["MASTER_PORT"] = "29999"   # choose any free port
-# from accelerate import notebook_launcher
-
-# num_processes = Number of GPUs you have
-# notebook_launcher(training_function, num_processes=torch.cuda.device_count())
-
-# # --------------------------------------------
-# # 7.3 – Run a small POC training loop
-# # --------------------------------------------
-
-# # You can adjust these to be very small for a first run:
-# vision_steps = getattr(cfg, "max_train_steps_vision", 100)
-# audio_steps  = getattr(cfg, "max_train_steps_audio", 100)
-
-# num_rounds = 1  # or >1 if you want to alternate vision/audio multiple times
-
-# for round_idx in range(num_rounds):
-#     print(f"\n========== Training Round {round_idx+1}/{num_rounds} ==========")
-
-#     # ---- Vision–text alignment ----
-#     print("\n--- Vision–Text alignment ---")
-#     train_one_epoch(
-#         dataloader=vision_loader,
-#         modality="vision",
-#         max_steps=vision_steps,
-#         log_prefix=f"round{round_idx+1}-",
-#     )
-#     eval_retrieval(vision_dataset, modality="vision", num_samples=32)
-
-#     # ---- Audio–text alignment ----
-#     print("\n--- Audio–Text alignment ---")
-#     train_one_epoch(
-#         dataloader=audio_loader,
-#         modality="audio",
-#         max_steps=audio_steps,
-#         log_prefix=f"round{round_idx+1}-",
-#     )
-#     eval_retrieval(audio_dataset, modality="audio", num_samples=32)
-
-# print("\nTraining POC finished.")
-
-# 
-
-
-
-
-
-
-
-
 
 
 
