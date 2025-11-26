@@ -1,0 +1,1 @@
+{"audio/eval/loss":3.5084056854248047,"audio/eval/accuracy":0,"_step":0,"vision/eval/loss":3.5045032501220703,"_timestamp":1.76403159344181e+09,"vision/eval/accuracy":0.0625,"audio/train/epoch_loss":0,"_runtime":29.740482326,"vision/eval/recall_at_1":0.0625,"audio/eval/recall_at_1":0,"vision/train/epoch_loss":0,"_wandb":{"runtime":29}}

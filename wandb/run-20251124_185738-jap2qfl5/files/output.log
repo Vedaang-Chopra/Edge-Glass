@@ -1,0 +1,271 @@
+
+Loading vision encoder: openai/clip-vit-base-patch32
+`torch_dtype` is deprecated! Use `dtype` instead!
+Vision encoder_dim_vision: 768
+
+Loading audio encoder: openai/whisper-base
+Audio hidden size: 512
+
+Loading Qwen2.5-7B: Qwen/Qwen2.5-7B-Instruct
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards: 100%|██████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:00<00:00, 155.80it/s]
+Qwen hidden_size (from config): 3584
+cfg.llm_hidden_size: 3584 <class 'int'>
+Full LLM Hidden Size: 3584
+✅ Corrected MRL Dimensions: (128, 256, 512, 768, 3584)
+Text embedding helper ready.
+
+Loading LibriSpeech ASR (streaming mode)...
+Resolving data files: 100%|███████████████████████████████████████████████████████████████████████████████████████████████| 48/48 [00:00<00:00, 36492.04it/s]
+Resolving data files: 100%|███████████████████████████████████████████████████████████████████████████████████████████████| 48/48 [00:00<00:00, 36906.80it/s]
+Resolving data files: 100%|███████████████████████████████████████████████████████████████████████████████████████████████| 64/64 [00:00<00:00, 37749.33it/s]
+Loaded streaming dataset: IterableDataset({
+    features: ['file', 'audio', 'text', 'speaker_id', 'chapter_id', 'id'],
+    num_shards: 14
+})
+
+Taking up to 100 examples in streaming mode...
+
+Subset collected: 100
+Keys: dict_keys(['file', 'audio', 'text', 'speaker_id', 'chapter_id', 'id'])
+Example 0: {'file': '/home/albert/.cache/huggingface/datasets/downloads/extracted/bc0d9a6ef85c2d487c9c6efbc91f8892df927c69d3f80545a668cc058d5f677e/374-180298-0000.flac', 'audio': {'bytes': b'fLaC\x00\x00\x00"\x10\x00\x10\x00\x00\x04\xa4\x00\x16\xc5\x03\xe8\x00\xf0\x00\x03\x8c \xbc\x9b)\\H\xbe6\xbe\xc0\xad\xc8H\x9a\xa8N^\x03\x00\x00$\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x02p\x00\x00\x00\x00\x00\x00\x02j\xeb\x10\x00\x04\x00\x00( \x00\x00\x00reference libFLAC 1.2.1 20070917\x00\x00\x00\x00\x81\x00 \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\
+
+Filtering by duration ≤ 50 seconds...
+After duration filtering: 100 examples
+
+Showing a few filtered samples...
+
+Sample 0:
+  Duration: 14.53 s
+  Transcript: CHAPTER SIXTEEN I MIGHT HAVE TOLD YOU OF THE BEGINNING OF THIS LIAISON IN A FEW LINES BUT I WANTED YOU TO SEE EVERY STEP BY WHICH WE CAME I TO AGREE TO WHATEVER MARGUERITE WISHED
+  Waveform shape: (232480,)
+
+Sample 1:
+  Duration: 16.09 s
+  Transcript: MARGUERITE TO BE UNABLE TO LIVE APART FROM ME IT WAS THE DAY AFTER THE EVENING WHEN SHE CAME TO SEE ME THAT I SENT HER MANON LESCAUT FROM THAT TIME SEEING THAT I COULD NOT CHANGE MY MISTRESS'S LIFE I CHANGED MY OWN
+  Waveform shape: (257360,)
+
+Sample 2:
+  Duration: 13.29 s
+  Transcript: I WISHED ABOVE ALL NOT TO LEAVE MYSELF TIME TO THINK OVER THE POSITION I HAD ACCEPTED FOR IN SPITE OF MYSELF IT WAS A GREAT DISTRESS TO ME THUS MY LIFE GENERALLY SO CALM
+  Waveform shape: (212720,)
+
+Sample 3:
+  Duration: 11.12 s
+  Transcript: ASSUMED ALL AT ONCE AN APPEARANCE OF NOISE AND DISORDER NEVER BELIEVE HOWEVER DISINTERESTED THE LOVE OF A KEPT WOMAN MAY BE THAT IT WILL COST ONE NOTHING
+  Waveform shape: (178000,)
+
+Sample 4:
+  Duration: 14.08 s
+  Transcript: NOTHING IS SO EXPENSIVE AS THEIR CAPRICES FLOWERS BOXES AT THE THEATRE SUPPERS DAYS IN THE COUNTRY WHICH ONE CAN NEVER REFUSE TO ONE'S MISTRESS AS I HAVE TOLD YOU I HAD LITTLE MONEY
+  Waveform shape: (225280,)
+
+Loading PixMo-Cap vision–text dataset (allenai/pixmo-cap)...
+PixMo-Cap split size: 717042
+PixMo columns: ['image_url', 'caption', 'transcripts']
+PixMo subset size: 100
+Using image column: image_url
+Audio dataset fixed (Padding Slicing + Text Norm).
+Example 0 features shape: torch.Size([726, 512])
+Example 0 text: Chapter sixteen i might have told you of the beginning of this liaison in a few lines but i wanted you to see every step by which we came i to agree to whatever marguerite wished
+Perceiver config:
+  perceiver_dim: 768
+  num_latents: 64
+  num_perceiver_layers: 6
+  num_attn_heads: 8
+  mlp_ratio: 4.0
+
+Adapters created:
+  VisionAdapter: ModalityAdapter(
+  (proj): Linear(in_features=768, out_features=768, bias=True)
+)
+  AudioAdapter: ModalityAdapter(
+  (proj): Linear(in_features=512, out_features=768, bias=True)
+)
+
+PerceiverResampler created:
+PerceiverResampler(
+  (layers): ModuleList(
+    (0-5): 6 x PerceiverLayer(
+      (cross_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=768, out_features=768, bias=True)
+      )
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=768, out_features=768, bias=True)
+      )
+      (ln_latents_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (ln_tokens): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (ln_latents_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (ln_latents_3): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (mlp): FeedForward(
+        (net): Sequential(
+          (0): Linear(in_features=768, out_features=3072, bias=True)
+          (1): GELU(approximate='none')
+          (2): Linear(in_features=3072, out_features=768, bias=True)
+        )
+      )
+    )
+  )
+)
+
+Projector created:
+  projector: Linear(in_features=768, out_features=3584, bias=True)
+
+Sanity check:
+  v_tokens shape: torch.Size([2, 32, 768])
+  latents shape: torch.Size([2, 64, 768])
+  z_llm shape: torch.Size([2, 64, 3584])
+Done Part 5.
+
+== Sanity check dims ==
+encoder_dim_vision: 768 <class 'int'>
+encoder_dim_audio: 512 <class 'int'>
+perceiver_dim: 768 <class 'int'>
+llm_hidden_size: 3584 <class 'int'>
+Vision dataset ready (HF image-based if available).
+  features shape: torch.Size([50, 768])
+  text snippet: This digital graphic features a modern, square wooden chest of drawers positioned at the center of the image, which is s ...
+Vision loader & audio loader ready.
+
+Part 6 ready: collate, MRL, and forward_alignment_step defined.
+Trainable: 0.proj.weight torch.Size([768, 768])
+Trainable: 0.proj.bias torch.Size([768])
+Trainable: 1.proj.weight torch.Size([768, 512])
+Trainable: 1.proj.bias torch.Size([768])
+Trainable: 2.latents torch.Size([64, 768])
+Trainable: 2.layers.0.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.0.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.0.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.0.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.0.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.0.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.0.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.0.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.0.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.0.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.0.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.0.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.0.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.0.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.0.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.0.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.0.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.0.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.0.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.0.mlp.net.2.bias torch.Size([768])
+Trainable: 2.layers.1.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.1.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.1.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.1.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.1.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.1.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.1.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.1.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.1.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.1.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.1.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.1.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.1.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.1.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.1.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.1.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.1.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.1.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.1.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.1.mlp.net.2.bias torch.Size([768])
+Trainable: 2.layers.2.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.2.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.2.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.2.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.2.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.2.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.2.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.2.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.2.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.2.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.2.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.2.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.2.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.2.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.2.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.2.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.2.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.2.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.2.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.2.mlp.net.2.bias torch.Size([768])
+Trainable: 2.layers.3.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.3.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.3.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.3.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.3.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.3.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.3.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.3.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.3.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.3.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.3.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.3.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.3.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.3.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.3.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.3.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.3.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.3.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.3.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.3.mlp.net.2.bias torch.Size([768])
+Trainable: 2.layers.4.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.4.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.4.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.4.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.4.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.4.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.4.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.4.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.4.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.4.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.4.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.4.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.4.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.4.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.4.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.4.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.4.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.4.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.4.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.4.mlp.net.2.bias torch.Size([768])
+Trainable: 2.layers.5.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.5.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.5.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.5.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.5.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.5.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.5.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.5.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.5.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.5.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.5.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.5.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.5.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.5.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.5.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.5.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.5.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.5.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.5.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.5.mlp.net.2.bias torch.Size([768])
+Trainable: 3.weight torch.Size([3584, 768])
+Trainable: 3.bias torch.Size([3584])
+
+Optimizer ready with 60509696 trainable params.
+Process 0 starting...
+
+========== Round 1/1 ==========
+round1-train-vision:   0%|                                                                                                             | 0/2 [00:00<?, ?it/s]
+[Eval vision] h_mod shape=torch.Size([32, 3584]), dtype=torch.float32
+[Eval vision] h_txt shape=torch.Size([32, 3584]), dtype=torch.float32
+[Eval vision] Retrieval Recall@1 on 32 samples: 0.062
+round1-train-audio:   0%|                                                                                                              | 0/2 [00:00<?, ?it/s]
+[Eval audio] h_mod shape=torch.Size([32, 3584]), dtype=torch.float32
+[Eval audio] h_txt shape=torch.Size([32, 3584]), dtype=torch.float32
+[Eval audio] Retrieval Recall@1 on 32 samples: 0.000
+Training Finished!

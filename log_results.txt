@@ -1,0 +1,229 @@
+Device: cuda
+Default dtype: torch.bfloat16
+Optimized Config Loaded.
+
+Loading vision encoder: openai/clip-vit-base-patch32
+Vision encoder_dim_vision: 768
+
+Loading audio encoder: openai/whisper-base
+Audio hidden size: 512
+
+Loading Qwen2.5-7B: Qwen/Qwen2.5-7B-Instruct
+Qwen hidden_size (from config): 3584
+cfg.llm_hidden_size: 3584 <class 'int'>
+Full LLM Hidden Size: 3584
+✅ Corrected MRL Dimensions: (128, 256, 512, 768, 3584)
+Text embedding helper ready.
+
+Loading LibriSpeech ASR (streaming mode)...
+Loaded streaming dataset: IterableDataset({
+    features: ['file', 'audio', 'text', 'speaker_id', 'chapter_id', 'id'],
+    num_shards: 14
+})
+
+Taking up to 5000 examples in streaming mode...
+
+Subset collected: 5000
+
+Filtering by duration ≤ 50.0 seconds...
+
+Loading PixMo-Cap vision–text dataset (allenai/pixmo-cap)...
+PixMo-Cap split size: 717042
+PixMo columns: ['image_url', 'caption', 'transcripts']
+PixMo subset size: 5000
+Using image column: image_url
+Perceiver config:
+  perceiver_dim: 768
+  num_latents: 64
+  num_perceiver_layers: 6
+  num_attn_heads: 8
+  mlp_ratio: 4.0
+
+Adapters created:
+  VisionAdapter: ModalityAdapter(
+  (proj): Linear(in_features=768, out_features=768, bias=True)
+)
+  AudioAdapter: ModalityAdapter(
+  (proj): Linear(in_features=512, out_features=768, bias=True)
+)
+
+PerceiverResampler created:
+PerceiverResampler(
+  (layers): ModuleList(
+    (0-5): 6 x PerceiverLayer(
+      (cross_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=768, out_features=768, bias=True)
+      )
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=768, out_features=768, bias=True)
+      )
+      (ln_latents_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (ln_tokens): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (ln_latents_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (ln_latents_3): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (mlp): FeedForward(
+        (net): Sequential(
+          (0): Linear(in_features=768, out_features=3072, bias=True)
+          (1): GELU(approximate='none')
+          (2): Linear(in_features=3072, out_features=768, bias=True)
+        )
+      )
+    )
+  )
+)
+
+Projector created:
+  projector: Linear(in_features=768, out_features=3584, bias=True)
+
+Sanity check:
+  v_tokens shape: torch.Size([2, 32, 768])
+  latents shape: torch.Size([2, 64, 768])
+  z_llm shape: torch.Size([2, 64, 3584])
+Done Part 5.
+
+== Sanity check dims ==
+encoder_dim_vision: 768 <class 'int'>
+encoder_dim_audio: 512 <class 'int'>
+perceiver_dim: 768 <class 'int'>
+llm_hidden_size: 3584 <class 'int'>
+Vision dataset ready (HF image-based if available).
+  features shape: torch.Size([50, 768])
+  text snippet: This digital graphic features a modern, square wooden chest of drawers positioned at the center of the image, which is s ...
+Vision loader & audio loader ready.
+
+Part 6 ready: collate, MRL, and forward_alignment_step defined.
+Trainable: 0.proj.weight torch.Size([768, 768])
+Trainable: 0.proj.bias torch.Size([768])
+Trainable: 1.proj.weight torch.Size([768, 512])
+Trainable: 1.proj.bias torch.Size([768])
+Trainable: 2.latents torch.Size([64, 768])
+Trainable: 2.layers.0.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.0.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.0.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.0.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.0.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.0.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.0.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.0.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.0.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.0.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.0.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.0.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.0.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.0.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.0.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.0.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.0.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.0.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.0.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.0.mlp.net.2.bias torch.Size([768])
+Trainable: 2.layers.1.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.1.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.1.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.1.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.1.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.1.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.1.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.1.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.1.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.1.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.1.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.1.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.1.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.1.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.1.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.1.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.1.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.1.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.1.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.1.mlp.net.2.bias torch.Size([768])
+Trainable: 2.layers.2.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.2.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.2.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.2.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.2.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.2.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.2.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.2.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.2.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.2.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.2.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.2.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.2.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.2.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.2.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.2.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.2.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.2.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.2.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.2.mlp.net.2.bias torch.Size([768])
+Trainable: 2.layers.3.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.3.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.3.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.3.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.3.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.3.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.3.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.3.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.3.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.3.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.3.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.3.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.3.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.3.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.3.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.3.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.3.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.3.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.3.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.3.mlp.net.2.bias torch.Size([768])
+Trainable: 2.layers.4.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.4.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.4.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.4.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.4.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.4.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.4.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.4.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.4.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.4.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.4.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.4.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.4.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.4.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.4.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.4.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.4.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.4.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.4.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.4.mlp.net.2.bias torch.Size([768])
+Trainable: 2.layers.5.cross_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.5.cross_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.5.cross_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.5.cross_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.5.self_attn.in_proj_weight torch.Size([2304, 768])
+Trainable: 2.layers.5.self_attn.in_proj_bias torch.Size([2304])
+Trainable: 2.layers.5.self_attn.out_proj.weight torch.Size([768, 768])
+Trainable: 2.layers.5.self_attn.out_proj.bias torch.Size([768])
+Trainable: 2.layers.5.ln_latents_1.weight torch.Size([768])
+Trainable: 2.layers.5.ln_latents_1.bias torch.Size([768])
+Trainable: 2.layers.5.ln_tokens.weight torch.Size([768])
+Trainable: 2.layers.5.ln_tokens.bias torch.Size([768])
+Trainable: 2.layers.5.ln_latents_2.weight torch.Size([768])
+Trainable: 2.layers.5.ln_latents_2.bias torch.Size([768])
+Trainable: 2.layers.5.ln_latents_3.weight torch.Size([768])
+Trainable: 2.layers.5.ln_latents_3.bias torch.Size([768])
+Trainable: 2.layers.5.mlp.net.0.weight torch.Size([3072, 768])
+Trainable: 2.layers.5.mlp.net.0.bias torch.Size([3072])
+Trainable: 2.layers.5.mlp.net.2.weight torch.Size([768, 3072])
+Trainable: 2.layers.5.mlp.net.2.bias torch.Size([768])
+Trainable: 3.weight torch.Size([3584, 768])
+Trainable: 3.bias torch.Size([3584])
+
+Optimizer ready with 60509696 trainable params.
+Process 0 starting...
+
+========== Round 1/30 ==========
+round1-train-vision:   0%|          | 0/300 [00:00<?, ?it/s][DEBUG vision] step=1 loss=6.9596 batch=1000
+round1-train-vision:   0%|          | 0/300 [19:16<?, ?it/s, loss=6.9596, eta_min=5764.0]round1-train-vision:   0%|          | 1/300 [19:16<96:04:00, 1156.66s/it, loss=6.9596, eta_min=5764.0][DEBUG vision] step=2 loss=6.9553 batch=1000
+round1-train-vision:   0%|          | 1/300 [29:12<96:04:00, 1156.66s/it, loss=6.9553, eta_min=4351.1]round1-train-vision:   1%|          | 2/300 [29:12<68:25:06, 826.53s/it, loss=6.9553, eta_min=4351.1] 

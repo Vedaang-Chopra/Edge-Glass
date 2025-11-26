@@ -1,0 +1,140 @@
+Process 0 starting...
+
+========== Round 1/30 ==========
+round1-train-vision:   0%|          | 0/300 [00:17<?, ?it/s]
+Traceback (most recent call last):
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1917, in <module>
+    training_function()
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1803, in training_function
+    vision_loss, global_step = train_one_epoch(
+                               ^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1538, in train_one_epoch
+    for step, batch in enumerate(pbar, start=1):
+                       ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+               ^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/accelerate/data_loader.py", line 567, in __iter__
+    current_batch = next(dataloader_iter)
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 732, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 788, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+            ~~~~~~~~~~~~^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 576, in __getitem__
+    return self._get_example(cur_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 549, in _get_example
+    img = self._load_image_from_url(url).convert("RGB")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 515, in _load_image_from_url
+    resp = requests.get(url, timeout=10)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/sessions.py", line 746, in send
+    r.content
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/models.py", line 902, in content
+    self._content = b"".join(self.iter_content(CONTENT_CHUNK_SIZE)) or b""
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/models.py", line 820, in generate
+    yield from self.raw.stream(chunk_size, decode_content=True)
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/urllib3/response.py", line 1091, in stream
+    data = self.read(amt=amt, decode_content=decode_content)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/urllib3/response.py", line 980, in read
+    data = self._raw_read(amt)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/urllib3/response.py", line 904, in _raw_read
+    data = self._fp_read(amt, read1=read1) if not fp_closed else b""
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/urllib3/response.py", line 887, in _fp_read
+    return self._fp.read(amt) if amt is not None else self._fp.read()
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/pace-apps/spack/packages/linux-rhel9-x86_64_v3/gcc-11.3.1/python-3.12.5-5sase6atfv2x5tf7dy5x5sqfzyguhsia/lib/python3.12/http/client.py", line 479, in read
+    s = self.fp.read(amt)
+        ^^^^^^^^^^^^^^^^^
+  File "/usr/local/pace-apps/spack/packages/linux-rhel9-x86_64_v3/gcc-11.3.1/python-3.12.5-5sase6atfv2x5tf7dy5x5sqfzyguhsia/lib/python3.12/socket.py", line 720, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1917, in <module>
+[rank0]:     training_function()
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1803, in training_function
+[rank0]:     vision_loss, global_step = train_one_epoch(
+[rank0]:                                ^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1538, in train_one_epoch
+[rank0]:     for step, batch in enumerate(pbar, start=1):
+[rank0]:                        ^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/tqdm/std.py", line 1181, in __iter__
+[rank0]:     for obj in iterable:
+[rank0]:                ^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/accelerate/data_loader.py", line 567, in __iter__
+[rank0]:     current_batch = next(dataloader_iter)
+[rank0]:                     ^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 732, in __next__
+[rank0]:     data = self._next_data()
+[rank0]:            ^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 788, in _next_data
+[rank0]:     data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+[rank0]:     data = [self.dataset[idx] for idx in possibly_batched_index]
+[rank0]:             ~~~~~~~~~~~~^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 576, in __getitem__
+[rank0]:     return self._get_example(cur_idx)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 549, in _get_example
+[rank0]:     img = self._load_image_from_url(url).convert("RGB")
+[rank0]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 515, in _load_image_from_url
+[rank0]:     resp = requests.get(url, timeout=10)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/api.py", line 73, in get
+[rank0]:     return request("get", url, params=params, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/api.py", line 59, in request
+[rank0]:     return session.request(method=method, url=url, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/sessions.py", line 589, in request
+[rank0]:     resp = self.send(prep, **send_kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/sessions.py", line 746, in send
+[rank0]:     r.content
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/models.py", line 902, in content
+[rank0]:     self._content = b"".join(self.iter_content(CONTENT_CHUNK_SIZE)) or b""
+[rank0]:                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/requests/models.py", line 820, in generate
+[rank0]:     yield from self.raw.stream(chunk_size, decode_content=True)
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/urllib3/response.py", line 1091, in stream
+[rank0]:     data = self.read(amt=amt, decode_content=decode_content)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/urllib3/response.py", line 980, in read
+[rank0]:     data = self._raw_read(amt)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/urllib3/response.py", line 904, in _raw_read
+[rank0]:     data = self._fp_read(amt, read1=read1) if not fp_closed else b""
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/urllib3/response.py", line 887, in _fp_read
+[rank0]:     return self._fp.read(amt) if amt is not None else self._fp.read()
+[rank0]:            ^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/usr/local/pace-apps/spack/packages/linux-rhel9-x86_64_v3/gcc-11.3.1/python-3.12.5-5sase6atfv2x5tf7dy5x5sqfzyguhsia/lib/python3.12/http/client.py", line 479, in read
+[rank0]:     s = self.fp.read(amt)
+[rank0]:         ^^^^^^^^^^^^^^^^^
+[rank0]:   File "/usr/local/pace-apps/spack/packages/linux-rhel9-x86_64_v3/gcc-11.3.1/python-3.12.5-5sase6atfv2x5tf7dy5x5sqfzyguhsia/lib/python3.12/socket.py", line 720, in readinto
+[rank0]:     return self._sock.recv_into(b)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]: KeyboardInterrupt

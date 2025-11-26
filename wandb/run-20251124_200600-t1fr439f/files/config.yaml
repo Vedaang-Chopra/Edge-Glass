@@ -1,0 +1,150 @@
+_wandb:
+    value:
+        cli_version: 0.23.0
+        e:
+            janpu37n021x4sfjykgm2iiy22z1nt3y:
+                codePath: code_base/v1_code_base/align_training.py
+                codePathLocal: code_base/v1_code_base/align_training.py
+                cpu_count: 64
+                cpu_count_logical: 64
+                cudaVersion: "12.9"
+                disk:
+                    /:
+                        total: "53619982336"
+                        used: "27188609024"
+                email: vedaangchopra@hotmail.com
+                executable: /storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/bin/python3
+                git:
+                    commit: f22e7ea0c1e58ac5db4acfc632f2ae0cdbab8dc7
+                    remote: git@github.com:Vedaang-Chopra/Edge-Glass.git
+                gpu: NVIDIA H200
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Hopper
+                      cudaCores: 16896
+                      memoryTotal: "150754820096"
+                      name: NVIDIA H200
+                      uuid: GPU-a834fce4-9456-6c32-43bc-8d8574de0b1f
+                    - architecture: Hopper
+                      cudaCores: 16896
+                      memoryTotal: "150754820096"
+                      name: NVIDIA H200
+                      uuid: GPU-efed8e15-dde8-e796-d84b-2a2efc1016e3
+                host: atl1-1-03-017-23-0.pace.gatech.edu
+                memory:
+                    total: "2163479007232"
+                os: Linux-5.14.0-570.37.1.el9_6.x86_64-x86_64-with-glibc2.34
+                program: /storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py
+                python: CPython 3.12.5
+                root: /storage/ice1/1/0/vchopra37/projects/edge_glass
+                slurm:
+                    job_id: "3642111"
+                    mpi_type: pmix_v4
+                    root: /opt/slurm/current
+                startedAt: "2025-11-25T01:06:00.211042Z"
+                writerId: janpu37n021x4sfjykgm2iiy22z1nt3y
+        m: []
+        python_version: 3.12.5
+        t:
+            "1":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 51
+                - 53
+                - 71
+            "2":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 51
+                - 53
+                - 71
+            "3":
+                - 2
+                - 13
+                - 61
+            "4": 3.12.5
+            "5": 0.23.0
+            "6": 4.57.1
+            "12": 0.23.0
+            "13": linux-x86_64
+audio_features_root:
+    value: features_audio_librispeech
+audio_model_name:
+    value: openai/whisper-base
+audio_sample_rate:
+    value: 16000
+batch_size_audio:
+    value: 1024
+batch_size_vision:
+    value: 1024
+encoder_dim_audio:
+    value: 512
+encoder_dim_vision:
+    value: 768
+grad_accum_steps:
+    value: 1
+learning_rate:
+    value: 0.0005
+librispeech_max_samples:
+    value: 100
+llm_hidden_size:
+    value: 3584
+llm_model_name:
+    value: Qwen/Qwen2.5-7B-Instruct
+log_every_steps:
+    value: 20
+max_audio_duration_s:
+    value: 50
+max_grad_norm:
+    value: 1
+max_train_steps_audio:
+    value: 100
+max_train_steps_vision:
+    value: 100
+mlp_ratio:
+    value: 4
+mrl_dims:
+    value:
+        - 128
+        - 256
+        - 512
+        - 768
+        - 3584
+mrl_temperature:
+    value: 0.07
+mrl_weight:
+    value: 0.1
+num_attn_heads:
+    value: 8
+num_latents:
+    value: 64
+num_perceiver_layers:
+    value: 6
+num_rounds:
+    value: 3
+perceiver_dim:
+    value: 768
+run_name:
+    value: alignment_h200_bs1024_r3x300
+save_dir:
+    value: runs_perceiver_mrl_qwen
+seed:
+    value: 42
+use_mrl:
+    value: true
+vision_features_root:
+    value: features_vision
+vision_max_samples:
+    value: 100
+vision_model_name:
+    value: openai/clip-vit-base-patch32
+wandb_project:
+    value: edgeglass-multimodal
+weight_decay:
+    value: 0.01

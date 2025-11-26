@@ -1,0 +1,12 @@
+Process 0 starting...
+
+========== Round 1/1 ==========
+round1-train-vision:   0%|                                                                                                             | 0/2 [00:00<?, ?it/s]
+[Eval vision] h_mod shape=torch.Size([32, 3584]), dtype=torch.float32
+[Eval vision] h_txt shape=torch.Size([32, 3584]), dtype=torch.float32
+[Eval vision] Retrieval Recall@1 on 32 samples: 0.062
+round1-train-audio:   0%|                                                                                                              | 0/2 [00:00<?, ?it/s]
+[Eval audio] h_mod shape=torch.Size([32, 3584]), dtype=torch.float32
+[Eval audio] h_txt shape=torch.Size([32, 3584]), dtype=torch.float32
+[Eval audio] Retrieval Recall@1 on 32 samples: 0.000
+Training Finished!

@@ -1,0 +1,8 @@
+Process 0 starting...
+
+========== Round 1/1 ==========
+round1-train-vision:   0%|                                                                                                            | 0/10 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.5045 R@1=0.062 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round1-train-audio:   0%|                                                                                                             | 0/10 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.5084 R@1=0.000 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+✅ Saved checkpoint to runs_perceiver_mrl_qwen/alignment_checkpoint.pt

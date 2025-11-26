@@ -1,0 +1,17 @@
+Process 0 starting...
+
+========== Round 1/1 ==========
+Traceback (most recent call last):
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1855, in <module>
+    training_function()
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1769, in training_function
+    vision_loss = train_one_epoch(
+                  ^^^^^^^^^^^^^^^^
+TypeError: train_one_epoch() missing 1 required positional argument: 'global_step'
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1855, in <module>
+[rank0]:     training_function()
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1769, in training_function
+[rank0]:     vision_loss = train_one_epoch(
+[rank0]:                   ^^^^^^^^^^^^^^^^
+[rank0]: TypeError: train_one_epoch() missing 1 required positional argument: 'global_step'

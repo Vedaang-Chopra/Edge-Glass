@@ -1,0 +1,4 @@
+Process 0 starting...
+
+========== Round 1/30 ==========
+round1-train-vision:   0%|          | 0/300 [00:00<?, ?it/s][DEBUG vision] step=1 loss=6.9776 batch=1024

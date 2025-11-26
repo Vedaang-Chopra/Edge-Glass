@@ -1,0 +1,102 @@
+Process 0 starting...
+
+========== Round 1/1 ==========
+round1-train-vision:   0%|                                                                                                          | 0/2000 [00:00<?, ?it/s]/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+round1-train-vision:   0%|                                                                                                          | 0/2000 [04:58<?, ?it/s]
+Traceback (most recent call last):
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1761, in <module>
+    training_function()
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1724, in training_function
+    train_one_epoch(
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1502, in train_one_epoch
+    for step, batch in enumerate(pbar, start=1):
+                       ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+               ^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/accelerate/data_loader.py", line 579, in __iter__
+    next_batch = next(dataloader_iter)
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 732, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 788, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+            ~~~~~~~~~~~~^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 556, in __getitem__
+    return self._get_example(cur_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 531, in _get_example
+    feats = self._encode_image(img)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 501, in _encode_image
+    proc = self.vision_processor(images=img, return_tensors="pt")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/transformers/image_processing_utils.py", line 51, in __call__
+    return self.preprocess(images, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/transformers/models/clip/image_processing_clip.py", line 328, in preprocess
+    image = self.resize(image=image, size=size, resample=resample, input_data_format=input_data_format)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/transformers/models/clip/image_processing_clip.py", line 193, in resize
+    return resize(
+           ^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/transformers/image_transforms.py", line 377, in resize
+    resized_image = image.resize((width, height), resample=resample, reducing_gap=reducing_gap)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py", line 2304, in resize
+    return self._new(self.im.resize(size, resample, box))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1761, in <module>
+[rank0]:     training_function()
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1724, in training_function
+[rank0]:     train_one_epoch(
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1502, in train_one_epoch
+[rank0]:     for step, batch in enumerate(pbar, start=1):
+[rank0]:                        ^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/tqdm/std.py", line 1181, in __iter__
+[rank0]:     for obj in iterable:
+[rank0]:                ^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/accelerate/data_loader.py", line 579, in __iter__
+[rank0]:     next_batch = next(dataloader_iter)
+[rank0]:                  ^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 732, in __next__
+[rank0]:     data = self._next_data()
+[rank0]:            ^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 788, in _next_data
+[rank0]:     data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+[rank0]:     data = [self.dataset[idx] for idx in possibly_batched_index]
+[rank0]:             ~~~~~~~~~~~~^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 556, in __getitem__
+[rank0]:     return self._get_example(cur_idx)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 531, in _get_example
+[rank0]:     feats = self._encode_image(img)
+[rank0]:             ^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 501, in _encode_image
+[rank0]:     proc = self.vision_processor(images=img, return_tensors="pt")
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/transformers/image_processing_utils.py", line 51, in __call__
+[rank0]:     return self.preprocess(images, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/transformers/models/clip/image_processing_clip.py", line 328, in preprocess
+[rank0]:     image = self.resize(image=image, size=size, resample=resample, input_data_format=input_data_format)
+[rank0]:             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/transformers/models/clip/image_processing_clip.py", line 193, in resize
+[rank0]:     return resize(
+[rank0]:            ^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/transformers/image_transforms.py", line 377, in resize
+[rank0]:     resized_image = image.resize((width, height), resample=resample, reducing_gap=reducing_gap)
+[rank0]:                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py", line 2304, in resize
+[rank0]:     return self._new(self.im.resize(size, resample, box))
+[rank0]:                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]: KeyboardInterrupt

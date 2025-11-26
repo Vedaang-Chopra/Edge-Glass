@@ -100,8 +100,8 @@ class Config:
 
     # === Training (batch / steps / rounds) ===
     # 2 GPUs, batch_vision=512, batch_audio=512 → global batch 1024 per step
-    batch_size_vision: int       = 1024   # per GPU
-    batch_size_audio: int        = 1024   # per GPU
+    batch_size_vision: int       = 1000   # per GPU
+    batch_size_audio: int        = 1000   # per GPU
 
     # ~3 hours budget:
     # 1 round = 300 vision + 300 audio steps = 600 steps
@@ -120,8 +120,8 @@ class Config:
 
     # === Data scale ===
     # You can bump these if IO allows
-    librispeech_max_samples: int = 20000
-    vision_max_samples: int      = 20000
+    librispeech_max_samples: int = 5000
+    vision_max_samples: int      = 5000
     max_audio_duration_s: float  = 50.0
 
     # --- Paths & Misc ---

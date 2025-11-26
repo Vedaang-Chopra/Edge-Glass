@@ -1,0 +1,62 @@
+Process 0 starting...
+
+========== Round 1/10 ==========
+round1-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.5085 R@1=0.031 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round1-train-audio:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.5154 R@1=0.000 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+
+========== Round 2/10 ==========
+round2-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.4987 R@1=0.031 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round2-train-audio:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.6005 R@1=0.031 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+
+========== Round 3/10 ==========
+round3-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.4937 R@1=0.000 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round3-train-audio:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.5350 R@1=0.062 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+
+========== Round 4/10 ==========
+round4-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.5158 R@1=0.031 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round4-train-audio:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.5354 R@1=0.000 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+
+========== Round 5/10 ==========
+round5-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.4767 R@1=0.031 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round5-train-audio:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.4851 R@1=0.031 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+
+========== Round 6/10 ==========
+round6-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.5521 R@1=0.000 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round6-train-audio:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.5624 R@1=0.062 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+
+========== Round 7/10 ==========
+round7-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.5081 R@1=0.031 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round7-train-audio:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.4800 R@1=0.000 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+
+========== Round 8/10 ==========
+round8-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.5332 R@1=0.031 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round8-train-audio:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.5688 R@1=0.062 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+
+========== Round 9/10 ==========
+round9-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.5133 R@1=0.031 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round9-train-audio:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.5051 R@1=0.000 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+
+========== Round 10/10 ==========
+round10-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval vision] B=32 val_loss=3.5091 R@1=0.031 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+round10-train-audio:   0%|          | 0/100 [00:00<?, ?it/s]
+[Eval audio] B=32 val_loss=3.5470 R@1=0.062 h_mod.dtype=torch.float32, h_txt.dtype=torch.float32
+✅ Saved checkpoint to runs_perceiver_mrl_qwen/v1_code_base/model_saved/alignment_checkpoint.pt

@@ -1,0 +1,18 @@
+Process 0 starting...
+
+========== Round 1/10 ==========
+round1-train-vision:   0%|          | 0/100 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1918, in <module>
+    training_function()
+  File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1819, in training_function
+    vision_hist["eval_loss"].append(vision_metrics["val_loss"])
+                                    ^^^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'vision_metrics' where it is not associated with a value
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1918, in <module>
+[rank0]:     training_function()
+[rank0]:   File "/storage/ice1/1/0/vchopra37/projects/edge_glass/code_base/v1_code_base/align_training.py", line 1819, in training_function
+[rank0]:     vision_hist["eval_loss"].append(vision_metrics["val_loss"])
+[rank0]:                                     ^^^^^^^^^^^^^^
+[rank0]: UnboundLocalError: cannot access local variable 'vision_metrics' where it is not associated with a value
