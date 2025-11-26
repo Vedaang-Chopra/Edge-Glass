@@ -1,0 +1,27 @@
+
+Loading vision encoder: openai/clip-vit-base-patch32
+`torch_dtype` is deprecated! Use `dtype` instead!
+Vision encoder_dim_vision: 768
+
+Loading audio encoder: openai/whisper-base
+Audio hidden size: 512
+
+Loading Qwen2.5-7B: Qwen/Qwen2.5-7B-Instruct
+`torch_dtype` is deprecated! Use `dtype` instead!
+model.safetensors.index.json: 27.8kB [00:00, 49.5MB/s]
+model-00002-of-00004.safetensors: 100%|█| 3.86G/3.86G [0
+model-00003-of-00004.safetensors: 100%|█| 3.86G/3.86G [0
+model-00004-of-00004.safetensors: 100%|█| 3.56G/3.56G [0
+model-00001-of-00004.safetensors: 100%|█| 3.95G/3.95G [0
+Fetching 4 files: 100%|██| 4/4 [07:03<00:00, 105.81s/it]
+Loading checkpoint shards: 100%|█| 4/4 [00:08<00:00,  2.01
+generation_config.json: 100%|█| 243/243 [00:00<00:00, 3.16
+Traceback (most recent call last):100%|█| 3.95G/3.95G [0
+Qwen hidden_size (from config): 3584
+cfg.llm_hidden_size: 3584 <class 'int'>
+Full LLM Hidden Size: 3584
+✅ Corrected MRL Dimensions: (128, 256, 512, 3584)
+Text embedding helper ready.
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/run_notebook.py", line 293, in <module>
+    import librosa
+ModuleNotFoundError: No module named 'librosa'

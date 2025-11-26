@@ -1,0 +1,113 @@
+_wandb:
+    value:
+        cli_version: 0.23.0
+        e:
+            wvfgpomvfna7y2soab6qv17tzbwcfl3y:
+                apple:
+                    ecpuCores: 4
+                    gpuCores: 40
+                    memoryGb: 64
+                    name: Apple M4 Max
+                    pcpuCores: 12
+                    ramTotalBytes: "68719476736"
+                    swapTotalBytes: "2147483648"
+                codePath: code_base/v1_code_base/run_notebook.py
+                codePathLocal: run_notebook.py
+                cpu_count: 16
+                cpu_count_logical: 16
+                disk:
+                    /:
+                        total: "994662584320"
+                        used: "352164888576"
+                email: vedaangchopra@hotmail.com
+                executable: /Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/venv/bin/python
+                git:
+                    commit: bc448f1036ab641f38b7cc74839923629231c366
+                    remote: https://github.com/Vedaang-Chopra/Edge-Glass.git
+                host: ipsec-10-2-128-82.vpn.gatech.edu
+                memory:
+                    total: "68719476736"
+                os: macOS-15.6-arm64-arm-64bit-Mach-O
+                program: /Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/run_notebook.py
+                python: CPython 3.14.0
+                root: /Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base
+                startedAt: "2025-11-24T20:25:05.490806Z"
+                writerId: wvfgpomvfna7y2soab6qv17tzbwcfl3y
+        m: []
+        python_version: 3.14.0
+        t:
+            "1":
+                - 1
+                - 11
+                - 41
+                - 49
+                - 51
+            "2":
+                - 1
+                - 11
+                - 41
+                - 49
+                - 51
+            "3":
+                - 13
+                - 16
+            "4": 3.14.0
+            "5": 0.23.0
+            "6": 4.57.2
+            "12": 0.23.0
+            "13": darwin-arm64
+audio_features_root:
+    value: features_audio_librispeech
+audio_model_name:
+    value: openai/whisper-base
+audio_sample_rate:
+    value: 16000
+batch_size_audio:
+    value: 16
+batch_size_vision:
+    value: 16
+encoder_dim_audio:
+    value: null
+encoder_dim_vision:
+    value: null
+learning_rate:
+    value: 0.0001
+librispeech_max_samples:
+    value: 3000
+llm_hidden_size:
+    value: null
+llm_model_name:
+    value: Qwen/Qwen2.5-7B-Instruct
+log_every_steps:
+    value: 20
+max_audio_duration_s:
+    value: 12
+max_train_steps_audio:
+    value: 200
+max_train_steps_vision:
+    value: 200
+mrl_dims:
+    value:
+        - 128
+        - 256
+        - 512
+mrl_temperature:
+    value: 0.07
+mrl_weight:
+    value: 0.1
+num_latents:
+    value: 64
+perceiver_dim:
+    value: 512
+save_dir:
+    value: runs_perceiver_mrl_qwen
+seed:
+    value: 42
+use_mrl:
+    value: true
+vision_features_root:
+    value: features_vision
+vision_model_name:
+    value: openai/clip-vit-base-patch32
+weight_decay:
+    value: 0.01

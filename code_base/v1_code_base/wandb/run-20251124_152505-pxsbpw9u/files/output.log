@@ -1,0 +1,36 @@
+
+Loading vision encoder: openai/clip-vit-base-patch32
+`torch_dtype` is deprecated! Use `dtype` instead!
+Vision encoder_dim_vision: 768
+
+Loading audio encoder: openai/whisper-base
+Audio hidden size: 512
+
+Loading Qwen2.5-7B: Qwen/Qwen2.5-7B-Instruct
+tokenizer_config.json: 7.30kB [00:00, 13.9MB/s]
+vocab.json: 2.78MB [00:00, 13.4MB/s]
+merges.txt: 1.67MB [00:00, 11.4MB/s]
+tokenizer.json: 7.03MB [00:00, 20.0MB/s]
+config.json: 100%|█████| 663/663 [00:00<00:00, 5.92MB/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Traceback (most recent call last):
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/run_notebook.py", line 202, in <module>
+    qwen_model = AutoModelForCausalLM.from_pretrained(
+        cfg.llm_model_name,
+        torch_dtype=default_dtype,
+        device_map="auto",
+    )
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/venv/lib/python3.14/site-packages/transformers/models/auto/auto_factory.py", line 604, in from_pretrained
+    return model_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/venv/lib/python3.14/site-packages/transformers/modeling_utils.py", line 277, in _wrapper
+    return func(*args, **kwargs)
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/venv/lib/python3.14/site-packages/transformers/modeling_utils.py", line 4806, in from_pretrained
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: Using a `device_map`, `tp_plan`, `torch.device` context manager or setting `torch.set_default_device(device)` requires `accelerate`. You can install it with `pip install accelerate`

@@ -1,0 +1,37 @@
+{
+  "os": "macOS-15.6-arm64-arm-64bit-Mach-O",
+  "python": "CPython 3.14.0",
+  "startedAt": "2025-11-24T20:25:05.490806Z",
+  "program": "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/run_notebook.py",
+  "codePath": "code_base/v1_code_base/run_notebook.py",
+  "codePathLocal": "run_notebook.py",
+  "git": {
+    "remote": "https://github.com/Vedaang-Chopra/Edge-Glass.git",
+    "commit": "bc448f1036ab641f38b7cc74839923629231c366"
+  },
+  "email": "vedaangchopra@hotmail.com",
+  "root": "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base",
+  "host": "ipsec-10-2-128-82.vpn.gatech.edu",
+  "executable": "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/venv/bin/python",
+  "cpu_count": 16,
+  "cpu_count_logical": 16,
+  "disk": {
+    "/": {
+      "total": "994662584320",
+      "used": "352164888576"
+    }
+  },
+  "memory": {
+    "total": "68719476736"
+  },
+  "apple": {
+    "name": "Apple M4 Max",
+    "ecpuCores": 4,
+    "pcpuCores": 12,
+    "gpuCores": 40,
+    "memoryGb": 64,
+    "swapTotalBytes": "2147483648",
+    "ramTotalBytes": "68719476736"
+  },
+  "writerId": "wvfgpomvfna7y2soab6qv17tzbwcfl3y"
+}

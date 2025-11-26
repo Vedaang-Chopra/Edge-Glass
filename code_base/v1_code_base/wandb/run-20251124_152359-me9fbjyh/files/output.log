@@ -1,0 +1,33 @@
+
+Loading vision encoder: openai/clip-vit-base-patch32
+preprocessor_config.json: 100%|█| 316/316 [00:00<00:00, 
+`torch_dtype` is deprecated! Use `dtype` instead!
+config.json: 4.19kB [00:00, 25.4MB/s]
+pytorch_model.bin: 100%|█| 605M/605M [00:15<00:00, 39.9M
+Traceback (most recent call last):
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/run_notebook.py", line 152, in <module>
+    vision_model = CLIPVisionModel.from_pretrained(
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        cfg.vision_model_name,
+        ^^^^^^^^^^^^^^^^^^^^^^
+        torch_dtype=default_dtype,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+        device_map=None,
+        ^^^^^^^^^^^^^^^^
+    ).to(device)
+    ^
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/venv/lib/python3.14/site-packages/transformers/modeling_utils.py", line 277, in _wrapper
+    return func(*args, **kwargs)
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/venv/lib/python3.14/site-packages/transformers/modeling_utils.py", line 4971, in from_pretrained
+    model = cls(config, *model_args, **model_kwargs)
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/venv/lib/python3.14/site-packages/transformers/models/clip/modeling_clip.py", line 775, in __init__
+    self.vision_model = CLIPVisionTransformer(config)
+                        ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/venv/lib/python3.14/site-packages/transformers/models/clip/modeling_clip.py", line 719, in __init__
+    embed_dim = config.hidden_size
+                ^^^^^^^^^^^^^^^^^^
+  File "/Users/vedaangchopra/all_data/complete_technical_work/all_projects_implemented/Edge Assistant/code_base/v1_code_base/venv/lib/python3.14/site-packages/transformers/configuration_utils.py", line 207, in __getattribute__
+    return super().__getattribute__(key)
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+AttributeError: 'CLIPConfig' object has no attribute 'hidden_size'
+model.safetensors: 100%|█| 605M/605M [00:14<00:00, 41.5M
