@@ -124,11 +124,22 @@ class VisionEncoder(nn.Module):
                 pooled: (B, hidden_size) - CLS token
                 mask: (B, num_patches) bool
         """
+        # if isinstance(images, list):
+        #     inputs = self.processor(images=images, return_tensors="pt")
+        #     pixel_values = inputs["pixel_values"]
+        # else:
+        #     pixel_values = images
+            
         if isinstance(images, list):
-            inputs = self.processor(images=images, return_tensors="pt")
+            inputs = self.processor(
+                images=images,
+                return_tensors="pt",
+                input_data_format="channels_last",  # avoids channel ambiguity on skinny images
+            )
             pixel_values = inputs["pixel_values"]
         else:
             pixel_values = images
+
         
         pixel_values = pixel_values.to(self.device, dtype=self.dtype)
         

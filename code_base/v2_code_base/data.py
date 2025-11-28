@@ -306,17 +306,63 @@ def create_dataloader(
 
 class SimpleImageTextDataset(Dataset):
     """Simple dataset from lists of images and texts."""
-    
+
     def __init__(self, images: List, texts: List[str]):
         assert len(images) == len(texts)
         self.images = images
         self.texts = texts
-    
+
     def __len__(self) -> int:
         return len(self.images)
-    
+
     def __getitem__(self, idx: int) -> Dict[str, Any]:
         return {
             "image": self.images[idx],
             "text": self.texts[idx],
         }
+
+
+# ============================================================
+# Usage Note: In-Memory Datasets
+# ============================================================
+"""
+For faster training with repeated epochs over the same data, consider using
+the InMemoryImageTextDataset and InMemoryAudioTextDataset from in_memory_datasets.py.
+
+These datasets pre-load all images/audio into memory at initialization,
+avoiding repeated network requests or file I/O during training.
+
+Example:
+    from datasets import load_dataset
+    from in_memory_datasets import InMemoryImageTextDataset
+
+    # Load HuggingFace dataset
+    hf_ds = load_dataset("allenai/pixmo-cap", split="train")
+
+    # Create in-memory dataset (pre-loads all images)
+    dataset = InMemoryImageTextDataset(
+        hf_dataset=hf_ds,
+        img_col="image_url",
+        txt_col="caption",
+        max_samples=10000,
+        image_size=(224, 224),
+    )
+
+    # Create DataLoader
+    dataloader = DataLoader(
+        dataset,
+        batch_size=32,
+        shuffle=True,
+        collate_fn=collate_images,
+    )
+
+Benefits:
+    - Much faster training (no repeated downloads/loading)
+    - Consistent iteration times
+    - Better for multi-epoch training
+
+Considerations:
+    - Requires sufficient RAM
+    - Initial loading takes time
+    - Use max_samples to limit memory usage
+"""

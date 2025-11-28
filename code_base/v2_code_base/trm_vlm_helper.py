@@ -143,15 +143,22 @@ def rotate_half(x: torch.Tensor) -> torch.Tensor:
     return torch.cat([-x2, x1], dim=-1)
 
 
-def apply_rotary_pos_emb(
-    q: torch.Tensor, 
-    k: torch.Tensor, 
-    cos: torch.Tensor, 
-    sin: torch.Tensor
-) -> Tuple[torch.Tensor, torch.Tensor]:
-    """Apply rotary embeddings to queries and keys."""
-    cos = cos.unsqueeze(0).unsqueeze(2)
-    sin = sin.unsqueeze(0).unsqueeze(2)
+# def apply_rotary_pos_emb(
+#     q: torch.Tensor, 
+#     k: torch.Tensor, 
+#     cos: torch.Tensor, 
+#     sin: torch.Tensor
+# ) -> Tuple[torch.Tensor, torch.Tensor]:
+#     """Apply rotary embeddings to queries and keys."""
+#     cos = cos.unsqueeze(0).unsqueeze(2)
+#     sin = sin.unsqueeze(0).unsqueeze(2)
+#     q_embed = (q * cos) + (rotate_half(q) * sin)
+#     k_embed = (k * cos) + (rotate_half(k) * sin)
+#     return q_embed, k_embed
+
+def apply_rotary_pos_emb(q, k, cos, sin):
+    cos = cos.unsqueeze(0).unsqueeze(1)  # (1, 1, seq_len, dim)
+    sin = sin.unsqueeze(0).unsqueeze(1)
     q_embed = (q * cos) + (rotate_half(q) * sin)
     k_embed = (k * cos) + (rotate_half(k) * sin)
     return q_embed, k_embed
@@ -339,9 +346,17 @@ class TRMDecoderLLM(nn.Module):
                     nn.init.zeros_(module.bias)
             elif isinstance(module, nn.Embedding):
                 nn.init.trunc_normal_(module.weight, std=0.02)
-    
+
     def get_input_embeddings(self, input_ids: torch.Tensor) -> torch.Tensor:
         """Get token embeddings scaled by sqrt(hidden_size)"""
+        # Guard against out-of-vocab token IDs so we fail fast instead of hitting a CUDA assert
+        if torch.any(input_ids >= self.config.vocab_size) or torch.any(input_ids < 0):
+            max_id = input_ids.max().item()
+            min_id = input_ids.min().item()
+            raise ValueError(
+                f"input_ids out of range for vocab_size={self.config.vocab_size} "
+                f"(min={min_id}, max={max_id}). Ensure tokenizer matches the trained vocabulary."
+            )
         return self.embed_scale * self.token_embedding(input_ids)
     
     def forward(
