@@ -1,0 +1,36 @@
+name: vision_text_alignment_qwen
+dataset:
+  name: pixmo_offline
+  batch_size: 64
+  cache_dir: ./checkpoints/datasets
+  image_root: pixmo_cap
+text_encoder:
+  model_name: sentence-transformers/all-mpnet-base-v2
+  projection_dim: 1536
+  use_mrl: true
+  mrl_dimensions: [768, 384, 192]
+vision_encoder:
+  model_name: openai/clip-vit-large-patch14-336
+  projection_dim: 1536
+  trainable: false
+decoder:
+  type: qwen
+  model_name: Qwen/Qwen2.5-7B-Instruct
+  use_lora: true
+  lora_r: 64
+  lora_alpha: 128
+losses:
+  contrastive: 1.0
+  mrl: 0.1
+optimization:
+  lr: 0.0001
+  grad_accum_steps: 8
+  total_steps: 60000
+trainer:
+  epochs: 4
+  batch_size: 64
+  save_every: 500
+  log_every: 20
+  ckpt_dir: ./checkpoints/vision_text_qwen
+  devices: 2
+  strategy: ddp

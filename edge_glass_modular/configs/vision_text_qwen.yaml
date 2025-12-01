@@ -1,0 +1,145 @@
+# Vision-Text Alignment with Qwen Decoder
+# Experiment 1: Load vision and text encoders, align with Qwen decoder
+
+name: vision_text_qwen
+description: "Vision-Text alignment with Qwen-7B decoder for instruction tuning"
+tags: [vision, text, qwen, alignment, instruction_tuning]
+
+# Vision Encoder Configuration
+vision_encoder:
+  model_name: "openai/clip-vit-large-patch14"
+  projection_dim: 1024
+  freeze: true
+
+  # Perceiver Resampler (set to true for ablation)
+  use_perceiver: false
+  perceiver_num_latents: 64
+  perceiver_latent_dim: 512
+  perceiver_num_layers: 3
+  perceiver_num_heads: 8
+
+  # Matryoshka Representation Learning
+  use_mrl: true
+  mrl_dimensions: [512, 256, 128]
+  mrl_loss_weight: 0.05
+
+# Text Encoder Configuration
+text_encoder:
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  projection_dim: 1024
+  freeze: true
+
+  # MRL for text
+  use_mrl: true
+  mrl_dimensions: [512, 256, 128]
+
+# Decoder Configuration
+decoder:
+  type: "qwen"
+  model_name: "Qwen/Qwen2.5-7B-Instruct"
+  freeze: false
+
+  # Quantization for memory efficiency
+  load_in_8bit: true
+  load_in_4bit: false
+
+  # LoRA fine-tuning
+  use_lora: true
+  lora_r: 32
+  lora_alpha: 64
+  lora_dropout: 0.1
+  lora_target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+# No fusion needed for bi-modal
+fusion: null
+
+# Dataset Configuration
+dataset:
+  data_dir: "./data"
+  cache_dir: "./cache"
+
+  # Modalities
+  use_vision: true
+  use_audio: false
+  use_text: true
+
+  # Dataset sizes
+  num_train_samples: 20000
+  num_val_samples: 2000
+
+  # Data loading
+  batch_size: 32
+  num_workers: 8
+  prefetch_factor: 2
+  persistent_workers: true
+  pin_memory: true
+
+  # Image settings
+  image_size: 224
+
+  # Text settings
+  max_text_length: 512
+
+  # Instruction tuning dataset
+  instruction_dataset: "Open-Orca/OpenOrca"
+  instruction_samples: 50000
+
+# Optimization Configuration
+optimization:
+  optimizer: "adamw"
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  betas: [0.9, 0.999]
+
+  # Learning rate schedule
+  lr_scheduler: "cosine"
+  warmup_steps: 500
+  warmup_ratio: 0.1
+
+  # Gradient control
+  max_grad_norm: 1.0
+  gradient_accumulation_steps: 2
+
+  # Mixed precision
+  mixed_precision: "bf16"
+
+  # Loss weights
+  contrastive_loss_weight: 1.0
+  mrl_loss_weight: 0.05
+  lm_loss_weight: 1.0
+
+# Training Configuration
+training:
+  num_epochs: 3
+  max_steps: null
+  eval_steps: 500
+  save_steps: 1000
+  logging_steps: 100
+
+  # Checkpointing
+  output_dir: "./checkpoints/vision_text_qwen"
+  save_total_limit: 3
+  resume_from_checkpoint: null
+
+  # Distributed training (set by torchrun)
+  local_rank: -1
+  world_size: 1
+  ddp_backend: "nccl"
+
+  # Evaluation
+  eval_strategy: "steps"
+  metric_for_best_model: "eval_loss"
+
+  # Reproducibility
+  seed: 42
+  deterministic: true
+
+  # Logging
+  log_level: "info"
+  report_to: ["wandb"]
+  wandb_project: "edge-glass"
+  wandb_run_name: "vision-text-qwen"
+
+# Experiment mode
+mode: "instruction_tuning"
+use_instruction_tuning: true

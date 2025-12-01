@@ -1,0 +1,111 @@
+# Tri-Modal Alignment with Qwen Decoder
+# Experiment 2: Vision + Audio + Text alignment with Qwen decoder
+
+name: trimodal_qwen
+description: "Tri-modal (vision-audio-text) alignment with Qwen-7B decoder"
+tags: [vision, audio, text, qwen, trimodal, instruction_tuning]
+
+# Vision Encoder
+vision_encoder:
+  model_name: "openai/clip-vit-large-patch14"
+  projection_dim: 2048
+  freeze: true
+  use_perceiver: true
+  perceiver_num_latents: 64
+  perceiver_latent_dim: 768
+  perceiver_num_layers: 4
+  perceiver_num_heads: 12
+  use_mrl: true
+  mrl_dimensions: [1024, 512, 256]
+  mrl_loss_weight: 0.05
+
+# Audio Encoder
+audio_encoder:
+  model_name: "openai/whisper-large-v3"
+  projection_dim: 2048
+  freeze: true
+  use_perceiver: true
+  perceiver_num_latents: 64
+  perceiver_latent_dim: 768
+  perceiver_num_layers: 4
+  perceiver_num_heads: 12
+  use_mrl: true
+  mrl_dimensions: [1024, 512, 256]
+  mrl_loss_weight: 0.05
+
+# Text Encoder
+text_encoder:
+  model_name: "sentence-transformers/gtr-t5-large"
+  projection_dim: 2048
+  freeze: true
+  use_mrl: true
+  mrl_dimensions: [1024, 512, 256]
+
+# Decoder
+decoder:
+  type: "qwen"
+  model_name: "Qwen/Qwen2.5-14B-Instruct"  # Larger model for tri-modal
+  freeze: false
+  load_in_8bit: true
+  load_in_4bit: false
+  use_lora: true
+  lora_r: 64
+  lora_alpha: 128
+  lora_dropout: 0.1
+  lora_target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+# Multimodal Fusion
+fusion:
+  strategy: "cross_attention"  # Options: concat, cross_attention, gated
+  fusion_dim: 2048
+  num_fusion_layers: 3
+  num_heads: 16
+  dropout: 0.1
+
+# Dataset
+dataset:
+  data_dir: "./data"
+  cache_dir: "./cache"
+  use_vision: true
+  use_audio: true
+  use_text: true
+  num_train_samples: 20000
+  num_val_samples: 2000
+  batch_size: 16  # Smaller batch for tri-modal
+  num_workers: 8
+  image_size: 224
+  audio_sample_rate: 16000
+  audio_max_duration: 10.0
+  audio_num_mels: 128
+  max_text_length: 512
+  instruction_dataset: "Open-Orca/OpenOrca"
+  instruction_samples: 50000
+
+# Optimization
+optimization:
+  optimizer: "adamw"
+  learning_rate: 1.5e-4  # Slightly lower for larger model
+  weight_decay: 0.01
+  lr_scheduler: "cosine"
+  warmup_steps: 1000
+  max_grad_norm: 1.0
+  gradient_accumulation_steps: 4  # Accumulate more for tri-modal
+  mixed_precision: "bf16"
+  contrastive_loss_weight: 1.0
+  mrl_loss_weight: 0.05
+  lm_loss_weight: 1.0
+
+# Training
+training:
+  num_epochs: 5
+  eval_steps: 500
+  save_steps: 1000
+  logging_steps: 50
+  output_dir: "./checkpoints/trimodal_qwen"
+  save_total_limit: 3
+  seed: 42
+  wandb_project: "edge-glass"
+  wandb_run_name: "trimodal-qwen"
+
+mode: "instruction_tuning"
+use_instruction_tuning: true

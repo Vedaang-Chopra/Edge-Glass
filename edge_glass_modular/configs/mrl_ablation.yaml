@@ -1,0 +1,25 @@
+name: mrl_ablation
+dataset:
+  name: pixmo_offline
+  batch_size: 64
+  cache_dir: ./checkpoints/datasets
+  image_root: pixmo_cap
+text_encoder:
+  model_name: sentence-transformers/all-MiniLM-L12-v2
+  projection_dim: 1024
+  use_mrl: true
+  mrl_dimensions: [512, 256, 128, 64]
+vision_encoder:
+  model_name: openai/clip-vit-large-patch14
+  projection_dim: 1024
+  use_mrl: true
+  mrl_dimensions: [512, 256, 128, 64]
+losses:
+  contrastive: 1.0
+  mrl: 0.2
+optimization:
+  lr: 0.0003
+trainer:
+  epochs: 1
+  batch_size: 64
+  ckpt_dir: ./checkpoints/mrl_ablation
