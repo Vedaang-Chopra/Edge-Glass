@@ -19,7 +19,7 @@ from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts, LinearLR, Sequ
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
-from core import (
+from imports.core import (
     VisionTextAligner,
     AlignmentConfig,
     compute_retrieval_metrics,

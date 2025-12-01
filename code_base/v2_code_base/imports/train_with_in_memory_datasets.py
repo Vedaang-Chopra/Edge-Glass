@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from datasets import load_dataset
 
 # Import your existing modules
-from core import (
+from imports.core import (
     AlignmentConfig,
     VisionTextAligner,
     set_seed,
@@ -18,7 +18,7 @@ from core import (
 )
 
 # Import the new in-memory datasets
-from in_memory_datasets import (
+from imports.in_memory_datasets import (
     InMemoryImageTextDataset,
     InMemoryAudioTextDataset,
     collate_in_memory_images,

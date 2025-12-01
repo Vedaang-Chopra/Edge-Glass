@@ -1,0 +1,39 @@
+edge_glass_modular
+├── README.md
+├── SETUP_AND_RUN.md
+├── configs
+│   ├── mrl_ablation.yaml
+│   ├── perceiver_ablation.yaml
+│   ├── trimodal_qwen.yaml
+│   ├── trimodal_trm.yaml
+│   └── vision_text_qwen.yaml
+├── notebooks
+├── pyproject.toml
+├── scripts
+│   └── download_datasets.py
+└── src
+    ├── __init__.py
+    ├── config.py
+    ├── data
+    │   └── __init__.py
+    ├── decoders
+    │   ├── __init__.py
+    │   ├── qwen.py
+    │   └── trm.py
+    ├── encoders
+    │   ├── __init__.py
+    │   ├── audio.py
+    │   ├── mrl.py
+    │   ├── perceiver.py
+    │   ├── text.py
+    │   └── vision.py
+    ├── models
+    │   ├── __init__.py
+    │   ├── alignment.py
+    │   ├── fusion.py
+    │   ├── losses.py
+    │   └── projector.py
+    ├── training
+    └── utils
+
+10 directories, 26 files

@@ -19,7 +19,7 @@ from transformers import (
     GenerationConfig,
 )
 
-from core import VisionTextAligner, AlignmentConfig, get_device
+from imports.core import VisionTextAligner, AlignmentConfig, get_device
 
 
 # ============================================================
