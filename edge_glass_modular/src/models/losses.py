@@ -45,6 +45,7 @@ def mrl_loss(
     embeddings_b_mrl: Dict[int, torch.Tensor],
     temperature: float = 0.07,
     weights: Optional[Dict[int, float]] = None,
+    sample_single_dim: bool = True,
 ) -> Dict[int, torch.Tensor]:
     """Compute Matryoshka Representation Learning loss at multiple dimensions.
 
@@ -53,16 +54,23 @@ def mrl_loss(
         embeddings_b_mrl: Dict of {dim: embeddings} for second modality
         temperature: Temperature for contrastive loss
         weights: Optional weights for each dimension
+        sample_single_dim: If True, sample one dimension per batch for efficiency
 
     Returns:
         Dictionary of {dim: loss_value}
     """
     losses = {}
 
-    for dim in embeddings_a_mrl.keys():
-        if dim not in embeddings_b_mrl:
-            continue
+    # Get available dimensions
+    available_dims = [dim for dim in embeddings_a_mrl.keys() if dim in embeddings_b_mrl]
 
+    if not available_dims:
+        return losses
+
+    # Sample single dimension per batch for efficiency
+    if sample_single_dim:
+        import random
+        dim = random.choice(available_dims)
         emb_a = embeddings_a_mrl[dim]
         emb_b = embeddings_b_mrl[dim]
 
@@ -73,6 +81,19 @@ def mrl_loss(
             loss = loss * weights[dim]
 
         losses[dim] = loss
+    else:
+        # Compute loss for all dimensions
+        for dim in available_dims:
+            emb_a = embeddings_a_mrl[dim]
+            emb_b = embeddings_b_mrl[dim]
+
+            loss = contrastive_loss(emb_a, emb_b, temperature=temperature)
+
+            # Apply weight if provided
+            if weights is not None and dim in weights:
+                loss = loss * weights[dim]
+
+            losses[dim] = loss
 
     return losses
 
@@ -81,18 +102,20 @@ class AlignmentLoss(nn.Module):
     """Combined alignment loss with contrastive and MRL components.
 
     Args:
-        contrastive_weight: Weight for main contrastive loss
+        contrastive_weight: Weight for main contrastive loss (CLIP loss)
         mrl_weight: Weight for MRL losses
         mrl_dimension_weights: Optional per-dimension weights for MRL
         temperature: Temperature for contrastive loss
+        sample_single_mrl_dim: If True, sample one MRL dim per batch
     """
 
     def __init__(
         self,
-        contrastive_weight: float = 1.0,
-        mrl_weight: float = 0.05,
+        contrastive_weight: float = 0.25,  # Updated: clip_weight = 0.25
+        mrl_weight: float = 1.0,  # Updated: mrl_weight = 1.0
         mrl_dimension_weights: Optional[Dict[int, float]] = None,
         temperature: float = 0.07,
+        sample_single_mrl_dim: bool = True,
     ):
         super().__init__()
 
@@ -100,6 +123,7 @@ class AlignmentLoss(nn.Module):
         self.mrl_weight = mrl_weight
         self.mrl_dimension_weights = mrl_dimension_weights
         self.temperature = temperature
+        self.sample_single_mrl_dim = sample_single_mrl_dim
 
     def forward(
         self,
@@ -134,6 +158,7 @@ class AlignmentLoss(nn.Module):
                 embeddings_b_mrl,
                 temperature=self.temperature,
                 weights=self.mrl_dimension_weights,
+                sample_single_dim=self.sample_single_mrl_dim,
             )
 
             # Add MRL losses
@@ -142,6 +167,10 @@ class AlignmentLoss(nn.Module):
                 total_loss += self.mrl_weight * loss_val
 
         losses["total_loss"] = total_loss
+        losses["loss_clip"] = contrastive  # For logging
+        if mrl_losses:
+            # Aggregate MRL loss for logging
+            losses["loss_mrl"] = sum(mrl_losses.values()) if mrl_losses else torch.tensor(0.0, device=contrastive.device)
 
         return losses
 

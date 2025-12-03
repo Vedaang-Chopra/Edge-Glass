@@ -21,7 +21,7 @@ def setup_logger(name: str = "edge_assistant", log_dir: str | None = None) -> lo
 
     if log_dir:
         Path(log_dir).mkdir(parents=True, exist_ok=True)
-        file_handler = logging.FileHandler(Path(log_dir) / f\"{name}.log\")
+        file_handler = logging.FileHandler(Path(log_dir) / f"{name}.log")
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
     return logger

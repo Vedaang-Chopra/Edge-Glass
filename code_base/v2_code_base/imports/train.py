@@ -430,9 +430,10 @@ def load_checkpoint(
     checkpoint_path: str,
     load_optimizer: bool = False,
     optimizer: Optional[AdamW] = None,
+    cfg: Optional= None,
 ):
     """Load model checkpoint."""
-    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    checkpoint = torch.load(checkpoint_path, map_location=cfg.device, weights_only=False)
     
     model.vision_adapter.load_state_dict(checkpoint["vision_adapter"])
     model.text_adapter.load_state_dict(checkpoint["text_adapter"])

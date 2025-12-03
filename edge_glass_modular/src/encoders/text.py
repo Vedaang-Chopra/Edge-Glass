@@ -42,7 +42,7 @@ class TextEncoder(nn.Module):
     def __init__(
         self,
         model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
-        projection_dim: int = 1024,
+        projection_dim: int = 4096,  # Updated to 4096 to match vision encoder
         freeze: bool = True,
         use_mrl: bool = False,
         mrl_dimensions: list = None,
@@ -66,10 +66,11 @@ class TextEncoder(nn.Module):
         # Projection layer
         self.projector = nn.Linear(self.hidden_dim, projection_dim)
 
-        # MRL projection
+        # MRL projection with updated dimensions for 4096
         if use_mrl:
             if mrl_dimensions is None:
-                mrl_dimensions = [512, 256, 128]
+                # Same MRL dimensions as vision: 4096 -> 2048 -> 1024 -> 512 -> 256 -> 128
+                mrl_dimensions = [2048, 1024, 512, 256, 128]
             self.mrl = MatryoshkaProjection(
                 input_dim=projection_dim, mrl_dimensions=mrl_dimensions
             )
@@ -104,13 +105,13 @@ class TextEncoder(nn.Module):
         # Project
         projected = self.projector(embeddings)  # (B, projection_dim)
 
-        # Apply MRL if enabled
+        # L2 normalize BEFORE MRL
+        pooled = nn.functional.normalize(projected, p=2, dim=-1)
+
+        # Apply MRL if enabled (MRL expects normalized input)
         mrl_embeddings = None
         if self.use_mrl:
-            mrl_embeddings = self.mrl(projected)
-
-        # L2 normalize
-        pooled = nn.functional.normalize(projected, p=2, dim=-1)
+            mrl_embeddings = self.mrl(pooled)
 
         # Note: Sequence embeddings not supported for sentence transformers
         # They only return sentence-level embeddings

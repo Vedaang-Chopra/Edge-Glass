@@ -8,6 +8,7 @@ from typing import Optional
 
 from .perceiver import PerceiverResampler
 from .mrl import MatryoshkaProjection
+from .pooling import AttentionPooling, SimpleAttentionPooling
 
 
 @dataclass
@@ -50,7 +51,7 @@ class VisionEncoder(nn.Module):
     def __init__(
         self,
         model_name: str = "openai/clip-vit-large-patch14",
-        projection_dim: int = 1024,
+        projection_dim: int = 4096,  # Updated to 4096 for top MRL dim
         freeze: bool = True,
         use_perceiver: bool = False,
         perceiver_num_latents: int = 64,
@@ -59,6 +60,8 @@ class VisionEncoder(nn.Module):
         perceiver_num_heads: int = 8,
         use_mrl: bool = False,
         mrl_dimensions: list = None,
+        use_attention_pooling: bool = True,  # New: use learnable attention pooling
+        pooling_type: str = "simple",  # "simple" or "multihead"
     ):
         super().__init__()
 
@@ -66,6 +69,7 @@ class VisionEncoder(nn.Module):
         self.projection_dim = projection_dim
         self.use_perceiver = use_perceiver
         self.use_mrl = use_mrl
+        self.use_attention_pooling = use_attention_pooling
 
         # Load CLIP vision encoder
         self.encoder = CLIPVisionModel.from_pretrained(model_name)
@@ -101,10 +105,28 @@ class VisionEncoder(nn.Module):
             self.final_projector = None
             current_dim = projection_dim
 
-        # MRL projection
+        # Learnable attention pooling (replaces mean/CLS pooling)
+        if use_attention_pooling and not use_perceiver:
+            if pooling_type == "multihead":
+                self.attention_pool = AttentionPooling(
+                    input_dim=projection_dim,
+                    num_queries=1,
+                    num_heads=8,
+                    dropout=0.1,
+                )
+            else:  # simple
+                self.attention_pool = SimpleAttentionPooling(
+                    input_dim=projection_dim,
+                    dropout=0.1,
+                )
+        else:
+            self.attention_pool = None
+
+        # MRL projection with updated dimensions for 4096
         if use_mrl:
             if mrl_dimensions is None:
-                mrl_dimensions = [512, 256, 128]
+                # Updated MRL dimensions: 4096 (top) -> 2048 -> 1024 -> 512 -> 256 -> 128
+                mrl_dimensions = [2048, 1024, 512, 256, 128]
             self.mrl = MatryoshkaProjection(
                 input_dim=projection_dim, mrl_dimensions=mrl_dimensions
             )
@@ -142,22 +164,28 @@ class VisionEncoder(nn.Module):
             # Project to final dimension
             latents = self.final_projector(latents)  # (B, num_latents, projection_dim)
 
-            # Pool latents (mean pooling)
+            # Pool latents (mean pooling for perceiver)
             pooled = latents.mean(dim=1)  # (B, projection_dim)
             sequence_output = latents if return_sequence else None
 
         else:
-            # Use CLS token as pooled representation
-            pooled = projected[:, 0, :]  # (B, projection_dim)
-            sequence_output = projected[:, 1:, :] if return_sequence else None
+            # Use attention pooling or CLS token
+            if self.attention_pool is not None:
+                # Learnable attention pooling over all tokens (including CLS)
+                pooled = self.attention_pool(projected)  # (B, projection_dim)
+                sequence_output = projected if return_sequence else None
+            else:
+                # Fallback to CLS token as pooled representation
+                pooled = projected[:, 0, :]  # (B, projection_dim)
+                sequence_output = projected[:, 1:, :] if return_sequence else None
 
-        # Apply MRL if enabled
+        # L2 normalize pooled embedding BEFORE MRL
+        pooled = nn.functional.normalize(pooled, p=2, dim=-1)
+
+        # Apply MRL if enabled (MRL expects normalized input)
         mrl_embeddings = None
         if self.use_mrl:
             mrl_embeddings = self.mrl(pooled)
-
-        # L2 normalize pooled embedding
-        pooled = nn.functional.normalize(pooled, p=2, dim=-1)
 
         return VisionEncoderOutput(
             pooled=pooled, sequence=sequence_output, mrl_embeddings=mrl_embeddings

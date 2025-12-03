@@ -21,3 +21,7 @@ logs/
 
 code_base/notebooks/freeze_align_poc/data/
 code_base/additional_code/other_repo/
+
+code_base/v2_code_base/wandb/
+
+dataset/

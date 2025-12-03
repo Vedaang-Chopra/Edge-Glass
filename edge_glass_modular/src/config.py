@@ -7,12 +7,51 @@ from pathlib import Path
 
 
 @dataclass
+class LossConfig:
+    """Configuration for alignment loss weights and options."""
+
+    contrastive: float = 1.0  # CLIP/main contrastive loss weight
+    mrl: float = 1.0  # Matryoshka loss weight
+    sample_single_mrl_dim: bool = True
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def get(self, key, default=None):
+        return getattr(self, key, default)
+
+
+@dataclass
+class TrainerConfig:
+    """Trainer configuration for checkpointing/logging orchestration."""
+
+    epochs: int = 3
+    num_epochs: Optional[int] = None  # Optional alias
+    batch_size: Optional[int] = None  # Optional override
+    save_every: int = 1
+    log_every: int = 100
+    ckpt_dir: str = "./checkpoints"
+    output_dir: str = "./outputs"
+    devices: int = 1
+    strategy: str = "ddp"
+    wandb_project: str = "edge_glass"
+    wandb_run_name: Optional[str] = None
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def get(self, key, default=None):
+        return getattr(self, key, default)
+
+
+@dataclass
 class EncoderConfig:
     """Configuration for a single encoder (vision/audio/text)."""
 
     model_name: str
     projection_dim: int = 1024
     freeze: bool = True
+    trainable: bool = False
 
     # Perceiver options
     use_perceiver: bool = False
@@ -25,6 +64,10 @@ class EncoderConfig:
     use_mrl: bool = False
     mrl_dimensions: List[int] = field(default_factory=lambda: [512, 256, 128])
     mrl_loss_weight: float = 0.05
+
+    # Attention pooling options
+    use_attention_pooling: bool = False
+    pooling_type: str = "simple"  # "simple" or "multihead"
 
 
 @dataclass
@@ -71,6 +114,9 @@ class FusionConfig:
 class DatasetConfig:
     """Configuration for datasets."""
 
+    # Dataset name
+    name: str = "default"
+
     # Paths
     data_dir: str = "./data"
     cache_dir: str = "./cache"
@@ -86,6 +132,7 @@ class DatasetConfig:
 
     # Data loading
     batch_size: int = 32
+    base_batch_size: int = 32
     num_workers: int = 8
     prefetch_factor: int = 2
     persistent_workers: bool = True
@@ -101,6 +148,12 @@ class DatasetConfig:
 
     # Text settings
     max_text_length: int = 512
+    text_dropout_prob: float = 0.0
+
+    # Parquet file paths (for Pixmo and similar datasets)
+    train_parquet: Optional[str] = None
+    val_parquet: Optional[str] = None
+    test_parquet: Optional[str] = None
 
     # Instruction tuning
     instruction_dataset: str = "Open-Orca/OpenOrca"
@@ -114,21 +167,27 @@ class OptimizationConfig:
     # Optimizer
     optimizer: Literal["adamw", "adam", "sgd"] = "adamw"
     learning_rate: float = 2e-4
+    lr: Optional[float] = None  # Alias for learning_rate
     weight_decay: float = 0.01
     betas: tuple = (0.9, 0.999)
     eps: float = 1e-8
 
     # Learning rate schedule
     lr_scheduler: Literal["cosine", "linear", "constant"] = "cosine"
-    warmup_steps: int = 500
+    warmup_steps: Optional[int] = None
     warmup_ratio: float = 0.1
+    total_steps: Optional[int] = None
 
     # Gradient
     max_grad_norm: float = 1.0
+    gradient_clip: Optional[float] = None  # Alias for max_grad_norm
     gradient_accumulation_steps: int = 1
+    grad_accum_steps: Optional[int] = None  # Alias for gradient_accumulation_steps
 
     # Mixed precision
     mixed_precision: Literal["no", "fp16", "bf16"] = "bf16"
+    fp16: bool = False
+    bf16: bool = False
 
     # Loss weights
     contrastive_loss_weight: float = 1.0
@@ -146,6 +205,8 @@ class TrainingConfig:
     eval_steps: int = 500
     save_steps: int = 1000
     logging_steps: int = 100
+    warmup_steps: Optional[int] = None
+    gradient_accumulation_steps: int = 1
 
     # Checkpointing
     output_dir: str = "./checkpoints"
@@ -193,12 +254,24 @@ class ExperimentConfig:
     optimization: OptimizationConfig = field(default_factory=OptimizationConfig)
     training: TrainingConfig = field(default_factory=TrainingConfig)
 
+    # Loss configuration (dataclass with dict-like access)
+    losses: LossConfig = field(default_factory=LossConfig)
+
+    # Trainer configuration (dataclass with dict-like access)
+    trainer: TrainerConfig = field(default_factory=TrainerConfig)
+
     # Experiment type
     mode: Literal["alignment", "instruction_tuning"] = "alignment"
     use_instruction_tuning: bool = False
 
     def __post_init__(self):
         """Validate configuration."""
+        # Normalize flexible sections first
+        if isinstance(self.losses, dict) or self.losses is None:
+            self.losses = LossConfig(**(self.losses or {}))
+        if isinstance(self.trainer, dict) or self.trainer is None:
+            self.trainer = TrainerConfig(**(self.trainer or {}))
+
         # Ensure at least one encoder is configured
         encoders = [self.vision_encoder, self.audio_encoder, self.text_encoder]
         if not any(encoders):
@@ -207,6 +280,14 @@ class ExperimentConfig:
         # Set wandb run name if not provided
         if self.training.wandb_run_name is None:
             self.training.wandb_run_name = self.name
+        if self.trainer.wandb_run_name is None:
+            self.trainer.wandb_run_name = self.name
+
+        # Normalize trainer epochs alias
+        if self.trainer.num_epochs is not None:
+            self.trainer.epochs = self.trainer.num_epochs
+        elif not self.trainer.epochs:
+            self.trainer.epochs = self.training.num_epochs
 
     def save(self, path: str):
         """Save configuration to YAML file."""
@@ -244,6 +325,12 @@ class ExperimentConfig:
             config_dict["optimization"] = OptimizationConfig(**config_dict["optimization"])
         if "training" in config_dict:
             config_dict["training"] = TrainingConfig(**config_dict["training"])
+        if "losses" in config_dict:
+            losses_cfg = config_dict["losses"]
+            config_dict["losses"] = LossConfig(**losses_cfg) if losses_cfg is not None else LossConfig()
+        if "trainer" in config_dict:
+            trainer_cfg = config_dict["trainer"]
+            config_dict["trainer"] = TrainerConfig(**trainer_cfg) if trainer_cfg is not None else TrainerConfig()
 
         return cls(**config_dict)
 
