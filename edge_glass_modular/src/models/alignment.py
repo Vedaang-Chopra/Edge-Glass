@@ -136,7 +136,12 @@ class MultimodalAlignmentModel(nn.Module):
                     hidden_dim=config.decoder.trm_hidden_dim,
                     num_layers=config.decoder.trm_num_layers,
                     num_heads=config.decoder.trm_num_heads,
+                    intermediate_dim=config.decoder.trm_intermediate_dim,
                     max_seq_len=config.decoder.trm_max_seq_len,
+                    dropout=config.decoder.trm_dropout,
+                    layer_norm_eps=config.decoder.trm_layer_norm_eps,
+                    use_rope=config.decoder.trm_use_rope,
+                    rope_theta=config.decoder.trm_rope_theta,
                 )
                 self.decoder = TRMDecoder(trm_config)
 
@@ -296,17 +301,28 @@ class MultimodalAlignmentModel(nn.Module):
                 logits = decoder_output.get("logits")
 
         # Combine losses
-        total_loss = None
-        if self.training:
-            if alignment_losses is not None:
-                total_loss = alignment_losses.get("total_loss", 0)
+        # total_loss = None
+        # if self.training:
+        #     if alignment_losses is not None:
+        #         total_loss = alignment_losses.get("total_loss", 0)
 
-            if lm_loss is not None:
-                lm_weight = self.config.optimization.lm_loss_weight
-                if total_loss is not None:
-                    total_loss = total_loss + lm_weight * lm_loss
-                else:
-                    total_loss = lm_weight * lm_loss
+        #     if lm_loss is not None:
+        #         lm_weight = self.config.optimization.lm_loss_weight
+        #         if total_loss is not None:
+        #             total_loss = total_loss + lm_weight * lm_loss
+        #         else:
+        #             total_loss = lm_weight * lm_loss
+        total_loss = None
+        if alignment_losses is not None:
+            total_loss = alignment_losses.get("total_loss", 0)
+
+        if lm_loss is not None:
+            lm_weight = self.config.optimization.lm_loss_weight
+            if total_loss is not None:
+                total_loss = total_loss + lm_weight * lm_loss
+            else:
+                total_loss = lm_weight * lm_loss
+
 
         return AlignmentModelOutput(
             loss=total_loss,

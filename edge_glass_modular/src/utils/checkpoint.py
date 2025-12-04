@@ -31,4 +31,4 @@ def load_checkpoint(path: str | Path, map_location: str | torch.device = "cpu"):
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(path)
-    return torch.load(path, map_location=map_location)
+    return torch.load(path, map_location=map_location, weights_only=False)

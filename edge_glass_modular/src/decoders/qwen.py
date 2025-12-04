@@ -116,10 +116,13 @@ class QwenDecoder(nn.Module):
         """
         # Get input embeddings
         inputs_embeds = self.model.get_input_embeddings()(input_ids)
+        embed_dtype = inputs_embeds.dtype
 
         # Prepend prefix if provided
         if prefix_embeds is not None:
             batch_size, num_prefix, _ = prefix_embeds.shape
+            if prefix_embeds.dtype != embed_dtype:
+                prefix_embeds = prefix_embeds.to(embed_dtype)
 
             # Concatenate prefix + text embeddings
             inputs_embeds = torch.cat([prefix_embeds, inputs_embeds], dim=1)
@@ -184,10 +187,13 @@ class QwenDecoder(nn.Module):
 
         # Get input embeddings
         inputs_embeds = self.model.get_input_embeddings()(input_ids)
+        embed_dtype = inputs_embeds.dtype
 
         # Prepend prefix if provided
         if prefix_embeds is not None:
             batch_size, num_prefix, _ = prefix_embeds.shape
+            if prefix_embeds.dtype != embed_dtype:
+                prefix_embeds = prefix_embeds.to(embed_dtype)
             inputs_embeds = torch.cat([prefix_embeds, inputs_embeds], dim=1)
 
             # Extend attention mask

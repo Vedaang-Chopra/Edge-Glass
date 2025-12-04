@@ -1,0 +1,141 @@
+# TRM-Style VLM Configuration for PixMo QA
+# Combines pretrained aligned vision encoder with TRM recursive decoder
+
+name: trm_vlm_qa
+description: Vision-Language Model with TRM decoder for PixMo QA
+seed: 42
+
+# Dataset configuration
+dataset:
+  name: pixmo_qa
+  train_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pimo-alignment/pixmo_qa_mixed_with_bytes.parquet
+  val_parquet: null  # TODO: Add validation parquet path
+  test_parquet: null  # TODO: Add test parquet path
+
+  image_size: 336
+  max_text_length: 512
+  max_question_length: 128
+  max_answer_length: 256
+  max_total_length: 384
+  text_dropout_prob: 0.0
+
+  batch_size: 16
+  base_batch_size: 16
+  eval_batch_size: 16
+  num_workers: 4
+  prefetch_factor: 2
+  pin_memory: true
+  persistent_workers: true
+
+# Vision encoder (loaded from pretrained alignment)
+vision_encoder:
+  model_name: openai/clip-vit-large-patch14-336
+  projection_dim: 4096
+  freeze: true
+  trainable: false
+  use_perceiver: true
+  perceiver_num_latents: 64
+  perceiver_latent_dim: 1024
+  perceiver_num_layers: 4
+  perceiver_num_heads: 8
+  perceiver_dropout: 0.0
+  use_mrl: true
+  mrl_dimensions: [3072, 2048, 1536, 1024, 768, 512]
+  use_attention_pooling: false
+  pooling_type: mean
+
+# Text encoder (not used for QA, but included for consistency)
+text_encoder:
+  model_name: sentence-transformers/all-mpnet-base-v2
+  projection_dim: 4096
+  freeze: true
+  trainable: false
+  use_mrl: false
+
+# Decoder configuration
+decoder:
+  type: qwen  # Using Qwen for QA task
+  model_name: Qwen/Qwen2.5-7B-Instruct
+  use_lora: true
+  lora_r: 64
+  lora_alpha: 128
+  lora_dropout: 0.05
+  lora_target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+  load_in_8bit: false
+  load_in_4bit: false
+
+# Fusion
+fusion: null
+
+# Loss configuration
+losses:
+  contrastive: 0.0  # No contrastive loss for QA
+  mrl: 0.0          # No MRL loss for QA
+  sample_single_mrl_dim: false
+
+# Optimization configuration
+optimization:
+  lr: 1.0e-4
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  max_grad_norm: 1.0
+  gradient_clip: 1.0
+  grad_accum_steps: 1
+  gradient_accumulation_steps: 1
+  fp16: false
+  bf16: true
+  mixed_precision: bf16
+  warmup_ratio: 0.05
+  warmup_steps: null
+  total_steps: null
+  lr_scheduler: cosine
+  min_lr_ratio: 0.1
+  contrastive_loss_weight: 0.0
+  mrl_loss_weight: 0.0
+  lm_loss_weight: 1.0
+
+# Trainer configuration
+trainer:
+  epochs: 10
+  num_epochs: 10
+  batch_size: 16
+  save_every: 1
+  log_every: 20
+  ckpt_dir: ./checkpoints/trm_vlm_qa
+  output_dir: ./outputs/trm_vlm_qa
+  devices: 1
+  strategy: ddp
+  use_wandb: true
+  wandb_project: edge_glass_trm_vlm
+  wandb_run_name: trm_vlm_qa
+  eval_batch_size: 16
+  save_optimizer_state: true
+  best_weights_only: false
+
+# Training configuration
+training:
+  num_epochs: 10
+  output_dir: ./outputs/trm_vlm_qa
+  save_steps: 500
+  logging_steps: 20
+  eval_steps: 500
+  warmup_steps: null
+  gradient_accumulation_steps: 1
+  wandb_project: edge_glass_trm_vlm
+  wandb_run_name: trm_vlm_qa
+
+# Output configuration (for compatibility)
+output:
+  checkpoint_dir: ./checkpoints/trm_vlm_qa
+  log_dir: ./logs/trm_vlm_qa
+  output_dir: ./outputs/trm_vlm_qa
+  save_best_only: true
+
+# Weights & Biases (for compatibility)
+wandb:
+  enabled: true
+  project: edge_glass_trm_vlm
+  entity: null
+  group: trm_vlm_qa
+  tags: [trm, vlm, pixmo_qa, recursive]

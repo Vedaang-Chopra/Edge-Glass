@@ -265,6 +265,121 @@ def build_datasets(dataset_cfg, transforms) -> Dict[str, Dataset]:
     return datasets
 
 
+class PixmoQADataset(Dataset):
+    """Dataset for PixMo QA with question-answer pairs.
+
+    Loads from parquet files with columns:
+    - image_bytes: Raw image bytes
+    - question: Question text
+    - answer: Answer text
+    - source: Source identifier
+
+    Args:
+        parquet_path: Path to parquet file
+        tokenizer: Tokenizer for encoding text
+        image_transforms: Optional image transforms
+        max_question_length: Maximum question token length
+        max_answer_length: Maximum answer token length
+    """
+
+    def __init__(
+        self,
+        parquet_path: str | Path,
+        tokenizer,
+        image_transforms: Optional[Callable] = None,
+        max_question_length: int = 128,
+        max_answer_length: int = 256,
+    ):
+        self.parquet_path = Path(parquet_path)
+        self.tokenizer = tokenizer
+        self.image_transforms = image_transforms
+        self.max_question_length = max_question_length
+        self.max_answer_length = max_answer_length
+
+        # Load parquet
+        self.df = pd.read_parquet(self.parquet_path)
+        self._drop_invalid_images()
+
+        # Validate columns
+        required_cols = ['image_bytes', 'question', 'answer']
+        missing_cols = [col for col in required_cols if col not in self.df.columns]
+        if missing_cols:
+            raise ValueError(f"Missing required columns: {missing_cols}")
+
+        print(f"Loaded {len(self.df)} samples from {self.parquet_path}")
+
+    def _drop_invalid_images(self):
+        """Remove rows with unreadable image bytes."""
+        bad_indices = []
+        for idx, image_bytes in enumerate(self.df["image_bytes"]):
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", Image.DecompressionBombWarning)
+                    Image.open(BytesIO(image_bytes)).verify()
+            except Exception:
+                bad_indices.append(idx)
+
+        if bad_indices:
+            self.df = self.df.drop(index=bad_indices).reset_index(drop=True)
+            warnings.warn(
+                f"Removed {len(bad_indices)} invalid images from {self.parquet_path}"
+            )
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+
+        # Load image
+        image_bytes = row['image_bytes']
+        try:
+            image = Image.open(BytesIO(image_bytes)).convert('RGB')
+        except (UnidentifiedImageError, OSError) as e:
+            raise UnidentifiedImageError(
+                f"Failed to load image at idx {idx}: {e}"
+            ) from e
+
+        # Convert to tensor and apply transforms
+        import torchvision.transforms as T
+        to_tensor = T.ToTensor()
+        image_tensor = to_tensor(image)
+
+        if self.image_transforms:
+            image_tensor = self.image_transforms(image_tensor)
+
+        # Get question and answer
+        question = row['question']
+        answer = row['answer']
+
+        # Tokenize question and answer
+        question_encoding = self.tokenizer(
+            question,
+            add_special_tokens=True,
+            truncation=True,
+            max_length=self.max_question_length,
+            return_tensors='pt',
+        )
+
+        answer_encoding = self.tokenizer(
+            answer,
+            add_special_tokens=True,
+            truncation=True,
+            max_length=self.max_answer_length,
+            return_tensors='pt',
+        )
+
+        return {
+            'image': image_tensor,
+            'question': question,
+            'answer': answer,
+            'question_ids': question_encoding['input_ids'].squeeze(0),
+            'question_mask': question_encoding['attention_mask'].squeeze(0),
+            'answer_ids': answer_encoding['input_ids'].squeeze(0),
+            'answer_mask': answer_encoding['attention_mask'].squeeze(0),
+        }
+
+
 def build_image_datasets_from_parquet(
     cfg,
     train_parquet_path: str | Path,

@@ -1,0 +1,2 @@
+best_val_loss,best_r1,best_r5,best_r10,final_train_loss,final_val_loss,embedding_dim,mrl_dims,clip_weight,mrl_weight
+0.0,0.5686997175216675,0.8190348744392395,0.8917560577392578,1.11396173216881,0.7646021544933319,4096,"[2048, 1024, 512, 256, 128]",0.25,1.0

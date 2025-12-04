@@ -292,3 +292,164 @@ class TrainingVisualizer:
         """
         df = pd.DataFrame([metrics])
         df.to_csv(self.save_dir / save_name, index=False)
+
+    def plot_rank_histogram(
+        self,
+        ranks: np.ndarray,
+        title: str = "Retrieval Rank Histogram",
+        max_rank: int = 100,
+        save_name: str = "rank_histogram.png",
+        dpi: int = 150,
+    ):
+        """Plot histogram of retrieval ranks.
+
+        Args:
+            ranks: Array of ranks (0-indexed)
+            title: Plot title
+            max_rank: Maximum rank to display
+            save_name: Filename to save
+            dpi: DPI for saved figure
+        """
+        ranks = np.clip(ranks, 0, max_rank)
+
+        plt.figure(figsize=(10, 6))
+        plt.hist(ranks + 1, bins=min(max_rank, 50), edgecolor='black')
+        plt.xlabel('Rank (1-indexed)')
+        plt.ylabel('Frequency (log scale)')
+        plt.yscale('log')
+        plt.title(title)
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(self.save_dir / save_name, dpi=dpi, bbox_inches='tight')
+        plt.close()
+
+    def plot_rank_cdf(
+        self,
+        ranks: np.ndarray,
+        title: str = "Retrieval Rank CDF",
+        max_k: int = 50,
+        save_name: str = "rank_cdf.png",
+        dpi: int = 150,
+    ):
+        """Plot cumulative distribution of ranks.
+
+        Args:
+            ranks: Array of ranks (0-indexed)
+            title: Plot title
+            max_k: Maximum K to display
+            save_name: Filename to save
+            dpi: DPI for saved figure
+        """
+        ranks_1indexed = ranks + 1
+        ks = np.arange(1, max_k + 1)
+        cdf = [(ranks_1indexed <= k).mean() * 100.0 for k in ks]
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(ks, cdf, marker='o', linewidth=2, markersize=4)
+        plt.xlabel('K')
+        plt.ylabel('P(rank ≤ K) [%]')
+        plt.title(title)
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(self.save_dir / save_name, dpi=dpi, bbox_inches='tight')
+        plt.close()
+
+    def plot_similarity_distributions(
+        self,
+        positive_sims: np.ndarray,
+        negative_sims: np.ndarray,
+        title: str = "Similarity Distributions",
+        save_name: str = "similarity_distributions.png",
+        dpi: int = 150,
+    ):
+        """Plot distributions of positive vs negative similarities.
+
+        Args:
+            positive_sims: Similarities for positive pairs
+            negative_sims: Similarities for negative pairs
+            title: Plot title
+            save_name: Filename to save
+            dpi: DPI for saved figure
+        """
+        plt.figure(figsize=(10, 6))
+        plt.hist(negative_sims, bins=50, alpha=0.6, label='Negative Pairs', color='red')
+        plt.hist(positive_sims, bins=50, alpha=0.6, label='Positive Pairs', color='green')
+        plt.xlabel('Cosine Similarity')
+        plt.ylabel('Frequency')
+        plt.title(title)
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(self.save_dir / save_name, dpi=dpi, bbox_inches='tight')
+        plt.close()
+
+    def plot_mrl_curves(
+        self,
+        mrl_results: Dict[int, Dict],
+        metric: str = 'r_at_1',
+        title: str = "MRL Performance vs Dimension",
+        save_name: str = "mrl_curves.png",
+        dpi: int = 150,
+    ):
+        """Plot MRL performance curves across dimensions.
+
+        Args:
+            mrl_results: Dict mapping dim -> {'i2t': metrics, 't2i': metrics}
+            metric: Metric name to plot (e.g., 'r_at_1', 'r_at_5')
+            title: Plot title
+            save_name: Filename to save
+            dpi: DPI for saved figure
+        """
+        dims = sorted(mrl_results.keys())
+        i2t_scores = [getattr(mrl_results[d]['i2t'], metric) for d in dims]
+        t2i_scores = [getattr(mrl_results[d]['t2i'], metric) for d in dims]
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(dims, i2t_scores, marker='o', linewidth=2, label='Image→Text', markersize=8)
+        plt.plot(dims, t2i_scores, marker='s', linewidth=2, label='Text→Image', markersize=8)
+        plt.xlabel('MRL Dimension')
+        plt.ylabel(f'{metric.replace("_", " ").title()} (%)')
+        plt.title(title)
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.xscale('log')
+        plt.tight_layout()
+        plt.savefig(self.save_dir / save_name, dpi=dpi, bbox_inches='tight')
+        plt.close()
+
+    def plot_recall_at_k(
+        self,
+        metrics: Dict[str, float],
+        direction: str = 'i2t',
+        title: Optional[str] = None,
+        save_name: str = "recall_at_k.png",
+        dpi: int = 150,
+    ):
+        """Plot Recall@K curve.
+
+        Args:
+            metrics: Metrics dict with r_at_1, r_at_5, etc.
+            direction: 'i2t' or 't2i'
+            title: Plot title (auto-generated if None)
+            save_name: Filename to save
+            dpi: DPI for saved figure
+        """
+        ks = [1, 5, 10, 50]
+        recalls = [
+            metrics.get(f'r_at_{k}', 0.0) if isinstance(metrics, dict)
+            else getattr(metrics, f'r_at_{k}', 0.0)
+            for k in ks
+        ]
+
+        if title is None:
+            title = f'Recall@K ({direction.upper()})'
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(ks, recalls, marker='o', linewidth=2, markersize=8)
+        plt.xlabel('K')
+        plt.ylabel('Recall (%)')
+        plt.title(title)
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(self.save_dir / save_name, dpi=dpi, bbox_inches='tight')
+        plt.close()

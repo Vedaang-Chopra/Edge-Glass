@@ -234,15 +234,24 @@ class ImprovedMultimodalTrainer:
         latest_path = self.ckpt_dir / "checkpoint_latest.pt"
         save_optimizer_state = getattr(self.cfg.trainer, "save_optimizer_state", True)
 
-        # Prefer latest for continuing training
-        checkpoint_path = latest_path if latest_path.exists() else (best_path if best_path.exists() else None)
+        # Prefer latest for continuing training; fall back to best if latest is missing or corrupted
+        checkpoint = None
+        checkpoint_path = None
+        for path in (latest_path, best_path):
+            if not path.exists():
+                continue
+            self.logger.info(f"Loading checkpoint from {path}")
+            try:
+                checkpoint = torch.load(path, map_location=self.device, weights_only=False)
+                checkpoint_path = path
+                break
+            except (RuntimeError, FileNotFoundError, IsADirectoryError) as e:
+                # Corrupted or unreadable checkpoint; try the next option
+                self.logger.warning(f"Failed to load checkpoint {path}: {e}")
 
-        if checkpoint_path is None:
-            self.logger.info("No checkpoint found. Starting training from scratch.")
+        if checkpoint is None:
+            self.logger.info("No valid checkpoint found. Starting training from scratch.")
             return
-
-        self.logger.info(f"Loading checkpoint from {checkpoint_path}")
-        checkpoint = torch.load(checkpoint_path, map_location=self.device)
 
         # Load model state
         model_to_load = self.model.module if isinstance(self.model, DDP) else self.model
@@ -402,6 +411,40 @@ class ImprovedMultimodalTrainer:
 
         return {**avg_losses, **metrics}
 
+    # Add this diagnostic cell before training
+    def diagnose_model(model, loader, device):
+        model.train()
+        batch = next(iter(loader))
+        images = batch["image"].to(device)
+        texts = batch["text"]
+        
+        # Forward pass
+        outputs = model(images=images, texts=texts)
+        loss = outputs.loss
+        
+        print(f"Initial loss: {loss.item():.4f}")
+        print(f"Expected random loss: {np.log(len(texts)):.4f}")  # Should be close
+        
+        # Backward pass
+        loss.backward()
+        
+        # Check trainable params got gradients
+        trainable_with_grad = 0
+        trainable_without_grad = 0
+        for name, p in model.named_parameters():
+            if p.requires_grad:
+                if p.grad is not None and p.grad.abs().sum() > 0:
+                    trainable_with_grad += 1
+                else:
+                    trainable_without_grad += 1
+                    print(f"  No gradient: {name}")
+        
+        print(f"\nTrainable params with gradients: {trainable_with_grad}")
+        print(f"Trainable params WITHOUT gradients: {trainable_without_grad}")
+        
+        model.zero_grad()
+
+    
     def train(self):
         """Main training loop."""
         self.logger.info("Starting training...")
@@ -477,7 +520,9 @@ class ImprovedMultimodalTrainer:
 
         self.logger.info("\nTraining completed!")
         self.logger.info(f"Best validation loss: {self.state.best_val_loss:.4f}")
-
+        
+        diagnose_model(self.model, self.train_loader, self.cfg.device)
+        
         if self.use_wandb and get_rank() == 0:
             wandb.finish()
 

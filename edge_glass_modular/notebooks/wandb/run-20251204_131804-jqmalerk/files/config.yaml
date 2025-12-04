@@ -1,0 +1,260 @@
+_wandb:
+    value:
+        cli_version: 0.23.0
+        e:
+            9v4sm7nda2s9y9ho1qr4wszxnq7l9cju:
+                codePath: /home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_modular/notebooks/01_pixmo_vision_text_alignment.ipynb
+                cpu_count: 64
+                cpu_count_logical: 64
+                cudaVersion: "12.9"
+                disk:
+                    /:
+                        total: "53619982336"
+                        used: "27193634816"
+                email: vedaangchopra@hotmail.com
+                executable: /home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/bin/python
+                git:
+                    commit: 1da5453c089b05c00671fa60ae1aac427e7c721d
+                    remote: git@github.com:Vedaang-Chopra/Edge-Glass.git
+                gpu: NVIDIA H200
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Hopper
+                      cudaCores: 16896
+                      memoryTotal: "150754820096"
+                      name: NVIDIA H200
+                      uuid: GPU-0a84aca2-3375-8f88-87ec-b98b729019f1
+                    - architecture: Hopper
+                      cudaCores: 16896
+                      memoryTotal: "150754820096"
+                      name: NVIDIA H200
+                      uuid: GPU-1571b5e6-9755-f3fc-3b8f-7f9802617477
+                host: atl1-1-03-017-9-0.pace.gatech.edu
+                memory:
+                    total: "2163478560768"
+                os: Linux-5.14.0-570.37.1.el9_6.x86_64-x86_64-with-glibc2.34
+                program: /home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_modular/notebooks/01_pixmo_vision_text_alignment.ipynb
+                python: CPython 3.12.5
+                root: /storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_modular/notebooks
+                slurm:
+                    job_id: "3899486"
+                    mpi_type: pmix_v4
+                    root: /opt/slurm/current
+                startedAt: "2025-12-04T18:18:04.395999Z"
+                writerId: 9v4sm7nda2s9y9ho1qr4wszxnq7l9cju
+        m: []
+        python_version: 3.12.5
+        t:
+            "1":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 51
+                - 53
+                - 71
+                - 75
+                - 98
+            "2":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 51
+                - 53
+                - 71
+                - 75
+                - 98
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.12.5
+            "5": 0.23.0
+            "6": 4.57.1
+            "8":
+                - 1
+            "12": 0.23.0
+            "13": linux-x86_64
+audio_encoder:
+    value: null
+dataset:
+    value:
+        audio_max_duration: 10
+        audio_num_mels: 128
+        audio_sample_rate: 16000
+        base_batch_size: 128
+        batch_size: 128
+        cache_dir: ./cache
+        data_dir: ./data
+        image_size: 336
+        instruction_dataset: Open-Orca/OpenOrca
+        instruction_samples: 50000
+        max_text_length: 512
+        name: pixmo_parquet
+        num_train_samples: 20000
+        num_val_samples: 2000
+        num_workers: 4
+        persistent_workers: true
+        pin_memory: true
+        prefetch_factor: 2
+        test_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_test.parquet
+        text_dropout_prob: 0.1
+        train_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_train.parquet
+        use_audio: false
+        use_text: true
+        use_vision: true
+        val_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_val.parquet
+decoder:
+    value:
+        freeze: false
+        load_in_4bit: false
+        load_in_8bit: false
+        lora_alpha: 128
+        lora_dropout: 0.05
+        lora_r: 64
+        lora_target_modules:
+            - q_proj
+            - v_proj
+            - k_proj
+            - o_proj
+        model_name: Qwen/Qwen2.5-7B-Instruct
+        trm_hidden_dim: 512
+        trm_max_seq_len: 2048
+        trm_num_heads: 8
+        trm_num_layers: 6
+        trm_vocab_size: 32000
+        type: qwen
+        use_lora: true
+description:
+    value: Vision-Text alignment with Pixmo dataset, 4096 dim embeddings, and improved training
+fusion:
+    value: null
+losses:
+    value:
+        contrastive: 0.25
+        mrl: 1
+        sample_single_mrl_dim: true
+mode:
+    value: alignment
+name:
+    value: pixmo_vision_text_alignment
+optimization:
+    value:
+        betas:
+            - 0.9
+            - 0.95
+        bf16: true
+        contrastive_loss_weight: 0.25
+        eps: 1e-08
+        fp16: false
+        grad_accum_steps: 1
+        gradient_accumulation_steps: 1
+        gradient_clip: 1
+        learning_rate: 0.0002
+        lm_loss_weight: 1
+        lr: 0.0002
+        lr_scheduler: cosine
+        max_grad_norm: 1
+        min_lr_ratio: 0
+        mixed_precision: bf16
+        mrl_loss_weight: 1
+        optimizer: adamw
+        total_steps: null
+        warmup_ratio: 0.1
+        warmup_steps: null
+        weight_decay: 0.01
+seed:
+    value: 42
+tags:
+    value: []
+text_encoder:
+    value:
+        freeze: true
+        model_name: sentence-transformers/all-mpnet-base-v2
+        mrl_dimensions:
+            - 2048
+            - 1024
+            - 512
+            - 256
+            - 128
+        mrl_loss_weight: 0.05
+        perceiver_dropout: 0.1
+        perceiver_latent_dim: 512
+        perceiver_num_heads: 8
+        perceiver_num_latents: 64
+        perceiver_num_layers: 3
+        pooling_type: simple
+        projection_dim: 4096
+        trainable: false
+        use_attention_pooling: false
+        use_mrl: true
+        use_perceiver: false
+trainer:
+    value:
+        batch_size: 128
+        best_weights_only: true
+        ckpt_dir: ./checkpoints/pixmo_alignment
+        devices: 2
+        epochs: 10
+        eval_batch_size: null
+        log_every: 20
+        num_epochs: 10
+        output_dir: ./outputs/pixmo_alignment
+        retrieval_eval_samples: null
+        save_every: 20
+        save_optimizer_state: true
+        strategy: ddp
+        use_wandb: true
+        wandb_project: edge_glass_alignment
+        wandb_run_name: pixmo_4096_mrl
+training:
+    value:
+        ddp_backend: nccl
+        deterministic: true
+        eval_steps: 500
+        eval_strategy: steps
+        gradient_accumulation_steps: 1
+        local_rank: -1
+        log_level: info
+        logging_steps: 20
+        max_steps: null
+        metric_for_best_model: eval_loss
+        num_epochs: 10
+        output_dir: ./outputs/pixmo_alignment
+        report_to:
+            - wandb
+        resume_from_checkpoint: null
+        save_steps: 500
+        save_total_limit: 3
+        seed: 42
+        wandb_project: edge_glass_alignment
+        wandb_run_name: pixmo_4096_mrl
+        warmup_steps: 500
+        world_size: 1
+use_instruction_tuning:
+    value: false
+vision_encoder:
+    value:
+        freeze: true
+        model_name: openai/clip-vit-large-patch14-336
+        mrl_dimensions:
+            - 2048
+            - 1024
+            - 512
+            - 256
+            - 128
+        mrl_loss_weight: 0.05
+        perceiver_dropout: 0.1
+        perceiver_latent_dim: 512
+        perceiver_num_heads: 8
+        perceiver_num_latents: 64
+        perceiver_num_layers: 3
+        pooling_type: simple
+        projection_dim: 4096
+        trainable: false
+        use_attention_pooling: true
+        use_mrl: true
+        use_perceiver: false

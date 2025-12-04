@@ -103,6 +103,16 @@ class DecoderConfig:
     trm_num_layers: int = 6
     trm_num_heads: int = 8
     trm_max_seq_len: int = 2048
+    trm_dropout: float = 0.1
+    trm_intermediate_dim: int = 2048
+    trm_layer_norm_eps: float = 1e-6
+    trm_use_rope: bool = True
+    trm_rope_theta: float = 10000.0
+    num_layers_baseline: Optional[int] = None  # Kept for backward compatibility
+    num_layers_trm: Optional[int] = None  # Kept for backward compatibility
+    num_inner_steps: Optional[int] = None  # TRM recursion parameters (not currently used)
+    num_outer_steps: Optional[int] = None  # TRM recursion parameters (not currently used)
+    use_learned_z_init: bool = False
 
 
 @dataclass
@@ -138,6 +148,7 @@ class DatasetConfig:
 
     # Data loading
     batch_size: int = 32
+    eval_batch_size: Optional[int] = None
     base_batch_size: int = 32
     num_workers: int = 8
     prefetch_factor: int = 2
@@ -154,6 +165,9 @@ class DatasetConfig:
 
     # Text settings
     max_text_length: int = 512
+    max_question_length: Optional[int] = None
+    max_answer_length: Optional[int] = None
+    max_total_length: Optional[int] = None
     text_dropout_prob: float = 0.0
 
     # Parquet file paths (for Pixmo and similar datasets)
@@ -299,10 +313,10 @@ class ExperimentConfig:
         if isinstance(self.trainer, dict) or self.trainer is None:
             self.trainer = TrainerConfig(**(self.trainer or {}))
 
-        # Ensure at least one encoder is configured
+        # Ensure the model has at least one learnable component defined
         encoders = [self.vision_encoder, self.audio_encoder, self.text_encoder]
-        if not any(encoders):
-            raise ValueError("At least one encoder must be configured")
+        if not any(encoders) and self.decoder is None:
+            raise ValueError("At least one encoder or decoder must be configured")
 
         # Set wandb run name if not provided
         if self.training.wandb_run_name is None:
@@ -336,31 +350,87 @@ class ExperimentConfig:
     @classmethod
     def from_dict(cls, config_dict: dict) -> "ExperimentConfig":
         """Load configuration from dictionary."""
-        # Parse nested configs
-        if "vision_encoder" in config_dict and config_dict["vision_encoder"] is not None:
-            config_dict["vision_encoder"] = EncoderConfig(**config_dict["vision_encoder"])
-        if "audio_encoder" in config_dict and config_dict["audio_encoder"] is not None:
-            config_dict["audio_encoder"] = EncoderConfig(**config_dict["audio_encoder"])
-        if "text_encoder" in config_dict and config_dict["text_encoder"] is not None:
-            config_dict["text_encoder"] = EncoderConfig(**config_dict["text_encoder"])
-        if "decoder" in config_dict and config_dict["decoder"] is not None:
-            config_dict["decoder"] = DecoderConfig(**config_dict["decoder"])
-        if "fusion" in config_dict and config_dict["fusion"] is not None:
-            config_dict["fusion"] = FusionConfig(**config_dict["fusion"])
-        if "dataset" in config_dict:
-            config_dict["dataset"] = DatasetConfig(**config_dict["dataset"])
-        if "optimization" in config_dict:
-            config_dict["optimization"] = OptimizationConfig(**config_dict["optimization"])
-        if "training" in config_dict:
-            config_dict["training"] = TrainingConfig(**config_dict["training"])
-        if "losses" in config_dict:
-            losses_cfg = config_dict["losses"]
-            config_dict["losses"] = LossConfig(**losses_cfg) if losses_cfg is not None else LossConfig()
-        if "trainer" in config_dict:
-            trainer_cfg = config_dict["trainer"]
-            config_dict["trainer"] = TrainerConfig(**trainer_cfg) if trainer_cfg is not None else TrainerConfig()
+        def _filter_fields(data, dataclass_type):
+            """Remove keys that are not part of the target dataclass."""
+            allowed = dataclass_type.__dataclass_fields__.keys()
+            return {k: v for k, v in (data or {}).items() if k in allowed}
 
-        return cls(**config_dict)
+        cfg = dict(config_dict)
+
+        # Parse nested configs
+        if "vision_encoder" in cfg and cfg["vision_encoder"] is not None:
+            cfg["vision_encoder"] = EncoderConfig(**_filter_fields(cfg["vision_encoder"], EncoderConfig))
+        if "audio_encoder" in cfg and cfg["audio_encoder"] is not None:
+            cfg["audio_encoder"] = EncoderConfig(**_filter_fields(cfg["audio_encoder"], EncoderConfig))
+        if "text_encoder" in cfg and cfg["text_encoder"] is not None:
+            cfg["text_encoder"] = EncoderConfig(**_filter_fields(cfg["text_encoder"], EncoderConfig))
+        if "decoder" in cfg and cfg["decoder"] is not None:
+            decoder_cfg = dict(cfg["decoder"])
+
+            # Map common TRM-style keys to internal names for backward compatibility
+            if decoder_cfg.get("type") == "trm":
+                alias_map = {
+                    "vocab_size": "trm_vocab_size",
+                    "hidden_dim": "trm_hidden_dim",
+                    "num_layers": "trm_num_layers",
+                    "num_heads": "trm_num_heads",
+                    "max_seq_len": "trm_max_seq_len",
+                    "dropout": "trm_dropout",
+                    "intermediate_dim": "trm_intermediate_dim",
+                    "layer_norm_eps": "trm_layer_norm_eps",
+                    "use_rope": "trm_use_rope",
+                    "rope_theta": "trm_rope_theta",
+                }
+                for old_key, new_key in alias_map.items():
+                    if old_key in decoder_cfg and new_key not in decoder_cfg:
+                        decoder_cfg[new_key] = decoder_cfg.pop(old_key)
+
+                # Support num_layers_trm / num_layers_baseline naming
+                if "num_layers_trm" in decoder_cfg and "trm_num_layers" not in decoder_cfg:
+                    decoder_cfg["trm_num_layers"] = decoder_cfg.pop("num_layers_trm")
+
+            decoder_cfg = _filter_fields(decoder_cfg, DecoderConfig)
+            cfg["decoder"] = DecoderConfig(**decoder_cfg)
+
+        if "fusion" in cfg and cfg["fusion"] is not None:
+            cfg["fusion"] = FusionConfig(**_filter_fields(cfg["fusion"], FusionConfig))
+
+        if "dataset" in cfg:
+            cfg["dataset"] = DatasetConfig(**_filter_fields(cfg["dataset"], DatasetConfig))
+
+        # Loss configuration
+        if "losses" in cfg:
+            losses_cfg = _filter_fields(cfg["losses"], LossConfig) if cfg["losses"] is not None else {}
+            cfg["losses"] = LossConfig(**losses_cfg) if losses_cfg is not None else LossConfig()
+
+        # Training/optimization/trainer configuration with cross-population from a single training block
+        training_section = cfg.get("training", {}) or {}
+        optimization_section = cfg.get("optimization", {}) or {}
+        trainer_section = cfg.get("trainer", {}) or {}
+
+        opt_fields = OptimizationConfig.__dataclass_fields__.keys()
+        trainer_fields = TrainerConfig.__dataclass_fields__.keys()
+        training_fields = TrainingConfig.__dataclass_fields__.keys()
+
+        opt_kwargs = {k: v for k, v in optimization_section.items() if k in opt_fields}
+        for k in opt_fields:
+            if k not in opt_kwargs and k in training_section:
+                opt_kwargs[k] = training_section[k]
+        cfg["optimization"] = OptimizationConfig(**opt_kwargs)
+
+        trainer_kwargs = {k: v for k, v in trainer_section.items() if k in trainer_fields}
+        for k in trainer_fields:
+            if k not in trainer_kwargs and k in training_section:
+                trainer_kwargs[k] = training_section[k]
+        cfg["trainer"] = TrainerConfig(**trainer_kwargs)
+
+        training_kwargs = {k: v for k, v in training_section.items() if k in training_fields}
+        cfg["training"] = TrainingConfig(**training_kwargs)
+
+        # Only pass recognized top-level keys to ExperimentConfig
+        allowed_top = set(cls.__dataclass_fields__.keys())
+        filtered_top = {k: v for k, v in cfg.items() if k in allowed_top}
+        return cls(**filtered_top)
 
     @classmethod
     def from_yaml(cls, path: str) -> "ExperimentConfig":

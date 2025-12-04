@@ -74,7 +74,7 @@ trainer:
   epochs: 10
   num_epochs: 10
   batch_size: 128
-  save_every: 10  # Save checkpoint every N epochs
+  save_every: 20  # Save checkpoint every N epochs
   log_every: 20  # Log every N steps
   ckpt_dir: ./checkpoints/pixmo_alignment
   output_dir: ./outputs/pixmo_alignment

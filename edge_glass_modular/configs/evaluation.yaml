@@ -1,0 +1,141 @@
+# Evaluation Configuration for Aligned Models
+# This config defines evaluation settings, benchmarks, and metrics
+
+name: "alignment_evaluation"
+
+# Model checkpoints to evaluate
+checkpoints:
+  pixmo_mlp:
+    path: "checkpoints/pixmo_alignment/checkpoint_best.pt"
+    type: "mlp"  # MLP-based alignment
+    config: "configs/pixmo_alignment.yaml"
+
+  perceiver_mrl:
+    path: "checkpoints/perceiver_mrl_alignment/checkpoint_best.pt"
+    type: "perceiver"  # Perceiver-based alignment
+    config: "configs/perceiver_mrl_alignment.yaml"
+
+# Dataset configuration for evaluation
+dataset:
+  # Test set
+  test_parquet: "/home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_test.parquet"
+
+  # Validation set (alternative)
+  val_parquet: "/home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_val.parquet"
+
+  # Image settings
+  image_size: 336
+
+  # Dataloader settings
+  batch_size: 64
+  num_workers: 8
+  pin_memory: true
+
+  # Evaluation subset (null for full dataset)
+  max_samples: null  # Set to integer to limit samples
+
+# Retrieval metrics configuration
+metrics:
+  # Recall@K values to compute
+  recall_at_k: [1, 5, 10, 20, 50, 100]
+
+  # mAP@K values
+  map_at_k: [10, 50, 100]
+
+  # NDCG@K values
+  ndcg_at_k: [10, 50, 100]
+
+  # Compute rank statistics
+  compute_rank_stats: true
+
+  # Compute similarity statistics
+  compute_similarity_stats: true
+
+# MRL evaluation configuration
+mrl:
+  # Evaluate at these dimensions
+  enabled: true
+  dimensions: [128, 256, 512, 1024, 2048, 3072, 4096]
+
+  # Metrics to compute per dimension
+  metrics_per_dim: ["r_at_1", "r_at_5", "r_at_10"]
+
+# Explainability analysis configuration
+explainability:
+  enabled: true
+
+  # Embedding space visualization
+  embedding_viz:
+    method: "pca"  # 'pca' or 'tsne'
+    n_samples: 1000  # Number of samples for visualization
+    n_components: 2
+
+  # Dimension importance analysis
+  dimension_analysis:
+    enabled: true
+    top_k: 20  # Top K dimensions to analyze
+
+  # Modality separation analysis
+  modality_separation:
+    enabled: true
+
+# Benchmark configuration
+benchmarks:
+  # Image-text retrieval benchmark
+  image_text_retrieval:
+    enabled: true
+    directions: ["i2t", "t2i"]  # image-to-text, text-to-image
+
+  # Zero-shot classification (if applicable)
+  zero_shot_classification:
+    enabled: false
+    dataset: null
+
+# Visualization configuration
+visualization:
+  # Output directory for plots
+  output_dir: "outputs/evaluation"
+
+  # DPI for saved figures
+  dpi: 150
+
+  # Style
+  style: "seaborn-v0_8-darkgrid"
+
+  # Plots to generate
+  plots:
+    - "training_curves"
+    - "rank_histogram"
+    - "rank_cdf"
+    - "similarity_distributions"
+    - "embedding_space"
+    - "mrl_curves"
+    - "recall_at_k"
+    - "similarity_matrix"
+
+# Logging configuration
+logging:
+  # Wandb logging
+  use_wandb: true
+  wandb_project: "edge_glass_alignment"
+  wandb_entity: null
+  run_name: "alignment_eval"
+
+  # Local logging
+  log_dir: "logs/evaluation"
+  save_metrics: true
+  save_embeddings: true
+
+# Output configuration
+output:
+  # Save results
+  save_dir: "results/evaluation"
+
+  # Results format
+  formats: ["json", "csv"]
+
+  # Save embeddings for further analysis
+  save_embeddings: true
+
+  # Generate report
+  generate_report: true
