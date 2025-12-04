@@ -34,8 +34,13 @@ class TrainerConfig:
     output_dir: str = "./outputs"
     devices: int = 1
     strategy: str = "ddp"
+    use_wandb: bool = True
     wandb_project: str = "edge_glass"
     wandb_run_name: Optional[str] = None
+    retrieval_eval_samples: Optional[int] = None
+    eval_batch_size: Optional[int] = None
+    save_optimizer_state: bool = True  # Toggle optimizer/scheduler/scaler saving
+    best_weights_only: bool = False  # Save only model weights for best checkpoint to reduce size
 
     def __getitem__(self, key):
         return getattr(self, key)
@@ -59,6 +64,7 @@ class EncoderConfig:
     perceiver_latent_dim: int = 512
     perceiver_num_layers: int = 3
     perceiver_num_heads: int = 8
+    perceiver_dropout: float = 0.1
 
     # MRL options
     use_mrl: bool = False
@@ -177,12 +183,13 @@ class OptimizationConfig:
     warmup_steps: Optional[int] = None
     warmup_ratio: float = 0.1
     total_steps: Optional[int] = None
+    min_lr_ratio: float = 0.0
 
     # Gradient
     max_grad_norm: float = 1.0
     gradient_clip: Optional[float] = None  # Alias for max_grad_norm
     gradient_accumulation_steps: int = 1
-    grad_accum_steps: Optional[int] = None  # Alias for gradient_accumulation_steps
+    grad_accum_steps: Optional[int] = 1  # Alias for gradient_accumulation_steps
 
     # Mixed precision
     mixed_precision: Literal["no", "fp16", "bf16"] = "bf16"
@@ -193,6 +200,25 @@ class OptimizationConfig:
     contrastive_loss_weight: float = 1.0
     mrl_loss_weight: float = 0.05
     lm_loss_weight: float = 1.0
+
+    def __post_init__(self):
+        # Keep lr and learning_rate in sync
+        if self.lr is None:
+            self.lr = self.learning_rate
+        else:
+            self.learning_rate = self.lr
+
+        # Normalize gradient accumulation alias
+        if self.grad_accum_steps is None:
+            self.grad_accum_steps = self.gradient_accumulation_steps
+        else:
+            self.gradient_accumulation_steps = self.grad_accum_steps
+
+        # Normalize gradient clipping alias
+        if self.gradient_clip is None:
+            self.gradient_clip = self.max_grad_norm
+        else:
+            self.max_grad_norm = self.gradient_clip
 
 
 @dataclass
@@ -241,6 +267,7 @@ class ExperimentConfig:
     name: str = "default"
     description: str = ""
     tags: List[str] = field(default_factory=list)
+    seed: int = 42
 
     # Model components
     vision_encoder: Optional[EncoderConfig] = None
@@ -282,6 +309,7 @@ class ExperimentConfig:
             self.training.wandb_run_name = self.name
         if self.trainer.wandb_run_name is None:
             self.trainer.wandb_run_name = self.name
+        self.training.seed = self.seed
 
         # Normalize trainer epochs alias
         if self.trainer.num_epochs is not None:

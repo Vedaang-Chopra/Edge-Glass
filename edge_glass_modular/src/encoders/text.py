@@ -3,8 +3,9 @@
 import torch
 import torch.nn as nn
 from sentence_transformers import SentenceTransformer
+from transformers import CLIPTextModel, CLIPTokenizerFast
 from dataclasses import dataclass
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Dict
 
 from .mrl import MatryoshkaProjection
 
@@ -52,16 +53,31 @@ class TextEncoder(nn.Module):
         self.model_name = model_name
         self.projection_dim = projection_dim
         self.use_mrl = use_mrl
+        self.is_clip = "clip" in model_name.lower()
 
-        # Load Sentence-BERT encoder
-        self.encoder = SentenceTransformer(model_name)
+        if self.is_clip:
+            # CLIP text backbone
+            self.encoder = CLIPTextModel.from_pretrained(model_name)
+            self.tokenizer = CLIPTokenizerFast.from_pretrained(model_name)
+        else:
+            # Sentence-BERT encoder
+            self.encoder = SentenceTransformer(model_name)
+            self.tokenizer = None
 
         if freeze:
             for param in self.encoder.parameters():
                 param.requires_grad = False
 
         # Get hidden dimension
-        self.hidden_dim = self.encoder.get_sentence_embedding_dimension()
+        if self.is_clip:
+            # CLIP configs expose text hidden size under text_config
+            self.hidden_dim = getattr(self.encoder.config, "hidden_size", None)
+            if self.hidden_dim is None and hasattr(self.encoder.config, "text_config"):
+                self.hidden_dim = self.encoder.config.text_config.hidden_size
+            if self.hidden_dim is None:
+                raise ValueError("Could not determine CLIP text hidden size")
+        else:
+            self.hidden_dim = self.encoder.get_sentence_embedding_dimension()
 
         # Projection layer
         self.projector = nn.Linear(self.hidden_dim, projection_dim)
@@ -78,7 +94,9 @@ class TextEncoder(nn.Module):
             self.mrl = None
 
     def forward(
-        self, texts: Union[List[str], torch.Tensor], return_sequence: bool = False
+        self,
+        texts: Union[List[str], torch.Tensor, Dict[str, torch.Tensor]],
+        return_sequence: bool = False,
     ) -> TextEncoderOutput:
         """Encode texts to embeddings.
 
@@ -89,21 +107,45 @@ class TextEncoder(nn.Module):
         Returns:
             TextEncoderOutput with pooled embeddings
         """
-        if isinstance(texts, list):
-            # Encode with Sentence-BERT
-            with torch.no_grad() if not self.training else torch.enable_grad():
-                embeddings = self.encoder.encode(
+        device = self.projector.weight.device
+
+        if self.is_clip:
+            if isinstance(texts, list):
+                inputs = self.tokenizer(
                     texts,
-                    convert_to_tensor=True,
-                    show_progress_bar=False,
-                    batch_size=len(texts),
-                )
+                    padding=True,
+                    truncation=True,
+                    return_tensors="pt",
+                ).to(device)
+            elif isinstance(texts, dict):
+                inputs = {k: v.to(device) for k, v in texts.items()}
+            else:
+                raise TypeError("CLIP text encoder expects list of strings or tokenized dict")
+
+            with torch.no_grad() if not self.training else torch.enable_grad():
+                outputs = self.encoder(**inputs, output_hidden_states=True)
+            # Use CLS token (position 0) as pooled representation
+            sequence_embeddings = outputs.last_hidden_state  # (B, seq_len, hidden_dim)
+            pooled_base = sequence_embeddings[:, 0, :]
         else:
-            # Assume already encoded
-            embeddings = texts
+            if isinstance(texts, list):
+                # Encode with Sentence-BERT
+                with torch.no_grad() if not self.training else torch.enable_grad():
+                    pooled_base = self.encoder.encode(
+                        texts,
+                        convert_to_tensor=True,
+                        show_progress_bar=False,
+                        batch_size=len(texts),
+                    )
+                sequence_embeddings = None
+            elif isinstance(texts, torch.Tensor):
+                pooled_base = texts  # Already tokenized/encoded
+                sequence_embeddings = None
+            else:
+                raise TypeError("TextEncoder expects list of strings or tensor embeddings")
 
         # Project
-        projected = self.projector(embeddings)  # (B, projection_dim)
+        projected = self.projector(pooled_base)  # (B, projection_dim)
 
         # L2 normalize BEFORE MRL
         pooled = nn.functional.normalize(projected, p=2, dim=-1)
@@ -114,8 +156,7 @@ class TextEncoder(nn.Module):
             mrl_embeddings = self.mrl(pooled)
 
         # Note: Sequence embeddings not supported for sentence transformers
-        # They only return sentence-level embeddings
-        sequence_output = None
+        sequence_output = sequence_embeddings if return_sequence else None
 
         return TextEncoderOutput(
             pooled=pooled, sequence=sequence_output, mrl_embeddings=mrl_embeddings

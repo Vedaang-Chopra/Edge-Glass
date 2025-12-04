@@ -10,8 +10,12 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import Dataset
 from torchvision.io import read_image
-from PIL import Image
+from PIL import Image, ImageFile, UnidentifiedImageError
 import pandas as pd
+import warnings
+
+# Allow loading truncated images instead of raising hard errors
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 class ImageTextDataset(Dataset):
@@ -125,12 +129,31 @@ class PixmoParquetImageTextDataset(Dataset):
 
         # Load parquet file
         self.df = pd.read_parquet(self.parquet_path)
+        self._drop_invalid_images()
 
         # Validate required columns
         required_cols = ['image_bytes', 'caption', 'sample_id']
         missing_cols = [col for col in required_cols if col not in self.df.columns]
         if missing_cols:
             raise ValueError(f"Missing required columns in parquet: {missing_cols}")
+
+    def _drop_invalid_images(self):
+        """Remove rows with unreadable image bytes so dataloader won't crash."""
+        bad_indices = []
+        for idx, image_bytes in enumerate(self.df["image_bytes"]):
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", Image.DecompressionBombWarning)
+                    Image.open(BytesIO(image_bytes)).verify()
+            except Exception:
+                bad_indices.append(idx)
+
+        if bad_indices:
+            self.df = self.df.drop(index=bad_indices).reset_index(drop=True)
+            warnings.warn(
+                f"Removed {len(bad_indices)} invalid images from {self.parquet_path}. "
+                "Downstream loaders will skip them."
+            )
 
     def __len__(self):
         return len(self.df)
@@ -140,7 +163,12 @@ class PixmoParquetImageTextDataset(Dataset):
 
         # Decode image bytes to PIL Image
         image_bytes = row['image_bytes']
-        image = Image.open(BytesIO(image_bytes)).convert('RGB')
+        try:
+            image = Image.open(BytesIO(image_bytes)).convert('RGB')
+        except (UnidentifiedImageError, OSError) as e:
+            raise UnidentifiedImageError(
+                f"Failed to load image at idx {idx} from {self.parquet_path}: {e}"
+            ) from e
 
         # Convert to tensor [0, 1] range
         import torchvision.transforms as T

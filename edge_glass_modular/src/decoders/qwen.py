@@ -64,7 +64,7 @@ class QwenDecoder(nn.Module):
             quantization_config=quantization_config,
             device_map=device_map,
             trust_remote_code=True,
-            torch_dtype=torch.bfloat16,
+            dtype=torch.bfloat16,
         )
 
         # Load tokenizer

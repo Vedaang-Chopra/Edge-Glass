@@ -69,11 +69,18 @@ class ImprovedMultimodalTrainer:
         self.model.to(self.device)
 
         # DDP setup
-        if cfg.trainer.strategy == "ddp" and torch.cuda.device_count() > 1:
+        ddp_requested = cfg.trainer.strategy == "ddp" and torch.cuda.device_count() > 1
+        distributed_env_ready = "RANK" in os.environ or dist.is_initialized()
+        if ddp_requested and distributed_env_ready:
             init_distributed()
             self.model = DDP(self.model, device_ids=[self.device.index])
             self.world_size = dist.get_world_size()
         else:
+            if ddp_requested and not distributed_env_ready:
+                self.logger.warning(
+                    "DDP requested but no distributed process group found. "
+                    "Falling back to single-process training. Launch with torchrun to enable DDP."
+                )
             self.world_size = 1
 
         # Effective batch size with DDP
@@ -89,6 +96,7 @@ class ImprovedMultimodalTrainer:
         )
 
         # Learning rate scheduler (warmup + cosine decay)
+        print(len(train_loader), cfg.trainer.epochs, cfg.optimization.grad_accum_steps)
         num_training_steps = len(train_loader) * cfg.trainer.epochs // cfg.optimization.grad_accum_steps
         warmup_steps = int(num_training_steps * cfg.optimization.warmup_ratio)
         self.scheduler = self._get_cosine_schedule_with_warmup(
@@ -162,41 +170,69 @@ class ImprovedMultimodalTrainer:
 
         model_to_save = self.model.module if isinstance(self.model, DDP) else self.model
 
+        save_optimizer_state = getattr(self.cfg.trainer, "save_optimizer_state", True)
+        best_weights_only = getattr(self.cfg.trainer, "best_weights_only", False)
+
         checkpoint = {
             'epoch': self.state.epoch,
             'global_step': self.state.global_step,
             'best_val_loss': self.state.best_val_loss,
             'model_state_dict': model_to_save.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict(),
-            'scheduler_state_dict': self.scheduler.state_dict(),
-            'scaler_state_dict': self.scaler.state_dict(),
             'history': self.history,
             'config': self.cfg,
         }
+        if save_optimizer_state:
+            checkpoint.update(
+                {
+                    'optimizer_state_dict': self.optimizer.state_dict(),
+                    'scheduler_state_dict': self.scheduler.state_dict(),
+                    'scaler_state_dict': self.scaler.state_dict(),
+                }
+            )
 
         # Save latest checkpoint
         latest_path = self.ckpt_dir / "checkpoint_latest.pt"
-        torch.save(checkpoint, latest_path)
-        self.logger.info(f"Saved latest checkpoint to {latest_path}")
+        try:
+            torch.save(checkpoint, latest_path)
+            self.logger.info(f"Saved latest checkpoint to {latest_path}")
+        except RuntimeError as e:
+            self.logger.error(f"Failed to save latest checkpoint to {latest_path}: {e}")
+            return
 
         # Save best model
         if is_best:
             best_path = self.ckpt_dir / "checkpoint_best.pt"
-            torch.save(checkpoint, best_path)
-            self.state.best_model_path = str(best_path)
-            self.logger.info(f"✓ Saved best model to {best_path}")
+            best_payload = checkpoint
+            if best_weights_only:
+                best_payload = {
+                    'epoch': self.state.epoch,
+                    'global_step': self.state.global_step,
+                    'best_val_loss': self.state.best_val_loss,
+                    'model_state_dict': model_to_save.state_dict(),
+                    'config': self.cfg,
+                }
+            try:
+                torch.save(best_payload, best_path)
+                self.state.best_model_path = str(best_path)
+                self.logger.info(f"✓ Saved best model to {best_path}")
+            except RuntimeError as e:
+                self.logger.error(f"Failed to save best checkpoint to {best_path}: {e}")
 
         # Save periodic checkpoint
         if epoch is not None:
             epoch_path = self.ckpt_dir / f"checkpoint_epoch_{epoch}.pt"
-            torch.save(checkpoint, epoch_path)
-            self.logger.info(f"Saved epoch {epoch} checkpoint to {epoch_path}")
+            try:
+                torch.save(checkpoint, epoch_path)
+                self.logger.info(f"Saved epoch {epoch} checkpoint to {epoch_path}")
+            except RuntimeError as e:
+                self.logger.error(f"Failed to save epoch checkpoint {epoch_path}: {e}")
 
     def _load_latest_checkpoint(self):
         """Load latest checkpoint for crash recovery."""
         # Try to load best checkpoint first
         best_path = self.ckpt_dir / "checkpoint_best.pt"
         latest_path = self.ckpt_dir / "checkpoint_latest.pt"
+        save_optimizer_state = getattr(self.cfg.trainer, "save_optimizer_state", True)
 
         # Prefer latest for continuing training
         checkpoint_path = latest_path if latest_path.exists() else (best_path if best_path.exists() else None)
@@ -213,9 +249,12 @@ class ImprovedMultimodalTrainer:
         model_to_load.load_state_dict(checkpoint['model_state_dict'])
 
         # Load optimizer and scheduler
-        self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-        self.scaler.load_state_dict(checkpoint['scaler_state_dict'])
+        if save_optimizer_state and 'optimizer_state_dict' in checkpoint:
+            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+            self.scaler.load_state_dict(checkpoint['scaler_state_dict'])
+        else:
+            self.logger.info("Checkpoint missing optimizer/scheduler/scaler states; starting those fresh.")
 
         # Load training state
         self.state.epoch = checkpoint['epoch']

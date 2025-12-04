@@ -1,0 +1,73 @@
+name: perceiver_mrl_alignment
+seed: 42
+
+# Dataset (PixMo parquet)
+dataset:
+  train_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_train.parquet
+  val_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_val.parquet
+  test_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_test.parquet
+  image_size: 336
+  max_text_length: 77
+  text_dropout_prob: 0.1
+  batch_size: 64
+  num_workers: 8
+  pin_memory: true
+  persistent_workers: true
+
+# Vision Encoder with Perceiver
+vision_encoder:
+  model_name: openai/clip-vit-large-patch14-336
+  freeze: true
+  projection_dim: 4096  # Top MRL dimension = Qwen hidden size
+  use_perceiver: true
+  perceiver_num_latents: 64
+  perceiver_latent_dim: 1024
+  perceiver_num_layers: 4
+  perceiver_num_heads: 8
+  perceiver_dropout: 0.0
+  use_mrl: true
+  mrl_dimensions: [3072, 2048, 1536, 1024, 768, 512]  # MRL dims (excluding top 4096)
+  use_attention_pooling: false  # Perceiver handles pooling
+  pooling_type: mean
+
+# Text Encoder
+text_encoder:
+  model_name: openai/clip-vit-large-patch14-336
+  freeze: true
+  projection_dim: 4096
+  use_mrl: true
+  mrl_dimensions: [3072, 2048, 1536, 1024, 768, 512]
+
+# Loss Configuration
+losses:
+  contrastive: 0.25  # CLIP weight
+  mrl: 1.0  # MRL weight
+  sample_single_mrl_dim: true
+
+# Optimization
+optimization:
+  lr: 0.0002
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  max_grad_norm: 1.0
+  warmup_ratio: 0.05
+  lr_scheduler: cosine
+  min_lr_ratio: 0.1
+  fp16: false
+  bf16: true
+  contrastive_loss_weight: 0.25
+  mrl_loss_weight: 1.0
+  grad_accum_steps: 1
+
+# Training
+trainer:
+  epochs: 10
+  output_dir: ./outputs/perceiver_mrl_alignment
+  ckpt_dir: ./checkpoints/perceiver_mrl_alignment
+  save_every: 1
+  log_every: 50
+  use_wandb: true
+  wandb_project: edge_glass
+  wandb_run_name: null
+  retrieval_eval_samples: 100
+  eval_batch_size: 128
