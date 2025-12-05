@@ -1,0 +1,51 @@
+{
+  "os": "Linux-5.14.0-570.37.1.el9_6.x86_64-x86_64-with-glibc2.34",
+  "python": "CPython 3.12.5",
+  "startedAt": "2025-12-05T07:32:33.915093Z",
+  "program": "/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_modular/notebooks/03_trm_vlm_qa_training_FIXED.ipynb",
+  "codePath": "/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_modular/notebooks/03_trm_vlm_qa_training_FIXED.ipynb",
+  "git": {
+    "remote": "git@github.com:Vedaang-Chopra/Edge-Glass.git",
+    "commit": "5e8cefda470912acfbd751ab31f29e33fa179888"
+  },
+  "email": "vedaangchopra@hotmail.com",
+  "root": "/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_modular/notebooks",
+  "host": "atl1-1-03-017-9-0.pace.gatech.edu",
+  "executable": "/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/bin/python",
+  "cpu_count": 64,
+  "cpu_count_logical": 64,
+  "gpu": "NVIDIA H200",
+  "gpu_count": 2,
+  "disk": {
+    "/": {
+      "total": "53619982336",
+      "used": "27193757696"
+    }
+  },
+  "memory": {
+    "total": "2163478560768"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA H200",
+      "memoryTotal": "150754820096",
+      "cudaCores": 16896,
+      "architecture": "Hopper",
+      "uuid": "GPU-669d3669-73af-9afd-6896-3e1ad01c536c"
+    },
+    {
+      "name": "NVIDIA H200",
+      "memoryTotal": "150754820096",
+      "cudaCores": 16896,
+      "architecture": "Hopper",
+      "uuid": "GPU-1571b5e6-9755-f3fc-3b8f-7f9802617477"
+    }
+  ],
+  "cudaVersion": "12.9",
+  "slurm": {
+    "job_id": "3934092",
+    "mpi_type": "pmix_v4",
+    "root": "/opt/slurm/current"
+  },
+  "writerId": "lgqc1usd5ez96f29hemgl8fqbxsb0svm"
+}

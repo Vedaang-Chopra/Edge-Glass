@@ -1,0 +1,92 @@
+_wandb:
+    value:
+        cli_version: 0.23.0
+        e:
+            n6ss1ciy42vqqjuvsduhyyn4rocxyv7a:
+                codePath: /home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_modular/notebooks/03_trm_vlm_qa_training_FIXED.ipynb
+                cpu_count: 64
+                cpu_count_logical: 64
+                cudaVersion: "12.9"
+                disk:
+                    /:
+                        total: "53619982336"
+                        used: "27195699200"
+                email: vedaangchopra@hotmail.com
+                executable: /home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/bin/python
+                git:
+                    commit: 5e8cefda470912acfbd751ab31f29e33fa179888
+                    remote: git@github.com:Vedaang-Chopra/Edge-Glass.git
+                gpu: NVIDIA H200
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Hopper
+                      cudaCores: 16896
+                      memoryTotal: "150754820096"
+                      name: NVIDIA H200
+                      uuid: GPU-3d62fdfd-87c5-b4e4-0e1f-2f025a5e782f
+                    - architecture: Hopper
+                      cudaCores: 16896
+                      memoryTotal: "150754820096"
+                      name: NVIDIA H200
+                      uuid: GPU-15deaa44-3f29-85eb-8609-5b640b00d84a
+                host: atl1-1-03-017-9-0.pace.gatech.edu
+                memory:
+                    total: "2163478560768"
+                os: Linux-5.14.0-570.37.1.el9_6.x86_64-x86_64-with-glibc2.34
+                program: /home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_modular/notebooks/03_trm_vlm_qa_training_FIXED.ipynb
+                python: CPython 3.12.5
+                root: /storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_modular/notebooks
+                slurm:
+                    job_id: "3927677"
+                    mpi_type: pmix_v4
+                    root: /opt/slurm/current
+                startedAt: "2025-12-05T03:29:32.060229Z"
+                writerId: n6ss1ciy42vqqjuvsduhyyn4rocxyv7a
+        m: []
+        python_version: 3.12.5
+        t:
+            "1":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 51
+                - 53
+                - 71
+                - 75
+                - 98
+            "2":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 51
+                - 53
+                - 71
+                - 75
+                - 98
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.12.5
+            "5": 0.23.0
+            "6": 4.57.1
+            "8":
+                - 1
+            "12": 0.23.0
+            "13": linux-x86_64
+batch_size:
+    value: 16
+decoder:
+    value: Qwen/Qwen2.5-7B-Instruct
+learning_rate:
+    value: 0.0001
+num_recursion_steps:
+    value: 4
+num_trm_layers:
+    value: 4
+use_trm_recursion:
+    value: true
