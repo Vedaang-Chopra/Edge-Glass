@@ -8,9 +8,9 @@ seed: 42
 # Dataset configuration
 dataset:
   name: pixmo_qa
-  train_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pimo-alignment/pixmo_qa_mixed_with_bytes.parquet
-  val_parquet: null  # TODO: Add validation parquet path
-  test_parquet: null  # TODO: Add test parquet path
+  train_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo_alignment/pixmo_qa_mixed_train.parquet
+  val_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo_alignment/pixmo_qa_mixed_val.parquet  # TODO: Add validation parquet path
+  test_parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo_alignment/pixmo_qa_mixed_test.parquet  # TODO: Add test parquet path
 
   image_size: 336
   max_text_length: 512

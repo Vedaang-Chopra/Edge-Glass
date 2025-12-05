@@ -455,3 +455,34 @@ class MultimodalAlignmentModel(nn.Module):
 
         print("-" * 60)
         print(f"{'TOTAL':<30} {self.num_trainable_parameters:>15,} {self.num_total_parameters:>15,}")
+
+    def to(self, *args, **kwargs):
+        """Safely move modules to a device/dtype.
+
+        Quantized decoders (8/4-bit with device_map) cannot be moved with the
+        standard ``nn.Module.to`` because their parameters live on meta tensors
+        during dispatch. We temporarily drop the decoder from the module tree
+        so encoders/fusion/projector can move while leaving the decoder on its
+        configured devices.
+        """
+        decoder = self.decoder
+
+        should_skip_decoder = False
+        if decoder is not None:
+            decoder_model = getattr(decoder, "model", None)
+            if decoder_model is not None:
+                should_skip_decoder = any([
+                    getattr(decoder_model, "is_loaded_in_8bit", False),
+                    getattr(decoder_model, "is_loaded_in_4bit", False),
+                    getattr(decoder_model, "hf_device_map", None) is not None,
+                    getattr(decoder_model, "device_map", None) is not None,
+                ])
+
+        if should_skip_decoder:
+            self.decoder = None
+            output = super(MultimodalAlignmentModel, self).to(*args, **kwargs)
+            self.decoder = decoder
+            return output
+
+        return super(MultimodalAlignmentModel, self).to(*args, **kwargs)
+
