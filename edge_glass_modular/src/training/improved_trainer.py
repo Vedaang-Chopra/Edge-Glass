@@ -368,24 +368,37 @@ class ImprovedMultimodalTrainer:
 
             outputs = self.model(images=images, texts=texts, return_embeddings=True)
 
+            # Check for loss
             if outputs.loss is not None:
                 val_losses['total'] += outputs.loss.item()
-            if outputs.losses:
-                if 'loss_clip' in outputs.losses:
-                    val_losses['clip'] += outputs.losses['loss_clip'].item()
-                if 'loss_mrl' in outputs.losses:
-                    val_losses['mrl'] += outputs.losses['loss_mrl'].item()
+                if outputs.losses:
+                    if 'loss_clip' in outputs.losses:
+                        val_losses['clip'] += outputs.losses['loss_clip'].item()
+                    if 'loss_mrl' in outputs.losses:
+                        val_losses['mrl'] += outputs.losses['loss_mrl'].item()
+                num_batches += 1
+            else:
+                # Debug logging for first few nan/none batches
+                if num_batches < 3:
+                    self.logger.warning(f"Validation step {num_batches}: Loss is None. Skipping accumulation.")
+                    self.logger.warning(f"  Vision emb: {outputs.vision_emb is not None}")
+                    self.logger.warning(f"  Text emb: {outputs.text_emb is not None}")
+                    if outputs.losses:
+                        self.logger.warning(f"  Loss components keys: {outputs.losses.keys()}")
 
             # Collect embeddings
             if outputs.vision_emb is not None:
-                vision_embeddings.append(outputs.vision_emb.cpu())
+                vision_embeddings.append(outputs.vision_emb.detach().cpu()) # Detach just in case
             if outputs.text_emb is not None:
-                text_embeddings.append(outputs.text_emb.cpu())
-
-            num_batches += 1
+                text_embeddings.append(outputs.text_emb.detach().cpu())
 
         # Average losses
-        avg_losses = {k: v / num_batches for k, v in val_losses.items()}
+        avg_losses = {}
+        if num_batches > 0:
+            avg_losses = {k: v / num_batches for k, v in val_losses.items()}
+        else:
+            self.logger.warning("No valid batches found for validation loss calculation.")
+            avg_losses = {'total': float('nan'), 'clip': float('nan'), 'mrl': float('nan')}
 
         # Compute retrieval metrics
         metrics = {}
@@ -411,38 +424,57 @@ class ImprovedMultimodalTrainer:
 
         return {**avg_losses, **metrics}
 
-    # Add this diagnostic cell before training
+    @staticmethod
     def diagnose_model(model, loader, device):
+        """Run a diagnostic forward/backward pass."""
         model.train()
-        batch = next(iter(loader))
+        try:
+            batch = next(iter(loader))
+        except StopIteration:
+            print("Loader is empty, cannot diagnose.")
+            return
+
         images = batch["image"].to(device)
         texts = batch["text"]
         
+        print("\n=== Model Diagnostic ===")
         # Forward pass
-        outputs = model(images=images, texts=texts)
-        loss = outputs.loss
-        
-        print(f"Initial loss: {loss.item():.4f}")
-        print(f"Expected random loss: {np.log(len(texts)):.4f}")  # Should be close
-        
-        # Backward pass
-        loss.backward()
-        
-        # Check trainable params got gradients
-        trainable_with_grad = 0
-        trainable_without_grad = 0
-        for name, p in model.named_parameters():
-            if p.requires_grad:
-                if p.grad is not None and p.grad.abs().sum() > 0:
-                    trainable_with_grad += 1
+        try:
+            outputs = model(images=images, texts=texts)
+            loss = outputs.loss
+            
+            if loss is not None:
+                print(f"Initial loss: {loss.item():.4f}")
+                print(f"Expected random loss: {np.log(len(texts)):.4f}")  # Should be close
+                
+                # Backward pass
+                loss.backward()
+                
+                # Check trainable params got gradients
+                trainable_with_grad = 0
+                trainable_without_grad = 0
+                for name, p in model.named_parameters():
+                    if p.requires_grad:
+                        if p.grad is not None and p.grad.abs().sum() > 0:
+                            trainable_with_grad += 1
+                        else:
+                            trainable_without_grad += 1
+                            # print(f"  No gradient: {name}") # Too verbose
+                
+                print(f"Trainable params with gradients: {trainable_with_grad}")
+                print(f"Trainable params WITHOUT gradients: {trainable_without_grad}")
+            else:
+                print("Diagnostic forward pass returned None loss.")
+                if outputs.losses:
+                    print(f"Loss components: {outputs.losses.keys()}")
                 else:
-                    trainable_without_grad += 1
-                    print(f"  No gradient: {name}")
-        
-        print(f"\nTrainable params with gradients: {trainable_with_grad}")
-        print(f"Trainable params WITHOUT gradients: {trainable_without_grad}")
+                    print("No loss components found.")
+
+        except Exception as e:
+            print(f"Diagnostic failed: {e}")
         
         model.zero_grad()
+        print("========================\n")
 
     
     def train(self):
@@ -521,7 +553,9 @@ class ImprovedMultimodalTrainer:
         self.logger.info("\nTraining completed!")
         self.logger.info(f"Best validation loss: {self.state.best_val_loss:.4f}")
         
-        diagnose_model(self.model, self.train_loader, self.cfg.device)
+        self.logger.info(f"Best validation loss: {self.state.best_val_loss:.4f}")
+        
+        self.diagnose_model(self.model, self.train_loader, self.device)
         
         if self.use_wandb and get_rank() == 0:
             wandb.finish()
