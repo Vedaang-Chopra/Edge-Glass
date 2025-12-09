@@ -1,0 +1,315 @@
+PosixPath('/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_modular/src')
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/transformers/utils/hub.py:110: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+PyTorch version: 2.9.0+cu128
+CUDA available: True
+GPU: NVIDIA H200
+GPU Memory: 150.11 GB
+Experiment: pixmo_vision_text_alignment
+
+Dataset Configuration:
+  Train Parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_train.parquet
+  Val Parquet: /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_val.parquet
+  Batch Size: 128
+  Text Dropout: 0.1
+
+Model Configuration:
+  Vision Encoder: openai/clip-vit-large-patch14-336
+  Projection Dim: 4096
+  MRL Dimensions: [2048, 1024, 512, 256, 128]
+  Attention Pooling: True
+  Pooling Type: simple
+
+Loss Configuration:
+  CLIP Weight: 0.25
+  MRL Weight: 1.0
+  Sample Single MRL Dim: True
+
+Optimization Configuration:
+  Learning Rate: 0.0002
+  Weight Decay: 0.01
+  Max Grad Norm: 1.0
+  Warmup Ratio: 0.1
+Using device: cuda
+
+Creating multimodal alignment model with 4096-dim embeddings...
+Could not render content for 'application/vnd.jupyter.widget-view+json'
+{"model_id":"4bb986c2cc9f4051aeca5fbeb229f2e5","version_major":2,"version_minor":0}
+trainable params: 40,370,176 || all params: 7,655,986,688 || trainable%: 0.5273
+
+============================================================
+Component                            Trainable           Total
+------------------------------------------------------------
+Vision Encoder                       4,214,785     307,722,241
+Text Encoder                         3,149,824     112,636,288
+Decoder                             40,370,176   7,655,986,688
+------------------------------------------------------------
+TOTAL                              987,324,417   9,015,934,849
+============================================================
+Loading Pixmo datasets from parquet files...
+/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_modular/src/data/dataset_builder.py:153: UserWarning: Removed 88 invalid images from /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_train.parquet. Downstream loaders will skip them.
+  warnings.warn(
+/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_modular/src/data/dataset_builder.py:153: UserWarning: Removed 16 invalid images from /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_val.parquet. Downstream loaders will skip them.
+  warnings.warn(
+
+Train samples: 13912
+Validation samples: 2984
+Test samples: 2980
+/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_modular/src/data/dataset_builder.py:153: UserWarning: Removed 20 invalid images from /home/hice1/vchopra37/scratch/projects/edge_glass/dataset/final_dataset/pixmo/pixmo_test.parquet. Downstream loaders will skip them.
+  warnings.warn(
+Train batches: 109
+Validation batches: 24
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+Batch keys: dict_keys(['image', 'text', 'sample_id'])
+Image tensor shape: torch.Size([128, 3, 336, 336])
+Number of captions: 128
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+
+Note: Some captions may show '[DROPPED TEXT]' due to text dropout.
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:3432: DecompressionBombWarning: Image size (130382142 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:3432: DecompressionBombWarning: Image size (161569818 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:3432: DecompressionBombWarning: Image size (100000000 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+[2025-12-04 13:17:52][WARNING] DDP requested but no distributed process group found. Falling back to single-process training. Launch with torchrun to enable DDP.
+109 10 1
+[2025-12-04 13:17:52][INFO] Loading checkpoint from checkpoints/pixmo_alignment/checkpoint_latest.pt
+/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_modular/src/training/improved_trainer.py:109: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=cfg.optimization.fp16 or cfg.optimization.bf16)
+[2025-12-04 13:18:04][INFO] Resumed from epoch 9, step 1199
+wandb: Currently logged in as: vedaangchopra (vedaangchopra_gatech) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+Tracking run with wandb version 0.23.0
+Run data is saved locally in /storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_modular/notebooks/wandb/run-20251204_131804-jqmalerk
+Syncing run pixmo_4096_mrl to Weights & Biases (docs)
+View project at https://wandb.ai/vedaangchopra_gatech/edge_glass_alignment
+View run at https://wandb.ai/vedaangchopra_gatech/edge_glass_alignment/runs/jqmalerk
+
+Trainer initialized with:
+  Checkpoint directory: checkpoints/pixmo_alignment
+  Effective batch size: 128
+  World size (GPUs): 1
+  Starting epoch: 9
+  Starting step: 1199
+  Best val loss: 0.0
+
+Starting training...
+============================================================
+[2025-12-04 13:18:13][INFO] Starting training...
+[2025-12-04 13:18:13][INFO] Epochs: 10
+[2025-12-04 13:18:13][INFO] Steps per epoch: 109
+[2025-12-04 13:18:13][INFO] Total training steps: 1090
+[2025-12-04 13:18:13][INFO] Effective batch size: 128
+[2025-12-04 13:18:13][INFO] 
+Epoch 10/10
+/storage/ice1/1/0/vchopra37/projects/edge_glass/edge_glass_modular/src/training/improved_trainer.py:295: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=self.cfg.optimization.fp16 or self.cfg.optimization.bf16):
+[2025-12-04 13:21:23][INFO] Train - Total: 1.1140, CLIP: 0.8983, MRL: 0.8894
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+[2025-12-04 13:22:04][INFO] Val - Total: 0.7646, CLIP: 0.6110, MRL: 0.6118
+[2025-12-04 13:22:04][INFO]   R@1: 56.87%, R@5: 81.90%, R@10: 89.18%
+[2025-12-04 13:22:27][INFO] Saved latest checkpoint to checkpoints/pixmo_alignment/checkpoint_latest.pt
+[2025-12-04 13:22:27][INFO] Saved training history to checkpoints/pixmo_alignment/training_history.json
+[2025-12-04 13:22:27][INFO] 
+Training completed!
+[2025-12-04 13:22:27][INFO] Best validation loss: 0.0000
+
+
+Run history:
+
+epoch	▁
+train/epoch	▁▁▁▁▁▁
+train/loss	▆█▇▁▁█
+train/loss_clip	▅█▆▁▂▆
+train/loss_mrl	▆▇▇▁▁█
+train/lr	▁▁▂▄▆█
+train/step	▁▂▄▅▇█
+val/i2t_r1	▁
+val/i2t_r10	▁
+val/i2t_r5	▁
++3	...
+
+Run summary:
+
+epoch	9
+train/epoch	9
+train/loss	1.24599
+train/loss_clip	0.98347
+train/loss_mrl	1.00012
+train/lr	1e-05
+train/step	1300
+val/i2t_r1	0.5687
+val/i2t_r10	0.89176
+val/i2t_r5	0.81903
++3	...
+
+View run pixmo_4096_mrl at: https://wandb.ai/vedaangchopra_gatech/edge_glass_alignment/runs/jqmalerk
+View project at: https://wandb.ai/vedaangchopra_gatech/edge_glass_alignment
+Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+Find logs at: ./wandb/run-20251204_131804-jqmalerk/logs
+
+============================================================
+Training completed!
+Best validation loss: 0.0000
+============================================================
+Training curves saved to outputs/pixmo_alignment/training_curves.png
+Loss components saved to outputs/pixmo_alignment/loss_components.png
+LR schedule saved to outputs/pixmo_alignment/lr_schedule.png
+Loaded best model from checkpoints/pixmo_alignment/checkpoint_best.pt
+Best epoch: 0
+Best val loss: 0.0000
+MultimodalAlignmentModel(
+  (vision_encoder): VisionEncoder(
+    (encoder): CLIPVisionModel(
+      (vision_model): CLIPVisionTransformer(
+        (embeddings): CLIPVisionEmbeddings(
+          (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+          (position_embedding): Embedding(577, 1024)
+        )
+        (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+        (encoder): CLIPEncoder(
+          (layers): ModuleList(
+            (0-23): 24 x CLIPEncoderLayer(
+              (self_attn): CLIPAttention(
+                (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              )
+              (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+              (mlp): CLIPMLP(
+                (activation_fn): QuickGELUActivation()
+                (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+                (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+              )
+              (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+...
+      )
+    )
+  )
+  (alignment_loss_fn): AlignmentLoss()
+)
+Output is truncated. View as a scrollable element or open in a text editor. Adjust cell output settings...
+Collecting embeddings for visualization...
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+Could not render content for 'application/vnd.jupyter.widget-view+json'
+{"model_id":"0880bb2026c54bae9dc52ae73d55cb6f","version_major":2,"version_minor":0}
+Vision embeddings: (1280, 4096)
+Text embeddings: (1280, 4096)
+Embedding space saved to outputs/pixmo_alignment/embedding_space.png
+Similarity matrix saved to outputs/pixmo_alignment/similarity_matrix.png
+TrainerConfig(epochs=10, num_epochs=10, batch_size=128, save_every=20, log_every=20, ckpt_dir='./checkpoints/pixmo_alignment', output_dir='./outputs/pixmo_alignment', devices=2, strategy='ddp', use_wandb=True, wandb_project='edge_glass_alignment', wandb_run_name='pixmo_4096_mrl', retrieval_eval_samples=None, eval_batch_size=None, save_optimizer_state=True, best_weights_only=True)
+EVAL SAMPLES: full validation set
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+/home/hice1/vchopra37/scratch/projects/edge_glass/edge_glass_env/lib/python3.12/site-packages/PIL/Image.py:1039: UserWarning: Palette images with Transparency expressed in bytes should be converted to RGBA images
+  warnings.warn(
+Collected 2984 validation pairs for MRL accuracy sweep
+Dim  128: Top-1 accuracy = 7.17%
+Dim  256: Top-1 accuracy = 9.18%
+Dim  512: Top-1 accuracy = 11.73%
+Dim 1024: Top-1 accuracy = 14.51%
+Dim 2048: Top-1 accuracy = 14.11%
+Dim 4096: Top-1 accuracy = 14.31%
+Accuracy plot saved to outputs/pixmo_alignment/mrl_dim_accuracy.png
+
+============================================================
+Example 1:
+Ground Truth Caption: This detailed behind-the-scenes image features Robert Englund, the actor renowned for his role as Freddy Krueger in the 1984 horror classic "A Nightmare on Elm Street." Englund, a white man, commands the frame, donning Freddy's iconic red and black striped sweater and what looks like dungarees. He grips a mallet upside down in his left hand, with the mallet head pointing downward.
+
+Of significant note is Englund's right hand, which is pressed to his chest and adorned with the infamous Freddy glove—a leather
+
+Top 5 Retrieved Captions:
+  1. [0.358] This detailed color photograph captures two men in character within a public res... 
+  2. [0.356] This detailed, colorful portrait features a man resembling a famous actor, albei... 
+  3. [0.353] A striking black and white graffiti-like artwork appears on a dilapidated, spall... 
+  4. [0.346] In this whimsical holiday photograph, former First Lady Nancy Reagan is perched ... 
+  5. [0.346] In this image, a person is dressed in a detailed Iron Man Halloween costume set ... 
+
+============================================================
+Example 2:
+Ground Truth Caption: Screenshot displaying three different Android app flows, each side-by-side against a black background:
+
+1. The first flow shows a notification with the message "Can't sign in."
+2. The second flow features an interface listing options such as Recent Plays, Albums, Artists, Songs, Playlists, Now Playing, and a call-to-action button labeled "Get Music in Store," resembling a Windows Music Store layout.
+3. The third flow focuses on a "Songs" menu with options to Play, Add to Playlist, Download, Delete, and See 
+
+Top 5 Retrieved Captions:
+  1. [0.410] The image depicts a cell phone screen with a variety of elements. In the upper l... 
+  2. [0.403] An image showing the screen of a smartphone displays various settings menus. At ... 
+...
+  2. [0.278] This photo depicts a six-inch tall, clear plastic diorama box designed for layer... 
+  3. [0.277] The image showcases a detailed, computer-generated pattern of leaves on a forest... 
+  4. [0.276] The image depicts a color illustration of various plant life, against a dark bac... 
+  5. [0.275] This color photograph showcases a lush terrarium encased in a long, rectangular ... 
+Output is truncated. View as a scrollable element or open in a text editor. Adjust cell output settings...
+
+============================================================
+EXPERIMENT SUMMARY
+============================================================
+
+Configuration:
+  Model: pixmo_vision_text_alignment
+  Vision Encoder: openai/clip-vit-large-patch14-336
+  Embedding Dimension: 4096
+  MRL Dimensions: [2048, 1024, 512, 256, 128]
+  Attention Pooling: True
+  Text Dropout: 0.1
+
+Loss Weights:
+  CLIP Loss: 0.25
+  MRL Loss: 1.0
+
+Training:
+  Epochs: 10
+  Training samples: 13912
+  Validation samples: 2984
+  Best validation loss: 0.0000
+  Best R@1: 56.87%
+  Best R@5: 81.90%
+  Best R@10: 89.18%
+
+Model Parameters:
+  Trainable: 987,324,417
+  Total: 9,015,934,849
+  Trainable %: 10.95%
+
+Output Files:
+  Best model: checkpoints/pixmo_alignment/checkpoint_best.pt
+  Latest checkpoint: checkpoints/pixmo_alignment/checkpoint_latest.pt
+  Training history: checkpoints/pixmo_alignment/training_history.json
+  Visualizations: outputs/pixmo_alignment
+
+============================================================
+Next Steps:
+============================================================
+1. Evaluate on held-out test set
+2. Try different attention pooling strategies
+3. Fine-tune with decoder for instruction following
+4. Export model for deployment
+5. Benchmark latency/throughput for serving
+============================================================
