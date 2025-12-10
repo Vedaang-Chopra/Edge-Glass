@@ -18,12 +18,12 @@ dataset:
   max_question_length: 128
   max_answer_length: 256
   max_total_length: 384
-  text_dropout_prob: 0.1 # INCREASED: 0.0 -> 0.1
+  text_dropout_prob: 0.2 # INCREASED: 0.1 -> 0.2
 
-  batch_size: 8
-  base_batch_size: 8
-  eval_batch_size: 8
-  num_workers: 8
+  batch_size: 4  # REDUCED: 8 -> 4 to prevent OOM
+  base_batch_size: 4
+  eval_batch_size: 4
+  num_workers: 4
   prefetch_factor: 1
   pin_memory: true
   persistent_workers: true
@@ -60,7 +60,7 @@ decoder:
   use_lora: true
   lora_r: 64
   lora_alpha: 128
-  lora_dropout: 0.1 # INCREASED: 0.05 -> 0.1
+  lora_dropout: 0.2 # INCREASED: 0.1 -> 0.2
   lora_target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
   load_in_8bit: false
   load_in_4bit: true
@@ -76,14 +76,14 @@ losses:
 
 # Optimization configuration
 optimization:
-  lr: 5.0e-5 # DECREASED: 1e-4 -> 5e-5
-  learning_rate: 5.0e-5
-  weight_decay: 0.1 # INCREASED: 0.01 -> 0.1
+  lr: 2.0e-5 # DECREASED: 5e-5 -> 2e-5
+  learning_rate: 2.0e-5
+  weight_decay: 0.2 # INCREASED: 0.1 -> 0.2
   betas: [0.9, 0.95]
   max_grad_norm: 1.0
   gradient_clip: 1.0
-  grad_accum_steps: 1
-  gradient_accumulation_steps: 1
+  grad_accum_steps: 2  # INCREASED: 1 -> 2 to compensate for smaller batch
+  gradient_accumulation_steps: 2
   fp16: false
   bf16: true
   mixed_precision: bf16
@@ -98,11 +98,12 @@ optimization:
 
 # Trainer configuration
 trainer:
-  epochs: 20
-  num_epochs: 20
-  batch_size: 16
-  save_every: 1
-  log_every: 20
+  epochs: 10
+  num_epochs: 10
+  batch_size: 8  # Effective = 4 * 4 GPUs * 2 accum = 32
+  save_every: 4
+
+  log_every: 1
   ckpt_dir: ./checkpoints/trm_vlm_qa_3b_reg
   output_dir: ./outputs/trm_vlm_qa_3b_reg
   devices: 1
@@ -110,7 +111,7 @@ trainer:
   use_wandb: true
   wandb_project: edgeglass_final_align
   wandb_run_name: trm_vlm_qa_3b_reg
-  eval_batch_size: 16
+  eval_batch_size: 8
   save_optimizer_state: true
   best_weights_only: false
 

@@ -60,6 +60,25 @@ def main():
     model = MultimodalAlignmentModel(config)
     model.to(device)
     
+    # Parameter diagnostic
+    if get_rank() == 0:
+        print("\n=== Parameter Diagnostic ===")
+        total_trainable = 0
+        for name, param in model.named_parameters():
+            if param.requires_grad:
+                total_trainable += param.numel()
+                # Print first 10 trainable params for debugging
+        print(f"Total trainable parameters: {total_trainable:,}")
+        
+        # Check per-component
+        if model.vision_encoder is not None:
+            ve_trainable = sum(p.numel() for p in model.vision_encoder.parameters() if p.requires_grad)
+            print(f"  Vision Encoder trainable: {ve_trainable:,}")
+        if model.text_encoder is not None:
+            te_trainable = sum(p.numel() for p in model.text_encoder.parameters() if p.requires_grad)
+            print(f"  Text Encoder trainable: {te_trainable:,}")
+        print("===========================\n")
+    
     # 4. Dataset
     if get_rank() == 0:
         print("Loading datasets...")
@@ -206,12 +225,8 @@ def main():
             
             # Vision encoder info
             'vision_encoder_name': config.vision_encoder.model_name,
-            'text_encoder_name': config.vision_encoder.text_model_name, # Note: config names might differ slightly, checking notebook output
-            # Notebook output says: 'vision_encoder_name': cfg.vision_encoder_name
-            # But in config object print (Cell 7): config.vision_encoder.perceiver_num_latents etc.
-            # I will trust the config object structure passed in.
-            
-            # Training info
+            'text_encoder_name': config.text_encoder.model_name if hasattr(config, 'text_encoder') else 'unknown',
+
             'best_val_loss': best_val_loss,
             'final_metrics': history,
             

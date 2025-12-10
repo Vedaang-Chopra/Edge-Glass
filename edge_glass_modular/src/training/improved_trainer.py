@@ -102,9 +102,12 @@ class ImprovedMultimodalTrainer:
         )
 
         # Learning rate scheduler (warmup + cosine decay)
-        print(len(train_loader), cfg.trainer.epochs, cfg.optimization.grad_accum_steps)
-        num_training_steps = len(train_loader) * cfg.trainer.epochs // cfg.optimization.grad_accum_steps
+        # IMPORTANT: With DDP, each process sees len(train_loader) // world_size batches
+        # The scheduler must be calibrated to the ACTUAL number of optimizer steps per process
+        steps_per_epoch = len(train_loader) // self.world_size
+        num_training_steps = steps_per_epoch * cfg.trainer.epochs // cfg.optimization.grad_accum_steps
         warmup_steps = int(num_training_steps * cfg.optimization.warmup_ratio)
+        print(f"Scheduler: {steps_per_epoch} steps/epoch × {cfg.trainer.epochs} epochs / {cfg.optimization.grad_accum_steps} accum = {num_training_steps} total, {warmup_steps} warmup")
         self.scheduler = self._get_cosine_schedule_with_warmup(
             self.optimizer,
             num_warmup_steps=warmup_steps,
@@ -112,7 +115,8 @@ class ImprovedMultimodalTrainer:
         )
 
         # Mixed precision
-        self.scaler = torch.cuda.amp.GradScaler(enabled=cfg.optimization.fp16 or cfg.optimization.bf16)
+        # Disable GradScaler for BF16 (not needed/recommended)
+        self.scaler = torch.cuda.amp.GradScaler(enabled=cfg.optimization.fp16)
 
         # Training state
         self.state = TrainerState()
@@ -317,10 +321,17 @@ class ImprovedMultimodalTrainer:
             # Update weights
             if (batch_idx + 1) % self.cfg.optimization.grad_accum_steps == 0:
                 self.scaler.unscale_(self.optimizer)
-                torch.nn.utils.clip_grad_norm_(
+                grad_norm = torch.nn.utils.clip_grad_norm_(
                     self.model.parameters(),
                     self.cfg.optimization.gradient_clip,
                 )
+                
+                # Debug logging for first few steps
+                if self.state.global_step < 5 and get_rank() == 0:
+                    self.logger.info(f"Step {self.state.global_step}: Grad norm = {grad_norm:.4f}")
+                    if grad_norm.item() == 0:
+                         self.logger.warning("  WARNING: Zero gradient norm!")
+                
                 self.scaler.step(self.optimizer)
                 self.scaler.update()
                 self.optimizer.zero_grad()

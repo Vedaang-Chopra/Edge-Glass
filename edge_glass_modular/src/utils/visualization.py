@@ -6,6 +6,7 @@ import numpy as np
 import torch
 from pathlib import Path
 from typing import Dict, List, Optional
+import warnings
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -25,7 +26,29 @@ class TrainingVisualizer:
     def __init__(self, save_dir: str | Path, style: str = "seaborn-v0_8-darkgrid"):
         self.save_dir = Path(save_dir)
         self.save_dir.mkdir(parents=True, exist_ok=True)
-        plt.style.use(style)
+        resolved_style = self._resolve_style(style)
+        plt.style.use(resolved_style)
+
+    @staticmethod
+    def _resolve_style(style: str) -> str:
+        """Map friendly style names to valid Matplotlib styles with fallback."""
+        aliases = {
+            "dark": "dark_background",
+            "white": "default",
+        }
+        resolved = aliases.get(style, style)
+        available = set(plt.style.available)
+
+        if resolved in available:
+            return resolved
+
+        fallback = "seaborn-v0_8-darkgrid" if "seaborn-v0_8-darkgrid" in available else "default"
+        warnings.warn(
+            f"Style '{style}' not found; using fallback '{fallback}'. "
+            f"Available styles: {sorted(available)}",
+            RuntimeWarning,
+        )
+        return fallback
 
     def plot_training_curves(
         self,
@@ -168,9 +191,12 @@ class TrainingVisualizer:
             text_embs: Text embeddings (N, dim)
             method: Dimensionality reduction method ("pca" or "tsne")
             n_samples: Number of samples to plot
-            save_name: Filename to save
-            dpi: DPI for saved figure
+        save_name: Filename to save
+        dpi: DPI for saved figure
         """
+        vision_embs = self._to_numpy(vision_embs)
+        text_embs = self._to_numpy(text_embs)
+
         # Subsample if needed
         if len(vision_embs) > n_samples:
             indices = np.random.choice(len(vision_embs), n_samples, replace=False)
@@ -241,6 +267,13 @@ class TrainingVisualizer:
         plt.tight_layout()
         plt.savefig(self.save_dir / save_name, dpi=dpi, bbox_inches='tight')
         plt.close()
+
+    @staticmethod
+    def _to_numpy(embs):
+        """Ensure embeddings are on CPU NumPy for plotting."""
+        if isinstance(embs, torch.Tensor):
+            return embs.detach().cpu().numpy()
+        return np.asarray(embs)
 
     def plot_similarity_matrix(
         self,

@@ -13,6 +13,7 @@ from .metrics import (
     compute_mrl_performance,
     compute_similarity_statistics,
 )
+from .zero_shot import ZeroShotClassifier
 
 
 class AlignmentBenchmark:
@@ -259,3 +260,31 @@ class AlignmentBenchmark:
         }, save_dir / 'embeddings.pt')
 
         print(f"\nResults saved to {save_dir}")
+
+    def evaluate_zero_shot(
+        self,
+        dataset_name: str,
+        class_names: List[str],
+        templates: List[str],
+        dataloader: DataLoader,
+    ) -> Dict[str, float]:
+        """Run zero-shot classification evaluation.
+        
+        Args:
+            dataset_name: Name of the dataset for logging
+            class_names: List of class names
+            templates: List of prompt templates
+            dataloader: DataLoader for the dataset
+            
+        Returns:
+            Dict with accuracy metrics
+        """
+        print(f"\nEvaluating Zero-Shot on {dataset_name}...")
+        classifier = ZeroShotClassifier(self.model, self.device)
+        classifier.build_classifier(class_names, templates)
+        metrics = classifier.evaluate(dataloader)
+        
+        print(f"  Top-1 Accuracy: {metrics['top1']:.2f}%")
+        print(f"  Top-5 Accuracy: {metrics['top5']:.2f}%")
+        
+        return metrics

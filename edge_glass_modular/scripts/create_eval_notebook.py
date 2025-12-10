@@ -64,8 +64,15 @@ print("Loading Qwen Decoder...")
 qwen_decoder = QwenDecoder(
     model_name=config.decoder.model_name,
     device_map="balanced", # Use balanced for multi-gpu inference
-    use_lora=True,
-    lora_config=config.decoder.lora
+    use_lora=config.decoder.use_lora,
+    load_in_8bit=config.decoder.load_in_8bit,
+    load_in_4bit=config.decoder.load_in_4bit,
+    lora_r=config.decoder.lora_r,
+    lora_alpha=config.decoder.lora_alpha,
+    lora_dropout=config.decoder.lora_dropout,
+    lora_target_modules=config.decoder.lora_target_modules,
+    num_key_value_heads=getattr(config.decoder, "num_key_value_heads", None),
+    intermediate_size=getattr(config.decoder, "intermediate_size", None),
 )
 
 # 3. TRM VLM Wrapper

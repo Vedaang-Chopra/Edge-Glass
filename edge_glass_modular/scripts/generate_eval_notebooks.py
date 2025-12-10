@@ -89,9 +89,16 @@ print("Loading VLM...")
 config = load_config(config_path)
 qwen_decoder = QwenDecoder(
     model_name=config.decoder.model_name,
-    load_in_4bit=True, # Use 4bit for inference efficiency
-    use_lora=True,
-    device_map="auto"
+    load_in_8bit=config.decoder.load_in_8bit,
+    load_in_4bit=config.decoder.load_in_4bit,
+    use_lora=config.decoder.use_lora,
+    lora_r=config.decoder.lora_r,
+    lora_alpha=config.decoder.lora_alpha,
+    lora_dropout=config.decoder.lora_dropout,
+    lora_target_modules=config.decoder.lora_target_modules,
+    device_map="auto",
+    num_key_value_heads=getattr(config.decoder, "num_key_value_heads", None),
+    intermediate_size=getattr(config.decoder, "intermediate_size", None),
 )
 
 vision_token_dim = alignment_config.vision_encoder.projection_dim
@@ -275,9 +282,21 @@ if os.path.exists(alignment_checkpoint):
     aligned_model.load_state_dict(ckpt['model_state_dict'], strict=False)
 aligned_model.eval().to(device)
 
-# 2. VLM
-config = load_config(config_path)
-qwen_decoder = QwenDecoder(config.decoder.model_name, load_in_4bit=True, use_lora=True, device_map="auto")
+    # 2. VLM
+    config = load_config(config_path)
+    qwen_decoder = QwenDecoder(
+        config.decoder.model_name,
+        load_in_8bit=config.decoder.load_in_8bit,
+        load_in_4bit=config.decoder.load_in_4bit,
+        use_lora=config.decoder.use_lora,
+        lora_r=config.decoder.lora_r,
+        lora_alpha=config.decoder.lora_alpha,
+        lora_dropout=config.decoder.lora_dropout,
+        lora_target_modules=config.decoder.lora_target_modules,
+        device_map=\"auto\",
+        num_key_value_heads=getattr(config.decoder, \"num_key_value_heads\", None),
+        intermediate_size=getattr(config.decoder, \"intermediate_size\", None),
+    )
 model = QwenVLM(
     qwen_decoder, alignment_config.vision_encoder.projection_dim,
     use_trm_recursion=use_trm, num_trm_layers=4, num_recursion_steps=4

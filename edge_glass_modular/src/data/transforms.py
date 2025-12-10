@@ -7,10 +7,19 @@ import torchaudio
 import torchvision.transforms as T
 from torchvision.transforms import functional as F
 
+class _EnsureTensor:
+    """Convert PIL/ndarray to tensor; passthrough if already tensor."""
+    def __call__(self, img):
+        if torch.is_tensor(img):
+            return img
+        return T.ToTensor()(img)
+
 
 def build_transforms(image_size: int = 224, sample_rate: int = 16000):
+    ensure_tensor = _EnsureTensor()
     vision = T.Compose(
         [
+            ensure_tensor,
             T.Resize((image_size, image_size)),
             T.ConvertImageDtype(torch.float32),
             T.Normalize(
@@ -35,9 +44,11 @@ def build_transforms(image_size: int = 224, sample_rate: int = 16000):
 
 def get_image_transforms(image_size: int = 224, is_training: bool = True):
     """Return image transforms for training or eval."""
+    ensure_tensor = _EnsureTensor()
     if is_training:
         return T.Compose(
             [
+                ensure_tensor,
                 T.Resize((image_size + 32, image_size + 32)),
                 T.RandomCrop((image_size, image_size)),
                 T.RandomHorizontalFlip(),
@@ -52,6 +63,7 @@ def get_image_transforms(image_size: int = 224, is_training: bool = True):
     else:
         return T.Compose(
             [
+                ensure_tensor,
                 T.Resize((image_size, image_size)),
                 T.ConvertImageDtype(torch.float32),
                 T.Normalize(

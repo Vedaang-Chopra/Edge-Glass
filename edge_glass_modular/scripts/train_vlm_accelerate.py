@@ -47,6 +47,7 @@ try:
     from decoders.trm import TRMConfig
     from data.dataset_builder import PixmoQADataset
     from data.transforms import get_image_transforms
+    from evaluation.qa_metrics import compute_bleu, compute_rouge_l, normalize_answer
 except ImportError as e:
     print(f"Error importing local modules: {e}")
     print(f"sys.path: {sys.path}")
@@ -245,6 +246,15 @@ def main():
 
     # 2. Load Qwen Decoder & VLM
     logger.info(f"Loading Qwen Decoder: {config.decoder.model_name}")
+    
+    # For 4-bit/8-bit loading with DDP, we strictly need a device_map.
+    # We map the entire model to the current accelerator device.
+    device_map = None
+    logger.info(f"DEBUG: load_in_4bit={config.decoder.load_in_4bit}, load_in_8bit={config.decoder.load_in_8bit}")
+    if config.decoder.load_in_4bit or config.decoder.load_in_8bit:
+        device_map = {"": accelerator.device}
+        logger.info(f"DEBUG: Setting device_map to {device_map}")
+
     qwen_decoder = QwenDecoder(
         model_name=config.decoder.model_name,
         load_in_8bit=config.decoder.load_in_8bit,
@@ -253,8 +263,11 @@ def main():
         lora_r=config.decoder.lora_r,
         lora_alpha=config.decoder.lora_alpha,
         lora_dropout=config.decoder.lora_dropout,
-        device_map=None # Let Accelerate handle placement
+        device_map=device_map
     )
+    
+    # Debug model structure
+    logger.info(f"DEBUG: QwenDecoder initialized with device_map={device_map}")
     
     vision_token_dim = alignment_config.vision_encoder.projection_dim
     
@@ -348,22 +361,64 @@ def main():
     best_val_loss = float('inf')
     
     # Load checkpoint if resuming
+    # Load checkpoint if resuming
+    if args.resume_from_checkpoint is None:
+        # Auto-detect if we should resume
+        output_path = Path(config.trainer.output_dir)
+        if output_path.exists():
+            # Get all checkpoints sorted by epoch (newest first)
+            all_checkpoints = sorted(output_path.glob("checkpoint-epoch-*"), key=lambda p: int(p.name.split('-')[-1]), reverse=True)
+            
+            for ckpt in all_checkpoints:
+                # Validate checkpoint completeness (check for scheduler.bin as a proxy for successful completion)
+                if (ckpt / "scheduler.bin").exists():
+                    logger.info(f"detected latest VALID checkpoint: {ckpt}")
+                    args.resume_from_checkpoint = str(ckpt)
+                    break
+                else:
+                    logger.warning(f"Skipping incomplete/corrupted checkpoint: {ckpt}")
+
     if args.resume_from_checkpoint:
         if args.resume_from_checkpoint == "latest":
-            # Auto-detect latest checkpoint
-            all_checkpoints = sorted(Path(config.trainer.output_dir).glob("checkpoint-epoch-*"), key=lambda p: int(p.name.split('-')[-1]))
-            if all_checkpoints:
-                args.resume_from_checkpoint = str(all_checkpoints[-1])
-                logger.info(f"Auto-detected latest checkpoint: {args.resume_from_checkpoint}")
-            else:
-                logger.warning("No checkpoints found for 'latest' resume. Starting from scratch.")
+             # This block handles the explicit "latest" flag case, apply same robust logic
+             output_path = Path(config.trainer.output_dir)
+             all_checkpoints = sorted(output_path.glob("checkpoint-epoch-*"), key=lambda p: int(p.name.split('-')[-1]), reverse=True)
+             found = False
+             for ckpt in all_checkpoints:
+                if (ckpt / "scheduler.bin").exists():
+                    args.resume_from_checkpoint = str(ckpt)
+                    logger.info(f"Auto-detected latest VALID checkpoint for 'latest' flag: {args.resume_from_checkpoint}")
+                    found = True
+                    break
+                else:
+                    logger.warning(f"Skipping incomplete checkpoint during 'latest' search: {ckpt}")
+            
+             if not found:
+                logger.warning("No valid checkpoints found for 'latest' resume. Starting from scratch.")
                 args.resume_from_checkpoint = None
 
+    start_epoch = 0
     if args.resume_from_checkpoint:
-        logger.info(f"Resuming from {args.resume_from_checkpoint}")
-        accelerator.load_state(args.resume_from_checkpoint)
+        logger.info(f"Resuming from {args.resume_from_checkpoint} (strict=False)")
+        # DeepSpeed uses 'load_module_strict', standard PyTorch uses 'strict'
+        load_kwargs = {}
+        if accelerator.distributed_type == "DEEPSPEED":
+            load_kwargs["load_module_strict"] = False
+        else:
+            load_kwargs["strict"] = False
+            
+        accelerator.load_state(args.resume_from_checkpoint, **load_kwargs)
+        
+        # Parse epoch from checkpoint name
+        try:
+            ckpt_name = Path(args.resume_from_checkpoint).name
+            if "checkpoint-epoch-" in ckpt_name:
+                start_epoch = int(ckpt_name.split('-')[-1])
+                logger.info(f"Setting start_epoch to {start_epoch}")
+        except ValueError:
+            logger.warning(f"Could not parse epoch from checkpoint name: {args.resume_from_checkpoint}")
 
-    for epoch in range(config.trainer.num_epochs):
+    for epoch in range(start_epoch, config.trainer.num_epochs):
         model.train()
         total_loss = 0
         
@@ -440,6 +495,9 @@ def main():
         # Validation and Save Best
         model.eval()
         val_loss = 0.0
+        val_bleu_total = 0.0
+        val_rouge_total = 0.0
+        val_metrics_count = 0
         num_batches = 0
         logger.info("Running validation...")
         
@@ -452,10 +510,59 @@ def main():
                     vision_tokens=vision_tokens,
                     question_ids=batch['question_ids'],
                     answer_ids=batch['answer_ids'],
-                    answer_mask=batch['answer_mask']
+                     answer_mask=batch['answer_mask']
                  )
                  val_loss += outputs.loss.item()
                  num_batches += 1
+                  
+                 # ---------------------------------------------------------
+                 # Generation Metrics (BLEU/ROUGE) - Run on subset
+                 # ---------------------------------------------------------
+                 # Only run generation on the first few batches of validation to save time
+                 # Step 0 is the first batch
+                 if num_batches <= 5: # Evaluate on first 5 batches * batch_size samples
+                     try:
+                         # We need to unwrap model to access .generate if it's wrapped in DDP
+                         unwrapped_model = accelerator.unwrap_model(model)
+                         
+                         # Access components
+                         if hasattr(unwrapped_model, 'module'): # Handle DDP wrapper nesting
+                             inner_model = unwrapped_model.module
+                         else:
+                             inner_model = unwrapped_model
+                             
+                         # Project vision tokens
+                         prefix_embeds = inner_model.vision_proj(vision_tokens)
+                         
+                         # Generate
+                         generated_ids = inner_model.qwen.generate(
+                             input_ids=batch['question_ids'],
+                             prefix_embeds=prefix_embeds,
+                             attention_mask=None,
+                             max_new_tokens=64,
+                             do_sample=False,
+                         )
+                         
+                         # Decode
+                         generated_text = accelerator.unwrap_model(qwen_decoder).tokenizer.batch_decode(
+                             generated_ids, skip_special_tokens=True
+                         )
+                         
+                         # Targets
+                         target_text = batch['answers']
+                         
+                         # Compute Metrics
+                         for pred, target in zip(generated_text, target_text):
+                             b_score = compute_bleu(pred, target)
+                             r_score = compute_rouge_l(pred, target)
+                             
+                             val_bleu_total += b_score
+                             val_rouge_total += r_score
+                             val_metrics_count += 1
+                             
+                     except Exception as e:
+                         # Use existing logger if available or print
+                         pass
         
         # Average loss across batches
         if num_batches > 0:
@@ -464,16 +571,24 @@ def main():
                 avg_val_perplexity = math.exp(avg_val_loss)
             except OverflowError:
                 avg_val_perplexity = float('inf')
+                
+            # Average metrics
+            avg_val_bleu = val_bleu_total / val_metrics_count if val_metrics_count > 0 else 0.0
+            avg_val_rouge = val_rouge_total / val_metrics_count if val_metrics_count > 0 else 0.0
         else:
             avg_val_loss = float('inf')
             avg_val_perplexity = float('inf')
+            avg_val_bleu = 0.0
+            avg_val_rouge = 0.0
             
         # Log validation loss
         if accelerator.is_main_process:
-            logger.info(f"Epoch {epoch} Validation Loss: {avg_val_loss:.4f} | Perplexity: {avg_val_perplexity:.4f}")
+            logger.info(f"Epoch {epoch} Validation Loss: {avg_val_loss:.4f} | Perplexity: {avg_val_perplexity:.4f} | BLEU: {avg_val_bleu:.2f} | ROUGE: {avg_val_rouge:.2f}")
             accelerator.log({
                 "val_loss": avg_val_loss,
-                "val_perplexity": avg_val_perplexity
+                "val_perplexity": avg_val_perplexity,
+                "val_bleu": avg_val_bleu,
+                "val_rouge": avg_val_rouge
             }, step=global_step)
             
             # Save if best

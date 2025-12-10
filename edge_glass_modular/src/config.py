@@ -5,6 +5,21 @@ from typing import List, Optional, Literal
 import yaml
 from pathlib import Path
 
+@dataclass
+class EmbeddingVizConfig:
+    """Embedding visualization options."""
+
+    method: Literal["pca", "tsne"] = "pca"
+    n_samples: int = 500
+
+
+@dataclass
+class ExplainabilityConfig:
+    """Explainability and visualization configuration."""
+
+    enabled: bool = True
+    embedding_viz: EmbeddingVizConfig = field(default_factory=EmbeddingVizConfig)
+
 
 @dataclass
 class LossConfig:
@@ -313,6 +328,9 @@ class ExperimentConfig:
     # Trainer configuration (dataclass with dict-like access)
     trainer: TrainerConfig = field(default_factory=TrainerConfig)
 
+    # Explainability/visualization options
+    explainability: ExplainabilityConfig = field(default_factory=ExplainabilityConfig)
+
     # Experiment type
     mode: Literal["alignment", "instruction_tuning"] = "alignment"
     use_instruction_tuning: bool = False
@@ -414,6 +432,16 @@ class ExperimentConfig:
         if "losses" in cfg:
             losses_cfg = _filter_fields(cfg["losses"], LossConfig) if cfg["losses"] is not None else {}
             cfg["losses"] = LossConfig(**losses_cfg) if losses_cfg is not None else LossConfig()
+
+        # Explainability configuration
+        expl_section = cfg.get("explainability", {}) or {}
+        if isinstance(expl_section, dict):
+            viz_section = expl_section.get("embedding_viz", {}) or {}
+            expl_kwargs = _filter_fields(expl_section, ExplainabilityConfig)
+            expl_kwargs["embedding_viz"] = EmbeddingVizConfig(**_filter_fields(viz_section, EmbeddingVizConfig))
+            cfg["explainability"] = ExplainabilityConfig(**expl_kwargs)
+        else:
+            cfg["explainability"] = ExplainabilityConfig()
 
         # Training/optimization/trainer configuration with cross-population from a single training block
         training_section = cfg.get("training", {}) or {}

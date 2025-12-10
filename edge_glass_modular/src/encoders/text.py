@@ -130,6 +130,8 @@ class TextEncoder(nn.Module):
         else:
             if isinstance(texts, list):
                 # Encode with Sentence-BERT
+                # Note: SentenceTransformer.encode() uses inference_mode internally,
+                # so we need to clone the output to enable gradient flow through projector
                 with torch.no_grad() if not self.training else torch.enable_grad():
                     pooled_base = self.encoder.encode(
                         texts,
@@ -137,6 +139,8 @@ class TextEncoder(nn.Module):
                         show_progress_bar=False,
                         batch_size=len(texts),
                     )
+                # Clone to exit inference mode and enable autograd
+                pooled_base = pooled_base.clone()
                 sequence_embeddings = None
             elif isinstance(texts, torch.Tensor):
                 pooled_base = texts  # Already tokenized/encoded
@@ -144,6 +148,9 @@ class TextEncoder(nn.Module):
             else:
                 raise TypeError("TextEncoder expects list of strings or tensor embeddings")
 
+        # Ensure tensor is on the correct device
+        pooled_base = pooled_base.to(device)
+        
         # Project
         projected = self.projector(pooled_base)  # (B, projection_dim)
 

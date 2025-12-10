@@ -5,10 +5,10 @@ The following diagram illustrates the two-stage training pipeline for the Edge G
 ```mermaid
 graph LR
     %% Global Styles
-    classDef frozen fill:#f5f5f5,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5,rx:5,ry:5;
-    classDef trainable fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,rx:5,ry:5;
-    classDef input fill:#ffffff,stroke:#333,stroke-width:1px,rx:0,ry:0;
-    classDef module fill:#fff8e1,stroke:#f57f17,stroke-width:2px,rx:5,ry:5;
+    classDef frozen fill:#f5f5f5,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5
+    classDef trainable fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef input fill:#ffffff,stroke:#333,stroke-width:1px
+    classDef module fill:#fff8e1,stroke:#f57f17,stroke-width:2px
 
     %% Stage 1: Alignment (Pre-training)
     subgraph S1 [Stage 1: Vision-Language Alignment]
@@ -24,21 +24,19 @@ graph LR
     %% Stage 2: VLM Tuning (Instruction Tuning)
     subgraph S2 [Stage 2: VLM Instruction Tuning]
         direction TB
-        I2(Image):::input --> VE_F[Vision Encoder<br/>(Frozen S1 Weights)]:::frozen
-        VE_F --> |577 Tokens| VP[Adapter<br/>4096 -> 1536]:::trainable
+        I2(Image):::input --> VE_F[Vision Encoder<br/>Frozen S1 Weights]:::frozen
+        VE_F --> |577 Tokens| VP[Adapter<br/>4096 to 1536]:::trainable
         
         Q(Question):::input --> Tok[Tokenizer]
         Tok --> |Text Emb| LLM_In
-        VP --> |Visual Emb| LLM_In{Concat}
+        VP --> |Visual Emb| LLM_In[Concat]
         
-        LLM_In --> LLM[Qwen2.5-1.5B<br/>(+ LoRA)]:::trainable
+        LLM_In --> LLM[Qwen2.5-1.5B<br/>+ LoRA]:::trainable
         LLM --> A(Answer):::input
     end
 
     %% Cross-stage link
     S1 -.-> |Transfer Weights| S2
-    
-    linkStyle default stroke-width:2px,fill:none,stroke:#666;
 ```
 
 ## Legend
@@ -49,3 +47,5 @@ graph LR
 | **Grey / Dashed Border** | **Frozen** | Parameters are static (loaded from previous stage or base model). |
 | **Orange** | **Loss Module** | Used for optimization objectives (e.g., Contrastive/MRL). |
 | **White** | **Input / Output** | Data elements flowing through the system. |
+
+

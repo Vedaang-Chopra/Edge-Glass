@@ -11,6 +11,30 @@ from .mrl import MatryoshkaProjection
 from .pooling import AttentionPooling, SimpleAttentionPooling
 
 
+class MLPAdapter(nn.Module):
+    """MLP Adapter with LayerNorm and non-linearity."""
+    
+    def __init__(
+        self, 
+        in_dim: int, 
+        out_dim: int, 
+        hidden_factor: float = 2.0,
+        dropout: float = 0.1,
+    ):
+        super().__init__()
+        hidden_dim = int(in_dim * hidden_factor)
+        self.net = nn.Sequential(
+            nn.LayerNorm(in_dim),
+            nn.Linear(in_dim, hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim, out_dim),
+        )
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
+
+
 @dataclass
 class VisionEncoderOutput:
     """Output from vision encoder."""
@@ -83,9 +107,16 @@ class VisionEncoder(nn.Module):
         self.hidden_dim = self.encoder.config.hidden_size
 
         # Projection layer
+        # Projection layer
         if use_perceiver:
             # Project to perceiver latent dim first
-            self.projector = nn.Linear(self.hidden_dim, perceiver_latent_dim)
+            # Use MLP Adapter (matches notebook implementation)
+            self.projector = MLPAdapter(
+                in_dim=self.hidden_dim, 
+                out_dim=perceiver_latent_dim,
+                hidden_factor=2.0,
+                dropout=0.1 # Default per notebook
+            )
             current_dim = perceiver_latent_dim
 
             # Perceiver resampler
@@ -97,7 +128,11 @@ class VisionEncoder(nn.Module):
             )
 
             # Final projection from perceiver to output dim
-            self.final_projector = nn.Linear(perceiver_latent_dim, projection_dim)
+            # Matches AlignmentProjector (LayerNorm + Linear)
+            self.final_projector = nn.Sequential(
+                nn.LayerNorm(perceiver_latent_dim),
+                nn.Linear(perceiver_latent_dim, projection_dim)
+            )
         else:
             # Direct projection
             self.projector = nn.Linear(self.hidden_dim, projection_dim)
@@ -161,12 +196,18 @@ class VisionEncoder(nn.Module):
             sequence = projected[:, 1:, :]  # (B, num_patches, latent_dim)
             latents = self.perceiver(sequence)  # (B, num_latents, latent_dim)
 
-            # Project to final dimension
-            latents = self.final_projector(latents)  # (B, num_latents, projection_dim)
-
             # Pool latents (mean pooling for perceiver)
-            pooled = latents.mean(dim=1)  # (B, projection_dim)
-            sequence_output = latents if return_sequence else None
+            pooled_latents = latents.mean(dim=1)  # (B, latent_dim)
+
+            # Project to final dimension AFTER pooling (matches notebook AlignmentProjector)
+            pooled = self.final_projector(pooled_latents)  # (B, projection_dim)
+            
+            # For sequence output, we need to decide if we project or not. 
+            # If final_projector is (Ln+Linear), we can apply it.
+            # But typically sequence is kept in latent space or projected. 
+            # Notebook doesn't use sequence from Perceiver for alignment, only for LLM.
+            # Let's project it to match pooled dimension.
+            sequence_output = self.final_projector(latents) if return_sequence else None
 
         else:
             # Use attention pooling or CLS token

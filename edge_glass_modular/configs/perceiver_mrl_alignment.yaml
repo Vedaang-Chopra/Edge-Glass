@@ -23,15 +23,15 @@ vision_encoder:
   model_name: openai/clip-vit-large-patch14-336
   freeze: true
   trainable: false
-  projection_dim: 4096  # Top MRL dimension = Qwen hidden size
+  projection_dim: 512  # Matches reference d_align
   use_perceiver: true
   perceiver_num_latents: 64
-  perceiver_latent_dim: 1024
+  perceiver_latent_dim: 512  # Matches reference perceiver_dim
   perceiver_num_layers: 4
   perceiver_num_heads: 8
-  perceiver_dropout: 0.0
+  perceiver_dropout: 0.1
   use_mrl: true
-  mrl_dimensions: [3072, 2048, 1536, 1024, 768, 512]  # MRL dims (excluding top 4096)
+  mrl_dimensions: [256, 128, 64]  # MRL dims (excluding top 512)
   use_attention_pooling: false  # Perceiver handles pooling
   pooling_type: mean
 
@@ -40,9 +40,9 @@ text_encoder:
   model_name: openai/clip-vit-large-patch14-336
   freeze: true
   trainable: false
-  projection_dim: 4096
+  projection_dim: 512
   use_mrl: true
-  mrl_dimensions: [3072, 2048, 1536, 1024, 768, 512]
+  mrl_dimensions: [256, 128, 64]
 
 # Decoder (LLM)
 decoder:
@@ -67,8 +67,8 @@ losses:
 
 # Optimization
 optimization:
-  lr: 0.002
-  learning_rate: 0.002
+  lr: 0.0001
+  learning_rate: 0.0001
   weight_decay: 0.01
   betas: [0.9, 0.95]
   gradient_clip: 1.0
