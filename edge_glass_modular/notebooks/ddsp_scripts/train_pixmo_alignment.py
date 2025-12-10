@@ -541,27 +541,34 @@ def main():
                 logger.info(f"New best model! Saving to {best_ckpt}...")
                 save_start = time.time()
                 
-                unwrapped_model = accelerator.unwrap_model(model)
-                best_checkpoint = {
-                    'model_state_dict': unwrapped_model.state_dict(),
-                    'config': asdict(config),
-                    'mrl_dims': getattr(config.vision_encoder, 'mrl_dimensions', []),
-                    'projection_dim': getattr(config.vision_encoder, 'projection_dim', 4096),
-                    'best_val_loss': best_val_loss,
-                    'epoch': epoch,
-                    'global_step': global_step,
-                    'training_date': datetime.now().isoformat(),
-                }
-                torch.save(best_checkpoint, best_ckpt)
-                
-                logger.info(f"Saved best checkpoint (Loss: {best_val_loss:.4f}). Time: {time.time() - save_start:.2f}s")
+                try:
+                    unwrapped_model = accelerator.unwrap_model(model)
+                    best_checkpoint = {
+                        'model_state_dict': unwrapped_model.state_dict(),
+                        'config': asdict(config),
+                        'mrl_dims': getattr(config.vision_encoder, 'mrl_dimensions', []),
+                        'projection_dim': getattr(config.vision_encoder, 'projection_dim', 4096),
+                        'best_val_loss': best_val_loss,
+                        'epoch': epoch,
+                        'global_step': global_step,
+                        'training_date': datetime.now().isoformat(),
+                    }
+                    torch.save(best_checkpoint, best_ckpt)
+                    logger.info(f"Saved best checkpoint (Loss: {best_val_loss:.4f}). Time: {time.time() - save_start:.2f}s")
+                except Exception as e:
+                    logger.warning(f"Failed to save best checkpoint (disk space?): {e}")
+                    logger.warning("Training will continue. Please clear disk space before next epoch.")
             else:
                 logger.info(f"Validation loss {avg_val_loss:.4f} did not improve from {best_val_loss:.4f}")
         
         # Save epoch checkpoint (full state for resume)
         epoch_ckpt = Path(ckpt_dir) / f"checkpoint-epoch-{epoch+1}"
         logger.info(f"Saving epoch checkpoint to {epoch_ckpt}...")
-        accelerator.save_state(epoch_ckpt)
+        try:
+            accelerator.save_state(epoch_ckpt)
+        except Exception as e:
+            logger.warning(f"Failed to save epoch checkpoint (disk space?): {e}")
+            logger.warning("Training will continue. Please clear disk space before next epoch.")
         
         # Checkpoint rotation: Keep only last 2 epochs, but preserve every 7th
         all_checkpoints = sorted(Path(ckpt_dir).glob("checkpoint-epoch-*"), 
@@ -591,24 +598,30 @@ def main():
         final_ckpt = Path(ckpt_dir) / "checkpoint-final"
         logger.info(f"Saving final checkpoint to {final_ckpt}...")
         save_start = time.time()
-        accelerator.save_state(final_ckpt)
+        try:
+            accelerator.save_state(final_ckpt)
+        except Exception as e:
+            logger.warning(f"Failed to save final state checkpoint (disk space?): {e}")
         
         if accelerator.is_main_process:
             # Also save a lightweight final checkpoint
-            unwrapped_model = accelerator.unwrap_model(model)
-            final_lightweight = {
-                'model_state_dict': unwrapped_model.state_dict(),
-                'config': asdict(config),
-                'mrl_dims': getattr(config.vision_encoder, 'mrl_dimensions', []),
-                'projection_dim': getattr(config.vision_encoder, 'projection_dim', 4096),
-                'best_val_loss': best_val_loss,
-                'num_epochs': num_epochs,
-                'total_steps': global_step,
-                'training_date': datetime.now().isoformat(),
-            }
-            torch.save(final_lightweight, Path(ckpt_dir) / "pixmo_alignment_final.pt")
+            try:
+                unwrapped_model = accelerator.unwrap_model(model)
+                final_lightweight = {
+                    'model_state_dict': unwrapped_model.state_dict(),
+                    'config': asdict(config),
+                    'mrl_dims': getattr(config.vision_encoder, 'mrl_dimensions', []),
+                    'projection_dim': getattr(config.vision_encoder, 'projection_dim', 4096),
+                    'best_val_loss': best_val_loss,
+                    'num_epochs': num_epochs,
+                    'total_steps': global_step,
+                    'training_date': datetime.now().isoformat(),
+                }
+                torch.save(final_lightweight, Path(ckpt_dir) / "pixmo_alignment_final.pt")
+                logger.info(f"Saved final checkpoint. Time: {time.time() - save_start:.2f}s")
+            except Exception as e:
+                logger.warning(f"Failed to save lightweight final checkpoint (disk space?): {e}")
             
-            logger.info(f"Saved final checkpoint. Time: {time.time() - save_start:.2f}s")
             logger.info("=" * 60)
             logger.info("Training Completed!")
             logger.info(f"Best Validation Loss: {best_val_loss:.4f}")

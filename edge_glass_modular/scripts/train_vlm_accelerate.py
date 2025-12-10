@@ -623,27 +623,33 @@ def main():
         logger.info(f"Saving full state checkpoint to {ckpt_dir}...")
         accelerator.save_state(ckpt_dir)
         
-        # Checkpoint rotation: Keep only last 2 epochs to save space
-        # BUT: Preserve checkpoints every 7 epochs (7, 14, 21, etc)
+        # Write epoch progress log (for user tracking)
+        if accelerator.is_main_process:
+            progress_log_path = Path(config.trainer.output_dir) / "training_progress.log"
+            with open(progress_log_path, 'a') as f:
+                import datetime
+                f.write(f"{datetime.datetime.now().isoformat()} | Epoch {epoch+1}/{config.trainer.num_epochs} completed | Val Loss: {avg_val_loss:.4f} | Best: {best_val_loss:.4f}\n")
+            logger.info(f"Epoch progress logged to {progress_log_path}")
+            
+            # Also write a simple state file for easy tracking of last epoch
+            state_file_path = Path(config.trainer.output_dir) / "training_state.txt"
+            with open(state_file_path, 'w') as f:
+                f.write(f"last_epoch: {epoch+1}\n")
+                f.write(f"total_epochs: {config.trainer.num_epochs}\n")
+                f.write(f"best_val_loss: {best_val_loss:.6f}\n")
+                f.write(f"last_val_loss: {avg_val_loss:.6f}\n")
+            logger.info(f"Training state saved to {state_file_path}")
+        
+        # Checkpoint rotation: Keep ONLY BEST and LAST checkpoints to save disk space
+        # checkpoint_best is saved separately, so we just keep the very last epoch checkpoint
         import shutil
         all_checkpoints = sorted(Path(config.trainer.output_dir).glob("checkpoint-epoch-*"), key=lambda p: int(p.name.split('-')[-1]))
         
-        if len(all_checkpoints) > 2:
-            # Candidates for deletion are potentially everything except the last 2
-            candidates_to_delete = all_checkpoints[:-2]
-            
-            for old_ckpt in candidates_to_delete:
-                # Check if this checkpoint should be preserved
-                try:
-                    ckpt_epoch = int(old_ckpt.name.split('-')[-1])
-                    if ckpt_epoch % 7 == 0:
-                        logger.info(f"Preserving checkpoint {old_ckpt} (Epoch {ckpt_epoch} is multiple of 7)")
-                        continue
-                except ValueError:
-                    pass # safe fallback, don't preserve if we can't parse
-                
+        if len(all_checkpoints) > 1:
+            # Delete ALL checkpoints except the very last one (checkpoint_best is separate)
+            for old_ckpt in all_checkpoints[:-1]:
                 if accelerator.is_main_process:
-                    logger.info(f"Deleting old checkpoint {old_ckpt}...")
+                    logger.info(f"Deleting old checkpoint {old_ckpt} to save disk space...")
                     try:
                         shutil.rmtree(old_ckpt)
                     except Exception as e:
