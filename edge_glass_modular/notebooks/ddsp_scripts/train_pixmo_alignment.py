@@ -305,12 +305,21 @@ def main():
         ckpt_path = Path(ckpt_dir)
         if ckpt_path.exists():
             # Get all checkpoints sorted by epoch (newest first)
-            all_checkpoints = sorted(ckpt_path.glob("checkpoint-epoch-*"), 
-                                     key=lambda p: int(p.name.split('-')[-1]), reverse=True)
+            # Handle both directories (old) and .pt files (new)
+            all_checkpoints = sorted(
+                list(ckpt_path.glob("checkpoint-epoch-*")) + list(ckpt_path.glob("checkpoint-epoch-*.pt")), 
+                key=lambda p: int(p.name.replace('.pt', '').split('-')[-1]), 
+                reverse=True
+            )
             
             for ckpt in all_checkpoints:
                 # Validate checkpoint completeness
-                if (ckpt / "scheduler.bin").exists():
+                # For directories, check scheduler.bin. For .pt files, trusted if they exist.
+                if ckpt.is_file() and ckpt.suffix == '.pt':
+                     logger.info(f"Auto-detected latest VALID checkpoint: {ckpt}")
+                     args.resume_from_checkpoint = str(ckpt)
+                     break
+                elif (ckpt / "scheduler.bin").exists():
                     logger.info(f"Auto-detected latest VALID checkpoint: {ckpt}")
                     args.resume_from_checkpoint = str(ckpt)
                     break
@@ -320,11 +329,19 @@ def main():
     if args.resume_from_checkpoint:
         if args.resume_from_checkpoint == "latest":
             ckpt_path = Path(ckpt_dir)
-            all_checkpoints = sorted(ckpt_path.glob("checkpoint-epoch-*"), 
-                                     key=lambda p: int(p.name.split('-')[-1]), reverse=True)
+            all_checkpoints = sorted(
+                list(ckpt_path.glob("checkpoint-epoch-*")) + list(ckpt_path.glob("checkpoint-epoch-*.pt")), 
+                key=lambda p: int(p.name.replace('.pt', '').split('-')[-1]), 
+                reverse=True
+            )
             found = False
             for ckpt in all_checkpoints:
-                if (ckpt / "scheduler.bin").exists():
+                if ckpt.is_file() and ckpt.suffix == '.pt':
+                     args.resume_from_checkpoint = str(ckpt)
+                     logger.info(f"Auto-detected latest VALID checkpoint: {args.resume_from_checkpoint}")
+                     found = True
+                     break
+                elif (ckpt / "scheduler.bin").exists():
                     args.resume_from_checkpoint = str(ckpt)
                     logger.info(f"Auto-detected latest VALID checkpoint: {args.resume_from_checkpoint}")
                     found = True
@@ -335,22 +352,42 @@ def main():
     
     if args.resume_from_checkpoint:
         logger.info(f"Resuming from {args.resume_from_checkpoint}")
-        load_kwargs = {}
-        if accelerator.distributed_type == "DEEPSPEED":
-            load_kwargs["load_module_strict"] = False
-        else:
-            load_kwargs["strict"] = False
-            
-        accelerator.load_state(args.resume_from_checkpoint, **load_kwargs)
         
-        # Parse epoch from checkpoint name
-        try:
-            ckpt_name = Path(args.resume_from_checkpoint).name
-            if "checkpoint-epoch-" in ckpt_name:
-                start_epoch = int(ckpt_name.split('-')[-1])
-                logger.info(f"Resuming from epoch {start_epoch}")
-        except ValueError:
-            logger.warning(f"Could not parse epoch from checkpoint name: {args.resume_from_checkpoint}")
+        # Handle lightweight .pt checkpoints
+        if str(args.resume_from_checkpoint).endswith('.pt'):
+             logger.info("Loading lightweight checkpoint (weights only, optimizer reset)...")
+             checkpoint = torch.load(args.resume_from_checkpoint, map_location='cpu')
+             
+             # Load state dict
+             unwrapped_model = accelerator.unwrap_model(model)
+             # Use strict=False to handle missing keys or LoRA incompatibilities gracefully
+             unwrapped_model.load_state_dict(checkpoint['model_state_dict'], strict=False)
+             logger.info("Model weights loaded.")
+             
+             # Try to restore epoch/best_loss info
+             if 'epoch' in checkpoint:
+                 start_epoch = checkpoint['epoch'] + 1 # Resume from NEXT epoch
+             if 'best_val_loss' in checkpoint:
+                 best_val_loss = checkpoint['best_val_loss']
+        else:
+            # Fallback to Accelerate full load for directories
+            load_kwargs = {}
+            if accelerator.distributed_type == "DEEPSPEED":
+                load_kwargs["load_module_strict"] = False
+            else:
+                load_kwargs["strict"] = False
+                
+            accelerator.load_state(args.resume_from_checkpoint, **load_kwargs)
+        
+        # Parse epoch from checkpoint name if not already set
+        if start_epoch == 0:
+            try:
+                ckpt_name = Path(args.resume_from_checkpoint).name
+                if "checkpoint-epoch-" in ckpt_name:
+                    start_epoch = int(ckpt_name.replace('.pt', '').split('-')[-1])
+                    logger.info(f"Resuming from epoch {start_epoch}")
+            except ValueError:
+                logger.warning(f"Could not parse epoch from checkpoint name: {args.resume_from_checkpoint}")
     
     # 7. Training Loop
     logger.info("Starting training...")
@@ -543,8 +580,17 @@ def main():
                 
                 try:
                     unwrapped_model = accelerator.unwrap_model(model)
+                    
+                    # Create filtered state dict for trainable parameters only
+                    full_state_dict = unwrapped_model.state_dict()
+                    trainable_only_state_dict = {
+                        k: v for k, v in full_state_dict.items() 
+                        if any(p.requires_grad for n, p in unwrapped_model.named_parameters() if n in k)
+                        or 'lora' in k  # Ensure LoRA adapters are saved even if implicit
+                    }
+                    
                     best_checkpoint = {
-                        'model_state_dict': unwrapped_model.state_dict(),
+                        'model_state_dict': trainable_only_state_dict,
                         'config': asdict(config),
                         'mrl_dims': getattr(config.vision_encoder, 'mrl_dimensions', []),
                         'projection_dim': getattr(config.vision_encoder, 'projection_dim', 4096),
@@ -561,25 +607,36 @@ def main():
             else:
                 logger.info(f"Validation loss {avg_val_loss:.4f} did not improve from {best_val_loss:.4f}")
         
-        # Save epoch checkpoint (full state for resume)
-        epoch_ckpt = Path(ckpt_dir) / f"checkpoint-epoch-{epoch+1}"
+        # Save epoch checkpoint (lightweight)
+        epoch_ckpt = Path(ckpt_dir) / f"checkpoint-epoch-{epoch+1}.pt"
         logger.info(f"Saving epoch checkpoint to {epoch_ckpt}...")
         try:
-            accelerator.save_state(epoch_ckpt)
+             # Use same lightweight dict as best_checkpoint
+            epoch_checkpoint = {
+                'model_state_dict': trainable_only_state_dict, # Reusing from best_ckpt logic above
+                'config': asdict(config),
+                'mrl_dims': getattr(config.vision_encoder, 'mrl_dimensions', []),
+                'projection_dim': getattr(config.vision_encoder, 'projection_dim', 4096),
+                'best_val_loss': best_val_loss,
+                'epoch': epoch,
+                'global_step': global_step,
+                'training_date': datetime.now().isoformat(),
+            }
+            torch.save(epoch_checkpoint, epoch_ckpt)
         except Exception as e:
             logger.warning(f"Failed to save epoch checkpoint (disk space?): {e}")
             logger.warning("Training will continue. Please clear disk space before next epoch.")
         
-        # Checkpoint rotation: Keep only last 2 epochs, but preserve every 7th
+        # Checkpoint rotation: Keep only last 1, handle .pt extension
         all_checkpoints = sorted(Path(ckpt_dir).glob("checkpoint-epoch-*"), 
-                                 key=lambda p: int(p.name.split('-')[-1]))
+                                 key=lambda p: int(p.name.replace('.pt', '').split('-')[-1]))
         
-        if len(all_checkpoints) > 2:
-            candidates_to_delete = all_checkpoints[:-2]
+        if len(all_checkpoints) > 1:
+            candidates_to_delete = all_checkpoints[:-1]
             
             for old_ckpt in candidates_to_delete:
                 try:
-                    ckpt_epoch = int(old_ckpt.name.split('-')[-1])
+                    ckpt_epoch = int(old_ckpt.name.replace('.pt', '').split('-')[-1])
                     if ckpt_epoch % 7 == 0:
                         logger.info(f"Preserving checkpoint {old_ckpt} (Epoch {ckpt_epoch} is multiple of 7)")
                         continue
@@ -589,17 +646,40 @@ def main():
                 if accelerator.is_main_process:
                     logger.info(f"Deleting old checkpoint {old_ckpt}...")
                     try:
-                        shutil.rmtree(old_ckpt)
+                        if old_ckpt.is_dir():
+                            shutil.rmtree(old_ckpt)
+                        else:
+                            os.remove(old_ckpt)
                     except Exception as e:
                         logger.warning(f"Failed to delete {old_ckpt}: {e}")
     
     # 9. Final save
     if global_step > 0:
-        final_ckpt = Path(ckpt_dir) / "checkpoint-final"
+        final_ckpt = Path(ckpt_dir) / "checkpoint-final.pt"
         logger.info(f"Saving final checkpoint to {final_ckpt}...")
         save_start = time.time()
         try:
-            accelerator.save_state(final_ckpt)
+             # Re-create dict if needed because scope might differ, or reuse if available (but carefully)
+             # To be safe, re-extract
+             unwrapped_model = accelerator.unwrap_model(model)
+             full_state_dict = unwrapped_model.state_dict()
+             trainable_only_state_dict = {
+                k: v for k, v in full_state_dict.items() 
+                if any(p.requires_grad for n, p in unwrapped_model.named_parameters() if n in k)
+                or 'lora' in k
+             }
+             
+             final_checkpoint = {
+                'model_state_dict': trainable_only_state_dict,
+                'config': asdict(config),
+                'mrl_dims': getattr(config.vision_encoder, 'mrl_dimensions', []),
+                'projection_dim': getattr(config.vision_encoder, 'projection_dim', 4096),
+                'best_val_loss': best_val_loss,
+                'num_epochs': num_epochs,
+                'total_steps': global_step,
+                'training_date': datetime.now().isoformat(),
+            }
+             torch.save(final_checkpoint, final_ckpt)
         except Exception as e:
             logger.warning(f"Failed to save final state checkpoint (disk space?): {e}")
         
