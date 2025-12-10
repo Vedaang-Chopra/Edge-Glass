@@ -25,3 +25,9 @@ code_base/additional_code/other_repo/
 code_base/v2_code_base/wandb/
 
 dataset/
+
+*run-*
+*wandb*
+*.bin
+*.pt
+
