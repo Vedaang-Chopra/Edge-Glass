@@ -73,7 +73,13 @@ class ImprovedMultimodalTrainer:
         distributed_env_ready = "RANK" in os.environ or dist.is_initialized()
         if ddp_requested and distributed_env_ready:
             init_distributed()
-            self.model = DDP(self.model, device_ids=[self.device.index])
+            # Enable find_unused_parameters to avoid DDP hangs when some parameters
+            # are conditionally used (e.g., Perceiver cross-attn blocks).
+            self.model = DDP(
+                self.model,
+                device_ids=[self.device.index],
+                find_unused_parameters=True,
+            )
             self.world_size = dist.get_world_size()
         else:
             if ddp_requested and not distributed_env_ready:
@@ -253,15 +259,24 @@ class ImprovedMultimodalTrainer:
             self.logger.info("No valid checkpoint found. Starting training from scratch.")
             return
 
-        # Load model state
         model_to_load = self.model.module if isinstance(self.model, DDP) else self.model
-        model_to_load.load_state_dict(checkpoint['model_state_dict'])
+        missing_keys, unexpected_keys = model_to_load.load_state_dict(checkpoint['model_state_dict'], strict=False)
+        
+        if missing_keys:
+            self.logger.warning(f"Missing keys in checkpoint: {missing_keys}")
+        if unexpected_keys:
+            self.logger.info(f"Unexpected keys in checkpoint (e.g. decoder when disabled): {len(unexpected_keys)} keys found.")
+            # self.logger.debug(f"Unexpected keys: {unexpected_keys}")
 
         # Load optimizer and scheduler
         if save_optimizer_state and 'optimizer_state_dict' in checkpoint:
-            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-            self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-            self.scaler.load_state_dict(checkpoint['scaler_state_dict'])
+            try:
+                self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+                self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+                self.scaler.load_state_dict(checkpoint['scaler_state_dict'])
+            except ValueError as e:
+                self.logger.warning(f"Failed to load optimizer state (likely due to architecture change/decoder disable): {e}")
+                self.logger.warning("Starting optimizer/scheduler fresh.")
         else:
             self.logger.info("Checkpoint missing optimizer/scheduler/scaler states; starting those fresh.")
 

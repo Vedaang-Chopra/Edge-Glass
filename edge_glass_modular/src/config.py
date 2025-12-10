@@ -96,6 +96,12 @@ class DecoderConfig:
     lora_target_modules: List[str] = field(
         default_factory=lambda: ["q_proj", "k_proj", "v_proj", "o_proj"]
     )
+    # Device placement for HF model loading (None keeps everything on the current process device)
+    device_map: Optional[str] = None
+    
+    # Architecture overrides
+    num_key_value_heads: Optional[int] = None
+    intermediate_size: Optional[int] = None
 
     # TRM specific
     trm_vocab_size: int = 32000
@@ -113,6 +119,12 @@ class DecoderConfig:
     num_inner_steps: Optional[int] = None  # TRM recursion parameters (not currently used)
     num_outer_steps: Optional[int] = None  # TRM recursion parameters (not currently used)
     use_learned_z_init: bool = False
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def get(self, key, default=None):
+        return getattr(self, key, default)
 
 
 @dataclass

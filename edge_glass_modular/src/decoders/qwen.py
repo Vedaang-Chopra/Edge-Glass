@@ -2,19 +2,19 @@
 
 import torch
 import torch.nn as nn
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, AutoConfig
 from peft import LoraConfig, get_peft_model, TaskType
 from typing import Optional, List
 
 
 class QwenDecoder(nn.Module):
     """Qwen LLM decoder with optional LoRA fine-tuning.
-
+    
     Supports:
     - 8-bit/4-bit quantization for memory efficiency
     - LoRA parameter-efficient fine-tuning
     - Multimodal prefix tokens from aligned encoders
-
+    
     Args:
         model_name: HuggingFace model name (e.g., 'Qwen/Qwen2.5-7B-Instruct')
         load_in_8bit: Use 8-bit quantization
@@ -37,7 +37,8 @@ class QwenDecoder(nn.Module):
         lora_alpha: int = 64,
         lora_dropout: float = 0.1,
         lora_target_modules: List[str] = None,
-        device_map: str = "auto",
+        device_map: Optional[str] = None,
+        **kwargs,
     ):
         super().__init__()
 
@@ -58,9 +59,21 @@ class QwenDecoder(nn.Module):
                 load_in_8bit=True,
             )
 
+        # Load config and override
+        config = AutoConfig.from_pretrained(model_name, trust_remote_code=True)
+        print(f"DEBUG: Initial config num_key_value_heads: {getattr(config, 'num_key_value_heads', 'MISSING')}")
+        for k, v in kwargs.items():
+            # Force set num_key_value_heads if provided, as it might be missing in older configs
+            if k == "num_key_value_heads" or hasattr(config, k):
+                if v is not None:
+                    print(f"DEBUG: Overriding config {k} with {v}")
+                    setattr(config, k, v)
+        print(f"DEBUG: Final config num_key_value_heads: {getattr(config, 'num_key_value_heads', 'MISSING')}")
+        
         # Load model
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
+            config=config,
             quantization_config=quantization_config,
             device_map=device_map,
             trust_remote_code=True,
@@ -102,6 +115,7 @@ class QwenDecoder(nn.Module):
         attention_mask: Optional[torch.Tensor] = None,
         prefix_embeds: Optional[torch.Tensor] = None,
         labels: Optional[torch.Tensor] = None,
+        **kwargs,
     ):
         """Forward pass through decoder.
 
@@ -110,9 +124,7 @@ class QwenDecoder(nn.Module):
             attention_mask: Attention mask (batch_size, seq_len)
             prefix_embeds: Optional multimodal prefix embeddings (batch_size, num_prefix, hidden_dim)
             labels: Optional labels for language modeling loss
-
-        Returns:
-            ModelOutput with logits and optional loss
+            **kwargs: Additional arguments passed to the underlying model
         """
         # Get input embeddings
         inputs_embeds = self.model.get_input_embeddings()(input_ids)
@@ -123,6 +135,10 @@ class QwenDecoder(nn.Module):
             batch_size, num_prefix, _ = prefix_embeds.shape
             if prefix_embeds.dtype != embed_dtype:
                 prefix_embeds = prefix_embeds.to(embed_dtype)
+            
+            # Ensure proper device placement for concatenation
+            if prefix_embeds.device != inputs_embeds.device:
+                prefix_embeds = prefix_embeds.to(inputs_embeds.device)
 
             # Concatenate prefix + text embeddings
             inputs_embeds = torch.cat([prefix_embeds, inputs_embeds], dim=1)
@@ -146,7 +162,10 @@ class QwenDecoder(nn.Module):
 
         # Forward through model
         outputs = self.model(
-            inputs_embeds=inputs_embeds, attention_mask=attention_mask, labels=labels
+            inputs_embeds=inputs_embeds,
+            attention_mask=attention_mask,
+            labels=labels,
+            **kwargs,
         )
 
         return outputs
@@ -209,6 +228,10 @@ class QwenDecoder(nn.Module):
                     dtype=torch.long,
                     device=prefix_embeds.device,
                 )
+
+        # Remove duplicate args from kwargs if present
+        kwargs.pop("pad_token_id", None)
+        kwargs.pop("eos_token_id", None)
 
         # Generate
         outputs = self.model.generate(

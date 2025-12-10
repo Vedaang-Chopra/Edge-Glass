@@ -128,6 +128,7 @@ class MultimodalAlignmentModel(nn.Module):
                     lora_alpha=config.decoder.lora_alpha,
                     lora_dropout=config.decoder.lora_dropout,
                     lora_target_modules=config.decoder.lora_target_modules,
+                    device_map=config.decoder.device_map,
                 )
             elif config.decoder.type == "trm":
                 from decoders.trm import TRMConfig
@@ -485,4 +486,3 @@ class MultimodalAlignmentModel(nn.Module):
             return output
 
         return super(MultimodalAlignmentModel, self).to(*args, **kwargs)
-
