@@ -1,9 +1,9 @@
-# TRM-Style VLM Configuration for PixMo QA (Regularized)
-# Combines pretrained aligned vision encoder with TRM recursive decoder
-# MODIFIED: Higher regularization to combat overfitting
+# Baseline (No-TRM) VLM Configuration for PixMo QA (Regularized)
+# Standard Qwen VLM without recursive TRM layers
+# Derived from configs/trm_vlm_qa_qwen2.5-3b_regularized.yaml
 
-name: trm_vlm_qa_3b_reg
-description: Vision-Language Model with TRM decoder for PixMo QA (Qwen 3B) - Regularized
+name: no_trm_vlm_qa_3b_reg
+description: Vision-Language Model Baseline (No TRM) for PixMo QA (Qwen 3B) - Regularized
 seed: 42
 
 # Dataset configuration
@@ -18,9 +18,9 @@ dataset:
   max_question_length: 128
   max_answer_length: 256
   max_total_length: 384
-  text_dropout_prob: 0.2 # INCREASED: 0.1 -> 0.2
+  text_dropout_prob: 0.2
 
-  batch_size: 4  # REDUCED: 8 -> 4 to prevent OOM
+  batch_size: 4  # Optimized for H200
   base_batch_size: 4
   eval_batch_size: 4
   num_workers: 4
@@ -45,7 +45,7 @@ vision_encoder:
   use_attention_pooling: false
   pooling_type: mean
 
-# Text encoder (not used for QA, but included for consistency)
+# Text encoder
 text_encoder:
   model_name: sentence-transformers/all-mpnet-base-v2
   projection_dim: 4096
@@ -55,12 +55,12 @@ text_encoder:
 
 # Decoder configuration
 decoder:
-  type: qwen  # Using Qwen for QA task
+  type: qwen
   model_name: Qwen/Qwen2.5-3B-Instruct
   use_lora: true
   lora_r: 64
   lora_alpha: 128
-  lora_dropout: 0.2 # INCREASED: 0.1 -> 0.2
+  lora_dropout: 0.2
   lora_target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
   load_in_8bit: false
   load_in_4bit: true
@@ -70,24 +70,24 @@ fusion: null
 
 # Loss configuration
 losses:
-  contrastive: 0.0  # No contrastive loss for QA
-  mrl: 0.0          # No MRL loss for QA
+  contrastive: 0.0
+  mrl: 0.0
   sample_single_mrl_dim: false
 
 # Optimization configuration
 optimization:
-  lr: 2.0e-5 # DECREASED: 5e-5 -> 2e-5
+  lr: 2.0e-5
   learning_rate: 2.0e-5
-  weight_decay: 0.2 # INCREASED: 0.1 -> 0.2
+  weight_decay: 0.2
   betas: [0.9, 0.95]
   max_grad_norm: 1.0
   gradient_clip: 1.0
-  grad_accum_steps: 2  # INCREASED: 1 -> 2 to compensate for smaller batch
-  gradient_accumulation_steps: 2
+  grad_accum_steps: 4          # INCREASED: 1 -> 4 to hit effective BS 128 (8*4GPUs*4Accum)
+  gradient_accumulation_steps: 4
   fp16: false
   bf16: true
   mixed_precision: bf16
-  warmup_ratio: 0.1 # INCREASED: 0.05 -> 0.1
+  warmup_ratio: 0.1
   warmup_steps: null
   total_steps: null
   lr_scheduler: cosine
@@ -98,46 +98,46 @@ optimization:
 
 # Trainer configuration
 trainer:
-  epochs: 10
+  epochs: 10             # REDUCED TO 5 EPOCHS for 3-hour limit (safer than 20)
   num_epochs: 10
-  batch_size: 4  # Effective = 4 * 4 GPUs * 2 accum = 32
-  save_every: 4
-
+  batch_size: 8         # SAFE BATCH SIZE (4 was 50%, 8 should be ~90%)
+  save_every: 1         # Save every epoch
+  
   log_every: 1
-  ckpt_dir: ./checkpoints/trm_vlm_qa_3b_reg
-  output_dir: ./outputs/trm_vlm_qa_3b_reg
+  ckpt_dir: ./checkpoints/no_trm_vlm_qa_3b_reg
+  output_dir: ./outputs/no_trm_vlm_qa_3b_reg
   devices: 1
   strategy: ddp
   use_wandb: true
-  wandb_project: edgeglass_final_align
-  wandb_run_name: trm_vlm_qa_3b_reg
-  eval_batch_size: 8
+  wandb_project: edge_glass_trm_vlm
+  wandb_run_name: no_trm_vlm_qa_3b_reg
+  eval_batch_size: 32
   save_optimizer_state: true
   best_weights_only: false
 
 # Training configuration
 training:
-  num_epochs: 20
-  output_dir: ./outputs/trm_vlm_qa_3b_reg
+  num_epochs: 5
+  output_dir: ./outputs/no_trm_vlm_qa_3b_reg
   save_steps: 500
   logging_steps: 20
   eval_steps: 500
   warmup_steps: null
-  gradient_accumulation_steps: 2
-  wandb_project: edgeglass_final_align
-  wandb_run_name: trm_vlm_qa_3b_reg
+  gradient_accumulation_steps: 4
+  wandb_project: edge_glass_trm_vlm
+  wandb_run_name: no_trm_vlm_qa_3b_reg
 
-# Output configuration (for compatibility)
+# Output configuration
 output:
-  checkpoint_dir: ./checkpoints/trm_vlm_qa_3b_reg
-  log_dir: ./logs/trm_vlm_qa_3b_reg
-  output_dir: ./outputs/trm_vlm_qa_3b_reg
+  checkpoint_dir: ./checkpoints/no_trm_vlm_qa_3b_reg
+  log_dir: ./logs/no_trm_vlm_qa_3b_reg
+  output_dir: ./outputs/no_trm_vlm_qa_3b_reg
   save_best_only: true
 
-# Weights & Biases (for compatibility)
+# Weights & Biases
 wandb:
   enabled: true
-  project: edgeglass_final_align
+  project: edge_glass_trm_vlm
   entity: null
-  group: trm_vlm_qa_3b
-  tags: [trm, vlm, pixmo_qa, recursive, qwen3b, regularized]
+  group: no_trm_vlm_qa_3b
+  tags: [baseline, no_trm, vlm, pixmo_qa, qwen3b, regularized]
